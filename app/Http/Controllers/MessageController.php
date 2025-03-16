@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageDeleted;
 use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class MessageController extends Controller
@@ -107,5 +109,42 @@ class MessageController extends Controller
             });
 
         return response()->json($messages);
+    }
+
+    /**
+     * Delete a message
+     *
+     * @param Message $message
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Message $message)
+    {
+        try {
+            // Check if the user is authorized to delete this message
+            if ($message->sender_id !== Auth::id()) {
+                return response()->json(['error' => 'Unauthorized. You can only delete your own messages.'], 403);
+            }
+
+            // If message has an attachment, delete the file from storage
+            if ($message->attachment) {
+                $attachment = json_decode($message->attachment);
+                if (isset($attachment->path) && $attachment->path) {
+                    // Extract the path relative to the storage folder
+                    if (Storage::disk('public')->exists($attachment->path)) {
+                        Storage::disk('public')->delete($attachment->path);
+                    }
+                }
+            }
+
+            // Delete the message
+            $message->delete();
+
+            broadcast(new MessageDeleted($message->id, $message->recipient_id))->toOthers();
+
+            return response()->json(['success' => 'Message deleted successfully']);
+        } catch (\Exception $e) {
+            Log::error('Error deleting message: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

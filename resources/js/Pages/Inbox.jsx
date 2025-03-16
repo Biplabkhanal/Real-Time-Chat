@@ -78,6 +78,24 @@ export default function Inbox({ auth, users }) {
         }
     };
 
+    const deleteMessage = async (messageId) => {
+        if (!confirm("Are you sure you want to delete this message?")) {
+            return;
+        }
+
+        try {
+            await axios.delete(`/message/${messageId}`);
+            // Update messages list after deletion
+            getMessages();
+            toast.success("Message deleted successfully");
+        } catch (error) {
+            console.error("Error deleting message:", error);
+            toast.error(
+                error.response?.data?.error || "Failed to delete message"
+            );
+        }
+    };
+
     const handleKeyDown = (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -100,12 +118,14 @@ export default function Inbox({ auth, users }) {
     }, [currentMessages]);
 
     const connectWebSocket = () => {
-        window.Echo.private(webSocketChannel).listen(
-            "MessageSent",
-            async (e) => {
+        window.Echo.private(webSocketChannel)
+            .listen("MessageSent", async (e) => {
                 await getMessages();
-            }
-        );
+            })
+            .listen("MessageDeleted", (e) => {
+                // Update messages when a message is deleted
+                getMessages();
+            });
     };
 
     useEffect(() => {
@@ -115,7 +135,35 @@ export default function Inbox({ auth, users }) {
         };
     }, []);
 
-    // Format timestamp without using date-fns
+    useEffect(() => {
+        selectedUserRef.current = selectedUser;
+        if (selectedUser) {
+            setMessageInput("");
+            setAttachments([]);
+
+            getMessages();
+            if (inputRef.current) inputRef.current.focus();
+        }
+    }, [selectedUser]);
+
+    const toggleDropdown = (event) => {
+        const dropdown = event.currentTarget.nextElementSibling;
+        dropdown.classList.toggle("hidden");
+
+        const closeDropdown = (e) => {
+            if (
+                !dropdown.contains(e.target) &&
+                e.target !== event.currentTarget
+            ) {
+                dropdown.classList.add("hidden");
+                document.removeEventListener("click", closeDropdown);
+            }
+        };
+        setTimeout(() => {
+            document.addEventListener("click", closeDropdown);
+        }, 10);
+    };
+
     const formatMessageTime = (timestamp) => {
         if (!timestamp) return "";
 
@@ -329,6 +377,58 @@ export default function Inbox({ auth, users }) {
                                                         : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-r-lg rounded-bl-lg border border-gray-200 dark:border-gray-700"
                                                 } p-4 shadow`}
                                             >
+                                                {isCurrentUser && (
+                                                    <div className="absolute top-1 right-1">
+                                                        <div className="dropdown inline-block relative">
+                                                            <button
+                                                                className="p-1 text-blue-200 hover:text-white transition-colors"
+                                                                title="Message options"
+                                                                onClick={
+                                                                    toggleDropdown
+                                                                }
+                                                            >
+                                                                <svg
+                                                                    className="w-4 h-4"
+                                                                    fill="none"
+                                                                    stroke="currentColor"
+                                                                    viewBox="0 0 24 24"
+                                                                >
+                                                                    <path
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        strokeWidth="2"
+                                                                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                                                                    />
+                                                                </svg>
+                                                            </button>
+                                                            <div className="dropdown-menu hidden absolute right-0 bg-white dark:bg-gray-800 rounded shadow-lg z-10 border border-gray-200 dark:border-gray-700">
+                                                                <button
+                                                                    onClick={() =>
+                                                                        deleteMessage(
+                                                                            message.id
+                                                                        )
+                                                                    }
+                                                                    className="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
+                                                                >
+                                                                    <svg
+                                                                        className="w-4 h-4 mr-2"
+                                                                        fill="none"
+                                                                        stroke="currentColor"
+                                                                        viewBox="0 0 24 24"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            strokeWidth="2"
+                                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                                        />
+                                                                    </svg>
+                                                                    Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                                 <p className="break-words">
                                                     {message.message}
                                                 </p>
@@ -426,7 +526,7 @@ export default function Inbox({ auth, users }) {
 
                                 {/* Attachments preview */}
                                 {attachments.length > 0 && (
-                                    <div className="bg-gray-100 dark:bg-gray-700 p-2 rounded mb-2">
+                                    <div className="bg-gray-100 dark:bg-gray-700 p-2 rounded mb-2 mr-[3.6rem]">
                                         <div className="flex flex-wrap gap-2">
                                             {attachments.map(
                                                 (attachment, index) => (
