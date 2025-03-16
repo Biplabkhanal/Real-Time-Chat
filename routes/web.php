@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -27,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/inbox', [MessageController::class, 'inbox'])->name('inbox');
     Route::post('/message/{user}', [MessageController::class, 'store'])->name('message.store');
     Route::get('/message/{user}', [MessageController::class, 'show'])->name('message.show');
+    Route::post('/upload-file', [FileUploadController::class, 'upload'])->name('upload.file');
 });
 
 require __DIR__ . '/auth.php';
