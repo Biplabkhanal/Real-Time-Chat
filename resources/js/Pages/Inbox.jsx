@@ -18,6 +18,7 @@ export default function Inbox({ auth, users }) {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [messageToDelete, setMessageToDelete] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState({});
+    const [lastSeen, setLastSeen] = useState({});
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -168,7 +169,15 @@ export default function Inbox({ auth, users }) {
                 }),
                 {}
             );
+            const lastSeenTimes = response.data.reduce(
+                (acc, user) => ({
+                    ...acc,
+                    [user.id]: user.last_seen_at,
+                }),
+                {}
+            );
             setOnlineUsers(users);
+            setLastSeen(lastSeenTimes);
         } catch (error) {
             console.error("Failed to fetch online status:", error);
         }
@@ -336,8 +345,13 @@ export default function Inbox({ auth, users }) {
                                                }`}
                                 >
                                     {/* User avatar with first letter of name */}
-                                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold">
-                                        {user.name.charAt(0).toUpperCase()}
+                                    <div className="relative">
+                                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold">
+                                            {user.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        {onlineUsers[user.id] && (
+                                            <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-800"></div>
+                                        )}
                                     </div>
                                     <div className="ml-4 flex-1">
                                         <div className="font-medium text-gray-900 dark:text-white">
@@ -383,23 +397,43 @@ export default function Inbox({ auth, users }) {
                         <>
                             {/* Chat Header */}
                             <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 text-white font-semibold">
-                                    {selectedUser.name.charAt(0).toUpperCase()}
+                                <div className="relative">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 text-white font-semibold">
+                                        {selectedUser.name
+                                            .charAt(0)
+                                            .toUpperCase()}
+                                    </div>
+                                    {onlineUsers[selectedUser.id] && (
+                                        <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-800"></div>
+                                    )}
                                 </div>
                                 <div className="ml-4 flex-1">
                                     <div className="font-bold text-gray-900 dark:text-white">
                                         {selectedUser.name}
                                     </div>
-                                    <div
-                                        className={`text-xs ${
-                                            onlineUsers[selectedUser.id]
-                                                ? "text-green-500"
-                                                : "text-gray-500"
-                                        }`}
-                                    >
-                                        {onlineUsers[selectedUser.id]
-                                            ? "Online"
-                                            : "Offline"}
+                                    <div className="text-xs">
+                                        {onlineUsers[selectedUser.id] ? (
+                                            <span className="text-green-500">
+                                                Online
+                                            </span>
+                                        ) : (
+                                            <div>
+                                                <span className="text-gray-500">
+                                                    Offline
+                                                </span>
+                                                <br />
+                                                {lastSeen[selectedUser.id] && (
+                                                    <span className="text-gray-400">
+                                                        Last seen:{" "}
+                                                        {new Date(
+                                                            lastSeen[
+                                                                selectedUser.id
+                                                            ]
+                                                        ).toLocaleString()}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
