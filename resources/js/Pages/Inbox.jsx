@@ -122,7 +122,7 @@ export default function Inbox({ auth, users }) {
     }, []);
 
     useEffect(() => {
-        fetchOnlineStatus();
+        // fetchOnlineStatus();
         updateMyStatus();
 
         // Setup Echo listener
@@ -183,8 +183,18 @@ export default function Inbox({ auth, users }) {
         }
     };
 
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            fetchOnlineStatus();
+        }, 15000);
+
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
+
     const updateMyStatus = async () => {
-        if (!auth.user) return; // Don't update if not logged in
+        if (!auth.user) return;
 
         try {
             await axios.post("/users/status/update");
