@@ -3,6 +3,7 @@
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserStatusController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,6 +31,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/message/{user}', [MessageController::class, 'show'])->name('message.show');
     Route::delete('/message/{message}', [MessageController::class, 'destroy'])->name('message.destroy');
     Route::post('/upload-file', [FileUploadController::class, 'upload'])->name('upload.file');
+
+    Route::get('/users/status', [UserStatusController::class, 'getOnlineUsers']);
+    Route::post('/users/status/update', [UserStatusController::class, 'updateStatus']);
 });
 
 require __DIR__ . '/auth.php';

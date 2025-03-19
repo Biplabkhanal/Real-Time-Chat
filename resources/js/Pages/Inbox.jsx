@@ -17,6 +17,7 @@ export default function Inbox({ auth, users }) {
     const [attachments, setAttachments] = useState([]);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [messageToDelete, setMessageToDelete] = useState(null);
+    const [onlineUsers, setOnlineUsers] = useState({});
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -118,6 +119,70 @@ export default function Inbox({ auth, users }) {
             window.Echo.leave(webSocketChannel);
         };
     }, []);
+
+    useEffect(() => {
+        fetchOnlineStatus();
+        updateMyStatus();
+
+        // Setup Echo listener
+        const channel = window.Echo.channel("users");
+        channel.listen("UserStatusChanged", (e) => {
+            setOnlineUsers((prev) => ({
+                ...prev,
+                [e.user.id]: e.user.is_online,
+            }));
+        });
+
+        // Periodic status update
+        const statusInterval = setInterval(updateMyStatus, 30000);
+
+        // Cleanup
+        return () => {
+            clearInterval(statusInterval);
+            channel.stopListening("UserStatusChanged");
+            window.Echo.leave("users");
+        };
+    }, []);
+
+    // Add beforeunload handler
+    useEffect(() => {
+        const handleUnload = async () => {
+            try {
+                await axios.post("/logout");
+            } catch (error) {
+                console.error("Logout failed:", error);
+            }
+        };
+
+        window.addEventListener("beforeunload", handleUnload);
+        return () => window.removeEventListener("beforeunload", handleUnload);
+    }, []);
+
+    const fetchOnlineStatus = async () => {
+        try {
+            const response = await axios.get("/users/status");
+            const users = response.data.reduce(
+                (acc, user) => ({
+                    ...acc,
+                    [user.id]: user.is_online,
+                }),
+                {}
+            );
+            setOnlineUsers(users);
+        } catch (error) {
+            console.error("Failed to fetch online status:", error);
+        }
+    };
+
+    const updateMyStatus = async () => {
+        if (!auth.user) return; // Don't update if not logged in
+
+        try {
+            await axios.post("/users/status/update");
+        } catch (error) {
+            console.error("Status update failed:", error);
+        }
+    };
 
     useEffect(() => {
         selectedUserRef.current = selectedUser;
@@ -325,9 +390,17 @@ export default function Inbox({ auth, users }) {
                                     <div className="font-bold text-gray-900 dark:text-white">
                                         {selectedUser.name}
                                     </div>
-                                    {/* <div className="text-xs text-green-500">
-                                        Online
-                                    </div> */}
+                                    <div
+                                        className={`text-xs ${
+                                            onlineUsers[selectedUser.id]
+                                                ? "text-green-500"
+                                                : "text-gray-500"
+                                        }`}
+                                    >
+                                        {onlineUsers[selectedUser.id]
+                                            ? "Online"
+                                            : "Offline"}
+                                    </div>
                                 </div>
                             </div>
 

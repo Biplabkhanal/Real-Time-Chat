@@ -1,8 +1,0 @@
-[build]
-  command = "npm run build && php artisan migrate --force"
-  publish = "public"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.php"
-  status = 200

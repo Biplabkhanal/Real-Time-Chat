@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\UserStatusChanged;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +42,17 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        // Update status before logout
+        $user->update([
+            'is_online' => false,
+            'last_seen_at' => now()
+        ]);
+
+        // Broadcast status change
+        broadcast(new UserStatusChanged($user))->toOthers();
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
