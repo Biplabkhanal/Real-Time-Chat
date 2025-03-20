@@ -49,4 +49,19 @@ class User extends Authenticatable
             'last_seen_at' => 'datetime',
         ];
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_id')
+            ->orWhere('recipient_id', $this->id);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            $user->messages()->delete();
+        });
+    }
 }
