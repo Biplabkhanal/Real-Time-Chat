@@ -3,10 +3,10 @@ import { Link } from "@inertiajs/react";
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
-            <div>
+        <div className="min-h-screen flex flex-col items-center pt-6 sm:justify-center sm:pt-0 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 bg-dots-darker dark:bg-dots-lighter">
+            <div className="transform hover:scale-105 transition-transform duration-200">
                 <Link href="/">
-                    <div className="text-xl font-bold text-blue-600 dark:text-blue-400 flex items-center">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 flex items-center">
                         <svg
                             className="h-8 w-8 mr-2"
                             fill="currentColor"
@@ -24,7 +24,7 @@ export default function GuestLayout({ children }) {
                 </Link>
             </div>
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
+            <div className="mt-6 w-full overflow-hidden px-6 py-4 shadow-2xl sm:max-w-md sm:rounded-lg">
                 {children}
             </div>
         </div>
