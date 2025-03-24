@@ -2,7 +2,7 @@ import React from "react";
 import TextArea from "./TextArea";
 import EmojiButton from "./EmojiButton";
 import FileUploadButton from "./FileUploadButton";
-import SendButton from "./SendButton";
+import SendButton from "../icons/SendButton";
 
 const MessageInput = ({
     inputRef,

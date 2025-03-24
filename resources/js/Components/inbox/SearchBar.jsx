@@ -2,11 +2,11 @@ import React from "react";
 
 const SearchBar = ({ searchInput, setSearchInput }) => {
     return (
-        <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+        <div className=" border-gray-200 dark:border-gray-700">
             <div className="relative">
                 <input
                     type="text"
-                    placeholder="Search contacts..."
+                    placeholder="Search ..."
                     className="w-full p-2 pl-8 border border-gray-300 dark:border-gray-600 rounded-lg
                                bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white
                                focus:outline-none focus:ring-2 focus:ring-blue-500"

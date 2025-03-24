@@ -1,14 +1,12 @@
 import ChatHeader from "@/Components/inbox/ChatHeader";
-import {
-    useFilterUsers,
-    useMessageHandler,
-} from "@/Components/inbox/customHooks/customHooks,";
+import { useMessageHandler } from "@/Components/inbox/customHooks/customHooks,";
 import EmptyChatState from "@/Components/inbox/EmptyChatState";
+import AddButton from "@/Components/inbox/icons/AddButton";
 import AttachmentPreview from "@/Components/inbox/Messages/AttachmentPreview";
 import ChatMessages from "@/Components/inbox/Messages/ChatMessages";
 import MessageInput from "@/Components/inbox/Messages/MessageInput";
-import SearchBar from "@/Components/inbox/SearchBar";
 import UserList from "@/Components/inbox/UserList";
+import UserModal from "@/Components/inbox/UserModal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import axios from "axios";
@@ -19,10 +17,10 @@ export default function Inbox({ auth, users }) {
     const webSocketChannel = `message.${auth.user.id}`;
 
     const [selectedUser, setSelectedUser] = useState(null);
-    const [searchInput, setSearchInput] = useState("");
     const [filteredUsers, setFilteredUsers] = useState(users);
     const [onlineUsers, setOnlineUsers] = useState({});
     const [lastSeen, setLastSeen] = useState({});
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -39,9 +37,6 @@ export default function Inbox({ auth, users }) {
         handleKeyDown,
         getMessages,
     } = useMessageHandler(selectedUserRef, inputRef);
-
-    // Filter users based on search input
-    useFilterUsers(searchInput, users, setFilteredUsers);
 
     const scrollToBottom = () => {
         if (targetScrollRef.current) {
@@ -180,6 +175,10 @@ export default function Inbox({ auth, users }) {
         };
     }, []);
 
+    const handleUserSelect = (user) => {
+        setSelectedUser(user);
+    };
+
     return (
         <AuthenticatedLayout>
             <Head title="ChatSync - Inbox" />
@@ -188,17 +187,22 @@ export default function Inbox({ auth, users }) {
                 {/* Sidebar */}
                 <div className="w-1/4 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
                     <div className="p-4 bg-gray-50 dark:bg-gray-900 font-bold text-lg border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                        <h2 className="text-gray-800 dark:text-white">Chats</h2>
-                        <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                            {filteredUsers.length}
-                        </span>
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-gray-800 dark:text-white">
+                                Chats
+                            </h2>
+                            <span className="bg-blue-500 text-white text-xs px-1 py-0 rounded-full">
+                                {filteredUsers.length}
+                            </span>
+                        </div>
+                        <AddButton onClick={() => setIsModalOpen(true)} />
+                        <UserModal
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                            users={filteredUsers}
+                            onSelect={handleUserSelect}
+                        />
                     </div>
-
-                    {/* Search bar */}
-                    <SearchBar
-                        searchInput={searchInput}
-                        setSearchInput={setSearchInput}
-                    />
 
                     {/* Contact List */}
                     <UserList

@@ -1,4 +1,4 @@
-import AttachmentIcon from "./AttachmentIcon";
+import AttachmentIcon from "../icons/AttachmentIcon";
 import { useFileUpload } from "./useFileUpload";
 
 const FileUploadButton = ({ onFileSelect, existingAttachments }) => {
