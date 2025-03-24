@@ -15,14 +15,14 @@ const MessageInput = ({
     sendMessage,
 }) => (
     <div className="flex items-center">
-        <div className="flex-1 relative">
+        <div className="flex-1 relative flex items-center">
             <TextArea
                 inputRef={inputRef}
                 value={messageInput}
                 onChange={setMessageInput}
                 onKeyDown={handleKeyDown}
             />
-            <div className="absolute right-3 bottom-3 flex space-x-1">
+            <div className="absolute right-3 flex space-x-1 items-center h-full">
                 <EmojiButton />
                 <FileUploadButton
                     onFileSelect={setAttachments}

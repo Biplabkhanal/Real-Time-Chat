@@ -14,10 +14,10 @@ const MessageAttachment = ({ attachment }) => (
             <a
                 href={attachment.url}
                 target="_blank"
-                className="flex items-center text-sm hover:underline text-blue-300"
+                className="inline-flex flex-col items-center bg-gray-700/50 rounded-lg p-3 hover:bg-gray-700/70 transition-colors"
             >
                 <svg
-                    className="w-4 h-4 mr-1"
+                    className="w-8 h-8 text-blue-400 mb-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -26,10 +26,12 @@ const MessageAttachment = ({ attachment }) => (
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
-                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                 </svg>
-                {attachment.name}
+                <span className="text-sm text-white truncate max-w-[120px]">
+                    {attachment.name}
+                </span>
             </a>
         )}
     </div>
