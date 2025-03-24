@@ -35,7 +35,7 @@ const UserListItemModal = ({
                 )}
             </div>
             <div className="ml-4 flex-1">
-                <div className="font-medium text-gray-900 dark:text-white">
+                <div className="text-sm text-gray-900 dark:text-white ">
                     {user.name}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
