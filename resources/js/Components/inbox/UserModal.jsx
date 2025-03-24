@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import { useFilterUsers } from "./customHooks/customHooks,";
+import UserListItemModal from "./UserListItemModal";
 
-const UserModal = ({ isOpen, onClose, users, onSelect }) => {
+const UserModal = ({ isOpen, onClose, users, onSelect, onlineUsers }) => {
     const [searchInput, setSearchInput] = useState("");
     const [filteredUsers, setFilteredUsers] = useState(users);
 
@@ -47,29 +48,13 @@ const UserModal = ({ isOpen, onClose, users, onSelect }) => {
                 <div className="p-2 overflow-y-auto h-[300px]">
                     {filteredUsers.length > 0 ? (
                         filteredUsers.map((user) => (
-                            <button
+                            <UserListItemModal
                                 key={user.id}
-                                onClick={() => {
-                                    onSelect(user);
-                                    onClose();
-                                }}
-                                className="w-full p-3 flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
-                            >
-                                <div className="relative">
-                                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white  ">
-                                        {user.name[0].toUpperCase()}
-                                    </div>
-                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
-                                </div>
-                                <div className="flex-1 text-left">
-                                    <div className="text-sm dark:text-white">
-                                        {user.name}
-                                    </div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                                        Online
-                                    </div>
-                                </div>
-                            </button>
+                                user={user}
+                                onSelect={onSelect}
+                                onClose={onClose}
+                                isOnline={onlineUsers[user.id]}
+                            />
                         ))
                     ) : (
                         <div className="h-full flex items-center justify-center">

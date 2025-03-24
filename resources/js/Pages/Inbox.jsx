@@ -201,6 +201,7 @@ export default function Inbox({ auth, users }) {
                             onClose={() => setIsModalOpen(false)}
                             users={filteredUsers}
                             onSelect={handleUserSelect}
+                            onlineUsers={onlineUsers}
                         />
                     </div>
 

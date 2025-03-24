@@ -49,6 +49,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_online' => 'boolean',
             'last_seen_at' => 'datetime',
+            'joined_at' => 'datetime',
         ];
     }
 
@@ -64,6 +65,10 @@ class User extends Authenticatable
 
         static::deleting(function ($user) {
             $user->messages()->delete();
+        });
+
+        static::creating(function ($user) {
+            $user->joined_at = now();
         });
     }
 

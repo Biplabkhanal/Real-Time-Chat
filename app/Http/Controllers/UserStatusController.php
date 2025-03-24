@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\UserStatusChanged;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
 
 class UserStatusController extends Controller
 {
