@@ -23,7 +23,6 @@ class MessageController extends Controller
     public function store(Request $request, User $user)
     {
         try {
-            // Handle multiple attachments
             if ($request->has('attachments') && is_array($request->attachments) && count($request->attachments) > 0) {
                 $sentMessages = [];
 
@@ -42,8 +41,6 @@ class MessageController extends Controller
 
                 // Broadcast the first message
                 broadcast(new MessageSent($firstMessage, Auth::user()))->toOthers();
-
-                // For additional attachments, create separate messages (without text content)
                 if (count($request->attachments) > 1) {
                     for ($i = 1; $i < count($request->attachments); $i++) {
                         $additionalMessage = new Message;
@@ -55,20 +52,18 @@ class MessageController extends Controller
 
                         $sentMessages[] = $additionalMessage;
 
-                        // Optional: broadcast each additional message if needed
                         broadcast(new MessageSent($additionalMessage, Auth::user()))->toOthers();
                     }
                 }
 
                 return response()->json($sentMessages);
             } else {
-                // Single message with no attachments or a single attachment
+
                 $message = new Message;
                 $message->sender_id = Auth::user()->id;
                 $message->recipient_id = $user->id;
                 $message->message = $request->message ?? '';
 
-                // Handle single attachment if present
                 if ($request->has('attachment') && $request->attachment) {
                     $message->attachment = json_encode($request->attachment);
                 }
@@ -101,7 +96,6 @@ class MessageController extends Controller
             ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($message) {
-                // Convert attachment JSON string back to object if present
                 if ($message->attachment) {
                     $message->attachment = json_decode($message->attachment);
                 }
@@ -125,11 +119,9 @@ class MessageController extends Controller
                 return response()->json(['error' => 'Unauthorized. You can only delete your own messages.'], 403);
             }
 
-            // If message has an attachment, delete the file from storage
             if ($message->attachment) {
                 $attachment = json_decode($message->attachment);
                 if (isset($attachment->path) && $attachment->path) {
-                    // Extract the path relative to the storage folder
                     if (Storage::disk('public')->exists($attachment->path)) {
                         Storage::disk('public')->delete($attachment->path);
                     }

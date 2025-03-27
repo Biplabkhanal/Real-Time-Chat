@@ -19,13 +19,20 @@ const UserListItem = ({ user, selectedUser, setSelectedUser, isOnline }) => {
                     <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-800"></div>
                 )}
             </div>
-            <div className="ml-4 flex-1">
-                <div className="font-medium text-gray-900 dark:text-white">
-                    {user.name}
+            <div className="ml-4 flex-1 flex justify-between items-center">
+                <div>
+                    <div className="font-medium text-gray-900 dark:text-white">
+                        {user.name}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {user.email}
+                    </div>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {user.email}
-                </div>
+                {/* {unreadCount > 0 && (
+                    <div className="min-w-[1.5rem] h-6 flex items-center justify-center bg-blue-500 text-white text-xs font-medium rounded-full px-2">
+                        {unreadCount}
+                    </div>
+                )} */}
             </div>
         </div>
     );

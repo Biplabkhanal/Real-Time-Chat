@@ -21,6 +21,7 @@ export default function Inbox({ auth, users }) {
     const [onlineUsers, setOnlineUsers] = useState({});
     const [lastSeen, setLastSeen] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [unreadCounts, setUnreadCounts] = useState({});
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -179,8 +180,22 @@ export default function Inbox({ auth, users }) {
         setSelectedUser(user);
     };
 
+    useEffect(() => {
+        const fetchUnreadCounts = async () => {
+            try {
+                const response = await axios.get("/messages/unread-count");
+                setUnreadCounts(response.data);
+            } catch (error) {
+                console.error("Error fetching unread counts:", error);
+                toast.error("Failed to fetch unread message counts");
+            }
+        };
+
+        fetchUnreadCounts();
+    }, [currentMessages]);
+
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout user={auth.user}>
             <Head title="ChatSync - Inbox" />
 
             <div className="h-[calc(100vh-64px)] flex bg-gray-100 dark:bg-gray-900 overflow-hidden">
@@ -211,6 +226,7 @@ export default function Inbox({ auth, users }) {
                         selectedUser={selectedUser}
                         setSelectedUser={setSelectedUser}
                         onlineUsers={onlineUsers}
+                        unreadCounts={unreadCounts}
                     />
                 </div>
 

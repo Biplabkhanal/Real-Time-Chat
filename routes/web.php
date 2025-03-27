@@ -30,6 +30,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/message/{user}', [MessageController::class, 'store'])->name('message.store');
     Route::get('/message/{user}', [MessageController::class, 'show'])->name('message.show');
     Route::delete('/message/{message}', [MessageController::class, 'destroy'])->name('message.destroy');
+
+
+
     Route::post('/upload-file', [FileUploadController::class, 'upload'])->name('upload.file');
 
     Route::get('/users/status', [UserStatusController::class, 'getOnlineUsers']);
