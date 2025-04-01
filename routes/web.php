@@ -3,7 +3,9 @@
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserStatusController;
+use App\Models\Review;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,6 +16,7 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'reviews' => Review::with('user')->latest()->get()
     ]);
 });
 
@@ -31,12 +34,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/message/{user}', [MessageController::class, 'show'])->name('message.show');
     Route::delete('/message/{message}', [MessageController::class, 'destroy'])->name('message.destroy');
 
-
-
     Route::post('/upload-file', [FileUploadController::class, 'upload'])->name('upload.file');
 
     Route::get('/users/status', [UserStatusController::class, 'getOnlineUsers']);
     Route::post('/users/status/update', [UserStatusController::class, 'updateStatus']);
+
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 });
 
 require __DIR__ . '/auth.php';

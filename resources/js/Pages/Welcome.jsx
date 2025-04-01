@@ -1,8 +1,17 @@
 import Dropdown from "@/Components/Dropdown";
+import ReviewForm from "@/Components/ReviewForm";
 import { Head, Link, usePage } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
+export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
     const user = usePage().props.auth.user;
+    const [reviewData, setReviewData] = useState(reviews || []);
+    useEffect(() => {
+        if (reviews) {
+            setReviewData(reviews);
+        }
+    }, [reviews]);
+
     return (
         <>
             <Head title="ChatSync - Real-Time Chat App" />
@@ -413,128 +422,80 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                             {/* Testimonials */}
                             <div className="mt-24 bg-gray-50 dark:bg-gray-900 py-16 px-4 sm:px-6 lg:px-8 rounded-2xl">
-                                <div className="max-w-4xl mx-auto text-center">
-                                    <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                                        Loved by users everywhere
-                                    </h2>
-                                    <p className="mt-3 text-xl text-gray-500 dark:text-gray-400 sm:mt-4">
-                                        Join thousands of satisfied users who've
-                                        transformed how they communicate
-                                    </p>
-                                </div>
-
-                                <div className="mt-12 grid gap-8 lg:grid-cols-3">
-                                    {/* Testimonial 1 */}
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                        <div className="flex items-center mb-4">
-                                            <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-                                            <div className="ml-4">
-                                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                                    Sarah Johnson
-                                                </h3>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    Marketing Manager
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <p className="text-gray-600 dark:text-gray-300">
-                                            "ChatSync has revolutionized how our
-                                            team communicates. The real-time
-                                            messaging makes collaboration
-                                            seamless, and the interface is
-                                            incredibly intuitive."
+                                <div className="max-w-4xl mx-auto">
+                                    <div className="text-center mb-12">
+                                        <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+                                            What Our Users Say
+                                        </h2>
+                                        <p className="mt-3 text-xl text-gray-500 dark:text-gray-400">
+                                            Read reviews from real ChatSync
+                                            users
                                         </p>
-                                        <div className="mt-4 flex text-yellow-400">
-                                            {[...Array(5)].map((_, i) => (
-                                                <svg
-                                                    key={i}
-                                                    className="h-5 w-5"
-                                                    fill="currentColor"
-                                                    viewBox="0 0 20 20"
-                                                >
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            ))}
-                                        </div>
                                     </div>
 
-                                    {/* Testimonial 2 */}
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                        <div className="flex items-center mb-4">
-                                            <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-                                            <div className="ml-4">
-                                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                                    Michael Chen
-                                                </h3>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    Software Developer
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <p className="text-gray-600 dark:text-gray-300">
-                                            "The security features in ChatSync
-                                            give me peace of mind when
-                                            discussing sensitive project
-                                            details. Plus, it's blazing fast
-                                            with no lag even in group
-                                            conversations."
-                                        </p>
-                                        <div className="mt-4 flex text-yellow-400">
-                                            {[...Array(5)].map((_, i) => (
-                                                <svg
-                                                    key={i}
-                                                    className="h-5 w-5"
-                                                    fill="currentColor"
-                                                    viewBox="0 0 20 20"
+                                    <div className="grid gap-8 lg:grid-cols-3">
+                                        {reviewData &&
+                                            reviewData.map((review) => (
+                                                <div
+                                                    key={review.id}
+                                                    className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8"
                                                 >
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
+                                                    <div className="flex items-center mb-4">
+                                                        <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700">
+                                                            {/* Add user avatar if available */}
+                                                        </div>
+                                                        <div className="ml-4">
+                                                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                                                {
+                                                                    review.user
+                                                                        .name
+                                                                }
+                                                            </h3>
+                                                            <div className="flex text-yellow-400">
+                                                                {[
+                                                                    ...Array(5),
+                                                                ].map(
+                                                                    (_, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="text-lg"
+                                                                        >
+                                                                            {i <
+                                                                            review.rating
+                                                                                ? "★"
+                                                                                : "☆"}
+                                                                        </span>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-gray-600 dark:text-gray-300">
+                                                        {review.content}
+                                                    </p>
+                                                    <div className="mt-4 text-sm text-gray-500">
+                                                        {new Date(
+                                                            review.created_at
+                                                        ).toLocaleDateString()}
+                                                    </div>
+                                                </div>
                                             ))}
-                                        </div>
                                     </div>
+                                    {auth.user && (
+                                        <div className="mt-12 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                                            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                                                Share Your Experience
+                                            </h3>
+                                            <ReviewForm />
+                                        </div>
+                                    )}
 
-                                    {/* Testimonial 3 */}
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                        <div className="flex items-center mb-4">
-                                            <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-                                            <div className="ml-4">
-                                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                                    Alex Rodriguez
-                                                </h3>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    Small Business Owner
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <p className="text-gray-600 dark:text-gray-300">
-                                            "As someone managing teams remotely,
-                                            ChatSync has been a game-changer.
-                                            The group chat functionality keeps
-                                            everyone connected and on the same
-                                            page."
-                                        </p>
-                                        <div className="mt-4 flex text-yellow-400">
-                                            {[...Array(5)].map((_, i) => (
-                                                <svg
-                                                    key={i}
-                                                    className="h-5 w-5"
-                                                    fill={
-                                                        i < 4
-                                                            ? "currentColor"
-                                                            : "none"
-                                                    }
-                                                    stroke={
-                                                        i >= 4
-                                                            ? "currentColor"
-                                                            : "none"
-                                                    }
-                                                    viewBox="0 0 20 20"
-                                                >
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    {/* Pagination */}
+                                    {reviews.links && (
+                                        <div className="mt-8">ssfs</div>
+                                    )}
                                 </div>
                             </div>
 
