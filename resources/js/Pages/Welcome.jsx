@@ -434,15 +434,19 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                     </div>
 
                                     <div className="grid gap-8 lg:grid-cols-3">
-                                        {reviewData &&
-                                            reviewData.map((review) => (
+                                        {reviews?.data &&
+                                            reviews.data.map((review) => (
                                                 <div
                                                     key={review.id}
-                                                    className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8"
+                                                    className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5"
                                                 >
                                                     <div className="flex items-center mb-4">
-                                                        <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700">
-                                                            {/* Add user avatar if available */}
+                                                        <div className="h-12 w-12 rounded-full bg-blue-500 dark:bg-blue-700 flex items-center justify-center text-white font-semibold text-xl">
+                                                            {review.user.name
+                                                                ?.split(" ")[0]
+                                                                ?.charAt(0)
+                                                                ?.toUpperCase() ||
+                                                                "?"}
                                                         </div>
                                                         <div className="ml-4">
                                                             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -475,7 +479,7 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                                     <p className="text-gray-600 dark:text-gray-300">
                                                         {review.content}
                                                     </p>
-                                                    <div className="mt-4 text-sm text-gray-500">
+                                                    <div className="mt-4 text-xs text-gray-500">
                                                         {new Date(
                                                             review.created_at
                                                         ).toLocaleDateString()}
@@ -483,6 +487,57 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                                 </div>
                                             ))}
                                     </div>
+
+                                    {/* Pagination */}
+                                    {reviews?.links &&
+                                        reviews.links.length > 3 && (
+                                            <div className="mt-8 flex justify-center">
+                                                <nav
+                                                    className="inline-flex rounded-md shadow-sm -space-x-px"
+                                                    aria-label="Pagination"
+                                                >
+                                                    {reviews.links.map(
+                                                        (link, index) => (
+                                                            <Link
+                                                                key={index}
+                                                                href={
+                                                                    link.url ||
+                                                                    "#"
+                                                                }
+                                                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium
+                        ${link.url ? "" : "opacity-50 cursor-not-allowed"}
+                        ${
+                            link.active
+                                ? "z-10 bg-blue-50 border-blue-500 text-blue-600 dark:bg-blue-900/50 dark:text-blue-200 dark:border-blue-600"
+                                : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                        }
+                        ${index === 0 ? "rounded-l-md" : ""}
+                        ${
+                            index === reviews.links.length - 1
+                                ? "rounded-r-md"
+                                : ""
+                        }
+                    `}
+                                                                preserveScroll
+                                                                only={[
+                                                                    "reviews",
+                                                                ]}
+                                                                disabled={
+                                                                    !link.url
+                                                                }
+                                                            >
+                                                                <span
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html: link.label,
+                                                                    }}
+                                                                />
+                                                            </Link>
+                                                        )
+                                                    )}
+                                                </nav>
+                                            </div>
+                                        )}
+
                                     {auth.user && (
                                         <div className="mt-12 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                                             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
@@ -490,11 +545,6 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                             </h3>
                                             <ReviewForm />
                                         </div>
-                                    )}
-
-                                    {/* Pagination */}
-                                    {reviews.links && (
-                                        <div className="mt-8">ssfs</div>
                                     )}
                                 </div>
                             </div>

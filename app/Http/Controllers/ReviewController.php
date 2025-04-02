@@ -23,11 +23,10 @@ class ReviewController extends Controller
     public function index()
     {
         $reviews = Review::with('user')
-            ->where('published', true)
-            ->latest()
-            ->paginate(9);
+            ->orderBy('created_at', 'desc')
+            ->paginate(6);
 
-        return Inertia::render('Reviews/Index', [
+        return inertia('Welcome', [
             'reviews' => $reviews
         ]);
     }

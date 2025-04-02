@@ -11,6 +11,8 @@ export default function ReviewForm() {
         e.preventDefault();
         post(route("reviews.store"), {
             onSuccess: () => reset(),
+            preserveScroll: true, // Add this to maintain scroll position
+            only: ["reviews"],
         });
     };
 
