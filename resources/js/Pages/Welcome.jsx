@@ -438,9 +438,9 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                             reviews.data.map((review) => (
                                                 <div
                                                     key={review.id}
-                                                    className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5"
+                                                    className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 flex flex-col h-64"
                                                 >
-                                                    <div className="flex items-center mb-4">
+                                                    <div className="flex items-center mb-3">
                                                         <div className="h-12 w-12 rounded-full bg-blue-500 dark:bg-blue-700 flex items-center justify-center text-white font-semibold text-xl">
                                                             {review.user.name
                                                                 ?.split(" ")[0]
@@ -476,10 +476,12 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <p className="text-gray-600 dark:text-gray-300">
-                                                        {review.content}
-                                                    </p>
-                                                    <div className="mt-4 text-xs text-gray-500">
+                                                    <div className="flex-1 overflow-y-auto pr-1">
+                                                        <p className="text-gray-600 dark:text-gray-300">
+                                                            {review.content}
+                                                        </p>
+                                                    </div>
+                                                    <div className="mt-1 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
                                                         {new Date(
                                                             review.created_at
                                                         ).toLocaleDateString()}
