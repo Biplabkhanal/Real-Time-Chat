@@ -12,9 +12,17 @@ const UserListItem = ({ user, selectedUser, setSelectedUser, isOnline }) => {
                        }`}
         >
             <div className="relative">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold">
-                    {user.name.charAt(0).toUpperCase()}
-                </div>
+                {user.avatar ? (
+                    <img
+                        src={`/storage/${user.avatar}`}
+                        alt={user.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                    />
+                ) : (
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold">
+                        {user.name.charAt(0).toUpperCase()}
+                    </div>
+                )}
                 {isOnline && (
                     <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-800"></div>
                 )}

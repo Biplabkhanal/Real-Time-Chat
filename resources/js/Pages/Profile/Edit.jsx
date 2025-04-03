@@ -3,6 +3,7 @@ import { Head } from "@inertiajs/react";
 import DeleteUserForm from "./Partials/DeleteUserForm";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
+import UpdateAvatarForm from "./Partials/UpdateAvatarForm";
 
 export default function Edit({ mustVerifyEmail, status }) {
     return (
@@ -16,6 +17,8 @@ export default function Edit({ mustVerifyEmail, status }) {
                                 status={status}
                                 className="w-full"
                             />
+                            <hr className="border-gray-200/50 dark:border-gray-700/50" />
+                            <UpdateAvatarForm className="w-full" />
                             <hr className="border-gray-200/50 dark:border-gray-700/50" />
                             <UpdatePasswordForm className="w-full" />
                         </div>

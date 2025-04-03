@@ -44,10 +44,22 @@ function ReviewCard({ review }) {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 flex flex-col h-64">
             <div className="flex items-center mb-3">
                 <div className="h-12 w-12 rounded-full bg-blue-500 dark:bg-blue-700 flex items-center justify-center text-white font-semibold text-xl">
-                    {review.user.name
-                        ?.split(" ")[0]
-                        ?.charAt(0)
-                        ?.toUpperCase() || "?"}
+                    <div className="flex-shrink-0">
+                        {review.user.avatar ? (
+                            <img
+                                src={`/storage/${review.user.avatar}`}
+                                alt={review.user.name}
+                                className="h-12 w-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                            />
+                        ) : (
+                            <div className="h-12 w-12 rounded-full bg-blue-500 dark:bg-blue-700 flex items-center justify-center text-white font-semibold text-xl border-2 border-gray-200 dark:border-gray-700">
+                                {review.user.name
+                                    ?.split(" ")[0]
+                                    ?.charAt(0)
+                                    ?.toUpperCase() || "?"}
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <div className="ml-4">
                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">

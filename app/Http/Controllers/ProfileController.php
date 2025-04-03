@@ -60,4 +60,27 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|max:2048', // 2MB max
+        ]);
+
+        $user = $request->user();
+
+        // Delete old avatar if exists
+        if ($user->avatar && file_exists(storage_path('app/public/' . $user->avatar))) {
+            unlink(storage_path('app/public/' . $user->avatar));
+        }
+
+        // Store the new avatar
+        $path = $request->file('avatar')->store('avatars', 'public');
+
+        $user->update([
+            'avatar' => $path,
+        ]);
+
+        return back()->with('status', 'Avatar updated successfully!');
+    }
 }
