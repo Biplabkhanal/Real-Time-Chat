@@ -27,14 +27,12 @@ export default function ReviewSection({ reviews, auth }) {
                 <PaginationLinks reviews={reviews} />
 
                 {/* Review Form */}
-                {auth.user && (
-                    <div className="mt-12 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                            Share Your Experience
-                        </h3>
-                        <ReviewForm />
-                    </div>
-                )}
+                <div className="mt-12 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                        Share Your Experience
+                    </h3>
+                    <ReviewForm auth={auth} />
+                </div>
             </div>
         </div>
     );
