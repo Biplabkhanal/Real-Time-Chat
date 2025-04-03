@@ -7,6 +7,7 @@ const ChatHeader = ({ selectedUser, onlineUsers, lastSeen }) => (
         <UserAvatar
             name={selectedUser.name}
             isOnline={onlineUsers[selectedUser.id]}
+            avatar={selectedUser.avatar}
         />
         <div className="ml-4 flex-1">
             <div className="font-bold text-gray-900 dark:text-white">
