@@ -139,4 +139,79 @@ class MessageController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function getSharedMedia(Request $request, $userId)
+    {
+        $currentUserId = auth()->id();
+
+        // Fetch shared media files between current user and the selected user
+        $media = Message::where(function ($query) use ($currentUserId, $userId) {
+            $query->where('sender_id', $currentUserId)
+                ->where('recipient_id', $userId);
+        })
+            ->orWhere(function ($query) use ($currentUserId, $userId) {
+                $query->where('sender_id', $userId)
+                    ->where('recipient_id', $currentUserId);
+            })
+            ->whereNotNull('attachment') // Only get messages with attachments
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($message) {
+                // Extract media information
+                return [
+                    'id' => $message->id,
+                    'path' => $message->attachment,
+                    'type' => $this->getFileType($message->attachment),
+                    'name' => $this->getFileName($message->attachment),
+                    'is_link' => $this->isLink($message->message),
+                    'url' => $this->extractUrl($message->message),
+                    'title' => $message->message,
+                    'created_at' => $message->created_at
+                ];
+            });
+
+        return response()->json($media);
+    }
+
+    // Helper methods
+    private function getFileType($path)
+    {
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        switch ($extension) {
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+                return 'image/' . $extension;
+            case 'pdf':
+                return 'application/pdf';
+            case 'doc':
+            case 'docx':
+                return 'application/msword';
+            case 'xlsx':
+            case 'xls':
+                return 'application/excel';
+            default:
+                return 'application/octet-stream';
+        }
+    }
+
+    private function getFileName($path)
+    {
+        if (!$path) return 'Unknown file';
+        return pathinfo($path, PATHINFO_FILENAME);
+    }
+
+    private function isLink($message)
+    {
+        if (!$message) return false;
+        return preg_match('/https?:\/\/[^\s]+/', $message) === 1;
+    }
+
+    private function extractUrl($message)
+    {
+        if (!$message) return '';
+        preg_match('/https?:\/\/[^\s]+/', $message, $matches);
+        return $matches[0] ?? '';
+    }
 }
