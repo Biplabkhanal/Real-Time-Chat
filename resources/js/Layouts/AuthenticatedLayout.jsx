@@ -13,8 +13,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <nav className="border-b border-gray-700 bg-gray-900">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
@@ -41,6 +41,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <NavLink
                                     href={route("inbox")}
                                     active={route().current("inbox")}
+                                    className="inline-flex items-center px-1 pt-1 border-b-2 text-xl font-medium leading-5 text-gray-200 hover:text-white focus:outline-none focus:text-white transition duration-150 ease-in-out"
+                                    activeClassName="border-indigo-400 text-white"
                                 >
                                     Inbox
                                 </NavLink>
@@ -54,7 +56,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                                className="inline-flex items-center rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-200 transition duration-150 ease-in-out hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
                                             >
                                                 {user.name}
 
@@ -74,9 +76,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </span>
                                     </Dropdown.Trigger>
 
-                                    <Dropdown.Content>
+                                    <Dropdown.Content contentClasses="bg-gray-800 border border-gray-700 rounded-md shadow-lg py-1 text-gray-200">
                                         <Dropdown.Link
                                             href={route("profile.edit")}
+                                            className="block px-4 py-2 text-sm hover:bg-gray-700 text-white hover:text-white focus:bg-gray-700 focus:text-white active:bg-gray-700 active:text-white transition ease-in-out duration-150"
                                         >
                                             Profile
                                         </Dropdown.Link>
@@ -84,6 +87,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route("logout")}
                                             method="post"
                                             as="button"
+                                            className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-white hover:text-white focus:bg-gray-700 focus:text-white active:bg-gray-700 active:text-white transition ease-in-out duration-150"
                                         >
                                             Log Out
                                         </Dropdown.Link>
