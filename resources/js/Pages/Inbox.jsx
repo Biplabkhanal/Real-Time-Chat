@@ -169,11 +169,9 @@ export default function Inbox({ auth, users }) {
 
             .listen("MessageDeleted", async (event) => {
                 if (event.isEntireConversation) {
-                    // Clear messages if entire conversation was deleted
                     setCurrentMessages([]);
                     toast.info("This conversation has been deleted.");
                 } else {
-                    // Just refresh messages if a single message was deleted
                     await getMessages();
                 }
             });

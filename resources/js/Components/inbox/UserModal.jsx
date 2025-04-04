@@ -6,8 +6,19 @@ import UserListItemModal from "./UserListItemModal";
 const UserModal = ({ isOpen, onClose, users, onSelect, onlineUsers }) => {
     const [searchInput, setSearchInput] = useState("");
     const [filteredUsers, setFilteredUsers] = useState(users);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     useFilterUsers(searchInput, users, setFilteredUsers);
+
+    const handleUserSelect = (user) => {
+        setSelectedUser(user);
+        if (typeof onSelect === "function") {
+            onSelect(user);
+        }
+        if (typeof onClose === "function") {
+            onClose();
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -38,29 +49,29 @@ const UserModal = ({ isOpen, onClose, users, onSelect, onlineUsers }) => {
                 </div>
 
                 {/* Search */}
-                <div className="p-4 border-b dark:border-gray-700">
+                <div className="p-4">
                     <SearchBar
-                        searchInput={searchInput}
-                        setSearchInput={setSearchInput}
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        placeholder="Search users..."
                     />
                 </div>
-                {/* Users List */}
-                <div className="p-2 overflow-y-auto h-[300px]">
+
+                {/* User List */}
+                <div className="overflow-y-auto max-h-[300px] p-2">
                     {filteredUsers.length > 0 ? (
                         filteredUsers.map((user) => (
                             <UserListItemModal
                                 key={user.id}
                                 user={user}
-                                onSelect={onSelect}
-                                onClose={onClose}
-                                isOnline={onlineUsers[user.id]}
+                                selectedUser={selectedUser}
+                                isOnline={onlineUsers?.[user.id] || false}
+                                onUserSelect={handleUserSelect}
                             />
                         ))
                     ) : (
-                        <div className="h-full flex items-center justify-center">
-                            <p className="text-gray-500 dark:text-gray-400 text-center">
-                                No users found
-                            </p>
+                        <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                            No users found
                         </div>
                     )}
                 </div>
