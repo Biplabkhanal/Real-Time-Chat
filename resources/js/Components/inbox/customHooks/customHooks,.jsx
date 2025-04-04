@@ -57,6 +57,7 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
             setMessageInput("");
             setAttachments([]);
 
+            // Refresh messages and focus input
             await getMessages();
             if (inputRef.current) inputRef.current.focus();
 

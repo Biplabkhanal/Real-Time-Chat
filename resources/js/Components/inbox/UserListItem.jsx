@@ -8,7 +8,7 @@ const UserListItem = ({ user, selectedUser, setSelectedUser, isOnline }) => {
                        ${
                            user.id === selectedUser?.id
                                ? "bg-blue-100 dark:bg-blue-900/50 border-l-4 border-blue-500"
-                               : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                               : "hover:bg-gray-100 dark:hover:bg-gray-700 my-1"
                        }`}
         >
             <div className="relative">
@@ -36,11 +36,6 @@ const UserListItem = ({ user, selectedUser, setSelectedUser, isOnline }) => {
                         {user.email}
                     </div>
                 </div>
-                {/* {unreadCount > 0 && (
-                    <div className="min-w-[1.5rem] h-6 flex items-center justify-center bg-blue-500 text-white text-xs font-medium rounded-full px-2">
-                        {unreadCount}
-                    </div>
-                )} */}
             </div>
         </div>
     );

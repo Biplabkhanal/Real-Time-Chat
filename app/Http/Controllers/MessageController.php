@@ -271,6 +271,36 @@ class MessageController extends Controller
         return response()->json($media);
     }
 
+
+    /**
+     * Get users with conversations
+     */
+    public function getUsersWithConversations()
+    {
+        $currentUserId = Auth::id();
+
+        // Find users who have exchanged messages with the current user
+        $userIds = Message::where(function ($query) use ($currentUserId) {
+            $query->where('sender_id', $currentUserId)
+                ->orWhere('recipient_id', $currentUserId);
+        })
+            ->pluck('sender_id')
+            ->merge(Message::where(function ($query) use ($currentUserId) {
+                $query->where('sender_id', $currentUserId)
+                    ->orWhere('recipient_id', $currentUserId);
+            })
+                ->pluck('recipient_id'))
+            ->unique()
+            ->reject(function ($id) use ($currentUserId) {
+                return $id === $currentUserId;
+            });
+
+        // Get user details for these IDs
+        $users = User::whereIn('id', $userIds)->get();
+
+        return response()->json($users);
+    }
+
     // Helper methods
     private function getFileType($path)
     {

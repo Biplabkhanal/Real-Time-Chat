@@ -36,6 +36,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/message/{message}', [MessageController::class, 'destroy'])->name('message.destroy');
     Route::delete('/conversation/{user}', [MessageController::class, 'destroyConversation'])->name('conversation.destroy');
     Route::get('/messages/media/{userId}', [MessageController::class, 'getSharedMedia'])->name('messages.media');
+    Route::get('/users-with-conversations', [MessageController::class, 'getUsersWithConversations'])->name('users.with.conversations');
+
 
     Route::post('/upload-file', [FileUploadController::class, 'upload'])->name('upload.file');
 

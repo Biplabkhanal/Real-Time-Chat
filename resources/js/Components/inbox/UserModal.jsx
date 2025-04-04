@@ -3,7 +3,14 @@ import SearchBar from "./SearchBar";
 import { useFilterUsers } from "./customHooks/customHooks,";
 import UserListItemModal from "./UserListItemModal";
 
-const UserModal = ({ isOpen, onClose, users, onSelect, onlineUsers }) => {
+const UserModal = ({
+    isOpen,
+    onClose,
+    users,
+    onSelect,
+    onlineUsers,
+    addToUsersList,
+}) => {
     const [searchInput, setSearchInput] = useState("");
     const [filteredUsers, setFilteredUsers] = useState(users);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -13,7 +20,7 @@ const UserModal = ({ isOpen, onClose, users, onSelect, onlineUsers }) => {
     const handleUserSelect = (user) => {
         setSelectedUser(user);
         if (typeof onSelect === "function") {
-            onSelect(user);
+            onSelect(user, true);
         }
         if (typeof onClose === "function") {
             onClose();
@@ -67,6 +74,7 @@ const UserModal = ({ isOpen, onClose, users, onSelect, onlineUsers }) => {
                                 selectedUser={selectedUser}
                                 isOnline={onlineUsers?.[user.id] || false}
                                 onUserSelect={handleUserSelect}
+                                addToUsersList={addToUsersList}
                             />
                         ))
                     ) : (

@@ -21,6 +21,8 @@ export default function Inbox({ auth, users }) {
     const [onlineUsers, setOnlineUsers] = useState({});
     const [lastSeen, setLastSeen] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [usersWithConversations, setUsersWithConversations] = useState([]);
+    const [isloading, setIsLoading] = useState(true);
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -190,6 +192,34 @@ export default function Inbox({ auth, users }) {
         setCurrentMessages([]);
     };
 
+    useEffect(() => {
+        const fetchUsersWithConversations = async () => {
+            setIsLoading(true);
+            try {
+                // Fetch users who have at least one message with the current user
+                const response = await axios.get("/users-with-conversations");
+                setUsersWithConversations(response.data);
+            } catch (error) {
+                console.error(
+                    "Error fetching users with conversations:",
+                    error
+                );
+                // Fallback to all users if the API fails
+                setUsersWithConversations(users);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchUsersWithConversations();
+    }, []);
+
+    const addToUsersList = (user) => {
+        const userExists = usersWithConversations.some((u) => u.id === user.id);
+        if (!userExists) {
+            setUsersWithConversations((prev) => [user, ...prev]);
+        }
+    };
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="ChatSync - Inbox" />
@@ -203,7 +233,7 @@ export default function Inbox({ auth, users }) {
                                 Chats
                             </h2>
                             <span className="bg-blue-500 text-white text-xs px-1 py-0 rounded-full">
-                                {filteredUsers.length}
+                                {usersWithConversations.length}
                             </span>
                         </div>
                         <AddButton onClick={() => setIsModalOpen(true)} />
@@ -213,15 +243,17 @@ export default function Inbox({ auth, users }) {
                             users={filteredUsers}
                             onSelect={handleUserSelect}
                             onlineUsers={onlineUsers}
+                            addToUsersList={addToUsersList}
                         />
                     </div>
 
                     {/* Contact List */}
                     <UserList
-                        filteredUsers={filteredUsers}
+                        filteredUsers={usersWithConversations}
                         selectedUser={selectedUser}
                         setSelectedUser={setSelectedUser}
                         onlineUsers={onlineUsers}
+                        isLoading={isLoading}
                     />
                 </div>
 

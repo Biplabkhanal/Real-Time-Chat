@@ -7,10 +7,14 @@ const UserListItemModal = ({
     onClose,
     isOnline,
     onUserSelect,
+    addToUsersList,
 }) => {
     const handleUserSelect = () => {
         if (typeof setSelectedUser === "function") {
             setSelectedUser(user);
+        }
+        if (typeof addToUsersList === "function") {
+            addToUsersList(user);
         }
         if (typeof onUserSelect === "function") {
             onUserSelect(user);
