@@ -214,19 +214,17 @@ const ConversationSidebar = ({
                                 {/* Users involved */}
                                 <div className="flex items-center justify-center space-x-6 py-2">
                                     <div className="flex flex-col items-center">
-                                        {currentUser.avatar_url ? (
+                                        {currentUser.avatar ? (
                                             <img
-                                                src={currentUser.avatar_url}
+                                                src={`/storage/${currentUser.avatar}`}
                                                 alt={currentUser.name}
-                                                className="h-12 w-12 rounded-full object-cover"
+                                                className="w-12 h-12 rounded-full object-cover"
                                             />
                                         ) : (
-                                            <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                                <span className="text-gray-500 dark:text-gray-400 text-lg font-medium">
-                                                    {currentUser.name
-                                                        .charAt(0)
-                                                        .toUpperCase()}
-                                                </span>
+                                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold">
+                                                {currentUser.name
+                                                    .charAt(0)
+                                                    .toUpperCase()}
                                             </div>
                                         )}
                                         <p className="mt-2 text-xs font-medium text-gray-900 dark:text-white">
@@ -237,19 +235,17 @@ const ConversationSidebar = ({
                                     <div className="w-8 h-0 border-t-2 border-gray-300 dark:border-gray-600"></div>
 
                                     <div className="flex flex-col items-center">
-                                        {selectedUser.avatar_url ? (
+                                        {selectedUser.avatar ? (
                                             <img
-                                                src={selectedUser.avatar_url}
+                                                src={`/storage/${selectedUser.avatar}`}
                                                 alt={selectedUser.name}
                                                 className="h-12 w-12 rounded-full object-cover"
                                             />
                                         ) : (
-                                            <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                                <span className="text-gray-500 dark:text-gray-400 text-lg font-medium">
-                                                    {selectedUser.name
-                                                        .charAt(0)
-                                                        .toUpperCase()}
-                                                </span>
+                                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold">
+                                                {selectedUser.name
+                                                    .charAt(0)
+                                                    .toUpperCase()}
                                             </div>
                                         )}
                                         <p className="mt-2 text-xs font-medium text-gray-900 dark:text-white">

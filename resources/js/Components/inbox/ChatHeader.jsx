@@ -152,7 +152,7 @@ const ChatHeader = ({
                         />
 
                         {showDropdown && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
+                            <div className="absolute right-0 mt-5 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
                                 <div className="py-1">
                                     <button
                                         onClick={toggleInfoSidebar}
@@ -168,7 +168,7 @@ const ChatHeader = ({
                                             : "View Conversation Info"}
                                         {isBlockedByUser && (
                                             <span className="block text-xs italic text-gray-400 dark:text-gray-500">
-                                                Not available - you've been
+                                                * Not available - you've been
                                                 blocked
                                             </span>
                                         )}
