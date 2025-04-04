@@ -2,8 +2,8 @@ import React from "react";
 
 const TabNavigation = ({ activeTab, setActiveTab, tabs }) => {
     return (
-        <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
-            <nav className="flex space-x-4" aria-label="Tabs">
+        <div className="border-b border-gray-200 dark:border-gray-700 px-4 ">
+            <nav className="flex space-x-7" aria-label="Tabs">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}

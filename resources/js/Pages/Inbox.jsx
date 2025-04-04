@@ -1,4 +1,5 @@
 import ChatHeader from "@/Components/inbox/ChatHeader";
+import ConversationSidebar from "@/Components/inbox/ChatHeader/ConversationSidebar";
 import { useMessageHandler } from "@/Components/inbox/customHooks/customHooks,";
 import EmptyChatState from "@/Components/inbox/EmptyChatState";
 import AddButton from "@/Components/inbox/icons/AddButton";
@@ -28,6 +29,7 @@ export default function Inbox({ auth, users }) {
         isBlocked: false,
         isBlockedByUser: false,
     });
+    const [showInfoSidebar, setShowInfoSidebar] = useState(false);
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -181,6 +183,7 @@ export default function Inbox({ auth, users }) {
 
     const handleUserSelect = (user) => {
         setSelectedUser(user);
+        setShowInfoSidebar(false);
     };
 
     const fetchUsersWithConversations = async () => {
@@ -292,7 +295,11 @@ export default function Inbox({ auth, users }) {
                 </div>
 
                 {/* Chat Area */}
-                <div className="flex flex-col flex-1 bg-gray-50 dark:bg-gray-900">
+                <div
+                    className={`flex flex-col ${
+                        showInfoSidebar ? "w-[50%]" : "flex-1"
+                    } bg-gray-50 dark:bg-gray-900`}
+                >
                     {!selectedUser ? (
                         <EmptyChatState />
                     ) : (
@@ -306,6 +313,8 @@ export default function Inbox({ auth, users }) {
                                 onConversationDeleted={
                                     handleConversationDeleted
                                 }
+                                showInfoSidebar={showInfoSidebar}
+                                setShowInfoSidebar={setShowInfoSidebar}
                             />
 
                             {/* Chat Messages */}
@@ -358,6 +367,14 @@ export default function Inbox({ auth, users }) {
                         </>
                     )}
                 </div>
+                {selectedUser && (
+                    <ConversationSidebar
+                        isOpen={showInfoSidebar}
+                        onClose={() => setShowInfoSidebar(false)}
+                        selectedUser={selectedUser}
+                        currentUser={auth.user}
+                    />
+                )}
             </div>
         </AuthenticatedLayout>
     );

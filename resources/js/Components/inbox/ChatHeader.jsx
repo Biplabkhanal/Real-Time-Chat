@@ -4,6 +4,7 @@ import UserStatus from "./UserStatus";
 import SharedMediaModal from "./Messages/SharedMediaModal";
 import { usePage } from "@inertiajs/react";
 import { toast } from "react-toastify";
+import axios from "axios";
 import ConversationDeleteModal from "./ChatHeader/ConversationDeleteModal";
 import MoreOptionsButton from "./ChatHeader/icons/MoreOptionsButton";
 import SearchButton from "./ChatHeader/icons/SearchButton";
@@ -14,6 +15,8 @@ const ChatHeader = ({
     onlineUsers,
     lastSeen,
     onConversationDeleted,
+    showInfoSidebar,
+    setShowInfoSidebar,
 }) => {
     const [showMediaModal, setShowMediaModal] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -98,14 +101,18 @@ const ChatHeader = ({
         setShowBlockModal(true);
     };
 
+    const toggleInfoSidebar = () => {
+        setShowInfoSidebar(!showInfoSidebar);
+        if (showDropdown) {
+            setShowDropdown(false);
+        }
+    };
+
     return (
         <div className="flex flex-col bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between p-3">
                 <div className="flex items-center">
-                    <div
-                        className="cursor-pointer"
-                        onClick={() => setShowMediaModal(true)}
-                    >
+                    <div>
                         <UserAvatar
                             name={selectedUser.name}
                             isOnline={onlineUsers[selectedUser.id]}
@@ -144,8 +151,13 @@ const ChatHeader = ({
                         {showDropdown && (
                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
                                 <div className="py-1">
-                                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        View profile
+                                    <button
+                                        onClick={toggleInfoSidebar}
+                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        {showInfoSidebar
+                                            ? "Hide Conversation Info"
+                                            : "View Conversation Info"}
                                     </button>
                                     <button
                                         onClick={() => openBlockConfirmation()}

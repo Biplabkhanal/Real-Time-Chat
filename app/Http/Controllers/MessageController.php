@@ -306,6 +306,72 @@ class MessageController extends Controller
         return response()->json($users);
     }
 
+    /**
+     * Get statistics about the conversation between two users
+     */
+    public function getConversationStats(User $user)
+    {
+        $currentUserId = Auth::id();
+        $otherUserId = $user->id;
+
+        // Get all messages between the two users
+        $messages = Message::where(function ($query) use ($currentUserId, $otherUserId) {
+            $query->where('sender_id', $currentUserId)
+                ->where('recipient_id', $otherUserId);
+        })->orWhere(function ($query) use ($currentUserId, $otherUserId) {
+            $query->where('sender_id', $otherUserId)
+                ->where('recipient_id', $currentUserId);
+        })->orderBy('created_at', 'asc')->get();
+
+        if ($messages->isEmpty()) {
+            return response()->json([
+                'total_messages' => 0,
+                'your_messages' => 0,
+                'their_messages' => 0,
+                'days_talking' => 0
+            ]);
+        }
+
+        // Calculate statistics
+        $yourMessages = $messages->where('sender_id', $currentUserId)->count();
+        $theirMessages = $messages->where('sender_id', $otherUserId)->count();
+
+        $firstMessage = $messages->first();
+        $latestMessage = $messages->last();
+
+        // Calculate unique days they've talked
+        $uniqueDays = $messages->groupBy(function ($message) {
+            return $message->created_at->format('Y-m-d');
+        });
+
+        // Find the busiest day
+        $busyDay = null;
+        $maxCount = 0;
+
+        foreach ($uniqueDays as $date => $msgs) {
+            $count = count($msgs);
+            if ($count > $maxCount) {
+                $maxCount = $count;
+                $busyDay = [
+                    'date' => $date,
+                    'count' => $count
+                ];
+            }
+        }
+
+        return response()->json([
+            'total_messages' => $messages->count(),
+            'your_messages' => $yourMessages,
+            'their_messages' => $theirMessages,
+            'days_talking' => $uniqueDays->count(),
+            'first_message_date' => $firstMessage->created_at,
+            'first_message_by' => $firstMessage->sender_id,
+            'latest_message_date' => $latestMessage->created_at,
+            'latest_message_by' => $latestMessage->sender_id,
+            'busy_day' => $busyDay
+        ]);
+    }
+
     // Helper methods
     private function getFileType($path)
     {
