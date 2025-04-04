@@ -140,6 +140,51 @@ class MessageController extends Controller
         }
     }
 
+    public function destroyConversation(User $user)
+    {
+        try {
+            $currentUserId = Auth::id();
+            $otherUserId = $user->id;
+
+            // Find all messages between the two users
+            $messages = Message::where(function ($query) use ($currentUserId, $otherUserId) {
+                $query->where('sender_id', $currentUserId)
+                    ->where('recipient_id', $otherUserId);
+            })->orWhere(function ($query) use ($currentUserId, $otherUserId) {
+                $query->where('sender_id', $otherUserId)
+                    ->where('recipient_id', $currentUserId);
+            })->get();
+
+            // Delete attachments from storage
+            foreach ($messages as $message) {
+                if ($message->attachment) {
+                    $attachment = json_decode($message->attachment);
+                    if (isset($attachment->path) && $attachment->path) {
+                        if (Storage::disk('public')->exists($attachment->path)) {
+                            Storage::disk('public')->delete($attachment->path);
+                        }
+                    }
+                }
+            }
+
+            // Delete all messages
+            Message::where(function ($query) use ($currentUserId, $otherUserId) {
+                $query->where('sender_id', $currentUserId)
+                    ->where('recipient_id', $otherUserId);
+            })->orWhere(function ($query) use ($currentUserId, $otherUserId) {
+                $query->where('sender_id', $otherUserId)
+                    ->where('recipient_id', $currentUserId);
+            })->delete();
+
+            broadcast(new MessageDeleted(null, $otherUserId, true))->toOthers();
+
+            return response()->json(['success' => 'Conversation deleted successfully']);
+        } catch (\Exception $e) {
+            Log::error('Error deleting conversation: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function getSharedMedia(Request $request, $userId)
     {
         $currentUserId = auth()->id();

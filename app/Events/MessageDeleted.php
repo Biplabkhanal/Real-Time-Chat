@@ -16,6 +16,7 @@ class MessageDeleted implements ShouldBroadcast
 
     public $messageId;
     public $recipientId;
+    public $isEntireConversation = false;
 
     /**
      * Create a new event instance.
@@ -24,10 +25,11 @@ class MessageDeleted implements ShouldBroadcast
      * @param int $recipientId
      * @return void
      */
-    public function __construct($messageId, $recipientId)
+    public function __construct($messageId, $recipientId, $isEntireConversation = false)
     {
         $this->messageId = $messageId;
         $this->recipientId = $recipientId;
+        $this->isEntireConversation = $isEntireConversation;
     }
 
     /**

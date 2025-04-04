@@ -36,6 +36,7 @@ export default function Inbox({ auth, users }) {
         handleSendMessage,
         handleKeyDown,
         getMessages,
+        setCurrentMessages,
     } = useMessageHandler(selectedUserRef, inputRef);
 
     const scrollToBottom = () => {
@@ -165,8 +166,16 @@ export default function Inbox({ auth, users }) {
             .listen("MessageSent", async () => {
                 await getMessages();
             })
-            .listen("MessageDeleted", async () => {
-                await getMessages();
+
+            .listen("MessageDeleted", async (event) => {
+                if (event.isEntireConversation) {
+                    // Clear messages if entire conversation was deleted
+                    setCurrentMessages([]);
+                    toast.info("This conversation has been deleted.");
+                } else {
+                    // Just refresh messages if a single message was deleted
+                    await getMessages();
+                }
             });
 
         return () => {
@@ -177,6 +186,10 @@ export default function Inbox({ auth, users }) {
 
     const handleUserSelect = (user) => {
         setSelectedUser(user);
+    };
+
+    const handleConversationDeleted = () => {
+        setCurrentMessages([]);
     };
 
     return (
@@ -225,6 +238,10 @@ export default function Inbox({ auth, users }) {
                                 selectedUser={selectedUser}
                                 onlineUsers={onlineUsers}
                                 lastSeen={lastSeen}
+                                auth={auth}
+                                onConversationDeleted={
+                                    handleConversationDeleted
+                                }
                             />
 
                             {/* Chat Messages */}

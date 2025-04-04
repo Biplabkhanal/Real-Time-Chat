@@ -57,11 +57,9 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
             setMessageInput("");
             setAttachments([]);
 
-            // Refresh messages and focus input
             await getMessages();
             if (inputRef.current) inputRef.current.focus();
 
-            // Show success toast
             toast.success("Message sent successfully");
         } catch (err) {
             setError("Failed to send message. Please try again.");
@@ -93,5 +91,6 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
         handleSendMessage,
         handleKeyDown,
         getMessages,
+        setCurrentMessages,
     };
 };

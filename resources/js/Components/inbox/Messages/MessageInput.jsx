@@ -4,6 +4,7 @@ import EmojiButton from "./EmojiButton";
 import FileUploadButton from "./FileUploadButton";
 import SendButton from "../icons/SendButton";
 import EmojiPicker from "emoji-picker-react";
+import VoiceButton from "../icons/VoiceMessageIcon";
 
 const MessageInput = ({
     inputRef,
@@ -53,6 +54,7 @@ const MessageInput = ({
                 />
                 <div className="absolute right-3 flex space-x-1 items-center h-full">
                     <div className="relative" ref={emojiContainerRef}>
+                        <VoiceButton />
                         <EmojiButton
                             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                         />
