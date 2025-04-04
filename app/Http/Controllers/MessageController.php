@@ -10,69 +10,42 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class MessageController extends Controller
 {
+    /**
+     * Display inbox page with users
+     */
     public function inbox()
     {
-        $users = User::where('id', '!=', Auth::user()->id)->get();
+        $users = User::where('id', '!=', Auth::id())->get();
         return Inertia::render('Inbox', ['users' => $users]);
     }
 
+    /**
+     * Store a new message
+     */
     public function store(Request $request, User $user)
     {
         try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'message' => 'nullable|string',
+                'attachments' => 'nullable|array',
+                'attachments.*' => 'required',
+                'attachment' => 'nullable',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+
             if ($request->has('attachments') && is_array($request->attachments) && count($request->attachments) > 0) {
-                $sentMessages = [];
-
-                // Create a message with text content (if any) and the first attachment
-                $firstMessage = new Message;
-                $firstMessage->sender_id = Auth::user()->id;
-                $firstMessage->recipient_id = $user->id;
-                $firstMessage->message = $request->message ?? '';
-
-                if (isset($request->attachments[0])) {
-                    $firstMessage->attachment = json_encode($request->attachments[0]);
-                }
-
-                $firstMessage->save();
-                $sentMessages[] = $firstMessage;
-
-                // Broadcast the first message
-                broadcast(new MessageSent($firstMessage, Auth::user()))->toOthers();
-                if (count($request->attachments) > 1) {
-                    for ($i = 1; $i < count($request->attachments); $i++) {
-                        $additionalMessage = new Message;
-                        $additionalMessage->sender_id = Auth::user()->id;
-                        $additionalMessage->recipient_id = $user->id;
-                        $additionalMessage->message = '';
-                        $additionalMessage->attachment = json_encode($request->attachments[$i]);
-                        $additionalMessage->save();
-
-                        $sentMessages[] = $additionalMessage;
-
-                        broadcast(new MessageSent($additionalMessage, Auth::user()))->toOthers();
-                    }
-                }
-
-                return response()->json($sentMessages);
+                return $this->storeMultipleAttachments($request, $user);
             } else {
-
-                $message = new Message;
-                $message->sender_id = Auth::user()->id;
-                $message->recipient_id = $user->id;
-                $message->message = $request->message ?? '';
-
-                if ($request->has('attachment') && $request->attachment) {
-                    $message->attachment = json_encode($request->attachment);
-                }
-
-                $message->save();
-
-                broadcast(new MessageSent($message, Auth::user()))->toOthers();
-
-                return response()->json($message);
+                return $this->storeSingleMessage($request, $user);
             }
         } catch (\Exception $e) {
             Log::error('Error sending message: ' . $e->getMessage());
@@ -80,12 +53,99 @@ class MessageController extends Controller
         }
     }
 
+    /**
+     * Store a message with multiple attachments
+     */
+    private function storeMultipleAttachments(Request $request, User $user)
+    {
+        $sentMessages = [];
+        $senderId = Auth::id();
+        $recipientId = $user->id;
+        $messageText = $request->message ?? '';
+
+        // Create the first message with text and first attachment
+        $firstMessage = $this->createMessage(
+            $senderId,
+            $recipientId,
+            $messageText,
+            isset($request->attachments[0]) ? $request->attachments[0] : null
+        );
+
+        $sentMessages[] = $firstMessage;
+        $this->broadcastMessage($firstMessage);
+
+        // Create additional messages for remaining attachments
+        if (count($request->attachments) > 1) {
+            for ($i = 1; $i < count($request->attachments); $i++) {
+                $message = $this->createMessage($senderId, $recipientId, '', $request->attachments[$i]);
+                $sentMessages[] = $message;
+                $this->broadcastMessage($message);
+            }
+        }
+
+        return response()->json($sentMessages);
+    }
+
+    /**
+     * Store a single message
+     */
+    private function storeSingleMessage(Request $request, User $user)
+    {
+        $message = $this->createMessage(
+            Auth::id(),
+            $user->id,
+            $request->message ?? '',
+            $request->has('attachment') ? $request->attachment : null
+        );
+
+        $this->broadcastMessage($message);
+        return response()->json($message);
+    }
+
+    /**
+     * Create a new message
+     */
+    private function createMessage($senderId, $recipientId, $messageText, $attachment = null)
+    {
+        $message = new Message;
+        $message->sender_id = $senderId;
+        $message->recipient_id = $recipientId;
+        $message->message = $messageText;
+
+        if ($attachment) {
+            $message->attachment = json_encode($attachment);
+        }
+
+        $message->save();
+        return $message;
+    }
+
+    /**
+     * Broadcast a message to other users
+     */
+    private function broadcastMessage(Message $message)
+    {
+        broadcast(new MessageSent($message, Auth::user()))->toOthers();
+    }
+
+    /**
+     * Get messages between two users
+     */
     public function show(User $user)
     {
-        $user1Id = Auth::user()->id;
-        $user2Id = $user->id;
+        $currentUserId = Auth::id();
+        $otherUserId = $user->id;
 
-        $messages = Message::where(function ($query) use ($user1Id, $user2Id) {
+        $messages = $this->getConversationMessages($currentUserId, $otherUserId);
+        return response()->json($messages);
+    }
+
+    /**
+     * Get messages between two users
+     */
+    private function getConversationMessages($user1Id, $user2Id)
+    {
+        return Message::where(function ($query) use ($user1Id, $user2Id) {
             $query->where('sender_id', $user1Id)
                 ->where('recipient_id', $user2Id);
         })
@@ -101,15 +161,10 @@ class MessageController extends Controller
                 }
                 return $message;
             });
-
-        return response()->json($messages);
     }
 
     /**
      * Delete a message
-     *
-     * @param Message $message
-     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Message $message)
     {
@@ -119,20 +174,10 @@ class MessageController extends Controller
                 return response()->json(['error' => 'Unauthorized. You can only delete your own messages.'], 403);
             }
 
-            if ($message->attachment) {
-                $attachment = json_decode($message->attachment);
-                if (isset($attachment->path) && $attachment->path) {
-                    if (Storage::disk('public')->exists($attachment->path)) {
-                        Storage::disk('public')->delete($attachment->path);
-                    }
-                }
-            }
-
-            // Delete the message
+            $this->deleteAttachment($message);
             $message->delete();
 
             broadcast(new MessageDeleted($message->id, $message->recipient_id))->toOthers();
-
             return response()->json(['success' => 'Message deleted successfully']);
         } catch (\Exception $e) {
             Log::error('Error deleting message: ' . $e->getMessage());
@@ -140,34 +185,24 @@ class MessageController extends Controller
         }
     }
 
+    /**
+     * Delete an entire conversation
+     */
     public function destroyConversation(User $user)
     {
         try {
             $currentUserId = Auth::id();
             $otherUserId = $user->id;
 
-            // Find all messages between the two users
-            $messages = Message::where(function ($query) use ($currentUserId, $otherUserId) {
-                $query->where('sender_id', $currentUserId)
-                    ->where('recipient_id', $otherUserId);
-            })->orWhere(function ($query) use ($currentUserId, $otherUserId) {
-                $query->where('sender_id', $otherUserId)
-                    ->where('recipient_id', $currentUserId);
-            })->get();
+            // Get all messages
+            $messages = $this->getConversationMessages($currentUserId, $otherUserId);
 
-            // Delete attachments from storage
+            // Delete attachments
             foreach ($messages as $message) {
-                if ($message->attachment) {
-                    $attachment = json_decode($message->attachment);
-                    if (isset($attachment->path) && $attachment->path) {
-                        if (Storage::disk('public')->exists($attachment->path)) {
-                            Storage::disk('public')->delete($attachment->path);
-                        }
-                    }
-                }
+                $this->deleteAttachment($message);
             }
 
-            // Delete all messages
+            // Delete all messages in one query
             Message::where(function ($query) use ($currentUserId, $otherUserId) {
                 $query->where('sender_id', $currentUserId)
                     ->where('recipient_id', $otherUserId);
@@ -177,7 +212,6 @@ class MessageController extends Controller
             })->delete();
 
             broadcast(new MessageDeleted(null, $otherUserId, true))->toOthers();
-
             return response()->json(['success' => 'Conversation deleted successfully']);
         } catch (\Exception $e) {
             Log::error('Error deleting conversation: ' . $e->getMessage());
@@ -185,12 +219,30 @@ class MessageController extends Controller
         }
     }
 
+    /**
+     * Delete attachment from storage
+     */
+    private function deleteAttachment($message)
+    {
+        if ($message->attachment) {
+            $attachment = json_decode($message->attachment);
+            if (isset($attachment->path) && $attachment->path) {
+                if (Storage::disk('public')->exists($attachment->path)) {
+                    Storage::disk('public')->delete($attachment->path);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get shared media between two users
+     */
     public function getSharedMedia(Request $request, $userId)
     {
-        $currentUserId = auth()->id();
+        $currentUserId = Auth::id();
 
         // Fetch shared media files between current user and the selected user
-        $media = Message::where(function ($query) use ($currentUserId, $userId) {
+        $messages = Message::where(function ($query) use ($currentUserId, $userId) {
             $query->where('sender_id', $currentUserId)
                 ->where('recipient_id', $userId);
         })
@@ -198,22 +250,23 @@ class MessageController extends Controller
                 $query->where('sender_id', $userId)
                     ->where('recipient_id', $currentUserId);
             })
-            ->whereNotNull('attachment') // Only get messages with attachments
+            ->whereNotNull('attachment')
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($message) {
-                // Extract media information
-                return [
-                    'id' => $message->id,
-                    'path' => $message->attachment,
-                    'type' => $this->getFileType($message->attachment),
-                    'name' => $this->getFileName($message->attachment),
-                    'is_link' => $this->isLink($message->message),
-                    'url' => $this->extractUrl($message->message),
-                    'title' => $message->message,
-                    'created_at' => $message->created_at
-                ];
-            });
+            ->get();
+
+        $media = $messages->map(function ($message) {
+            $attachment = json_decode($message->attachment);
+            return [
+                'id' => $message->id,
+                'path' => $attachment->path ?? null,
+                'type' => $attachment->type ?? $this->getFileType($attachment->path ?? ''),
+                'name' => $attachment->name ?? $this->getFileName($attachment->path ?? ''),
+                'is_link' => $this->isLink($message->message),
+                'url' => $this->extractUrl($message->message),
+                'title' => $message->message,
+                'created_at' => $message->created_at
+            ];
+        });
 
         return response()->json($media);
     }
@@ -221,24 +274,22 @@ class MessageController extends Controller
     // Helper methods
     private function getFileType($path)
     {
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-        switch ($extension) {
-            case 'jpg':
-            case 'jpeg':
-            case 'png':
-            case 'gif':
-                return 'image/' . $extension;
-            case 'pdf':
-                return 'application/pdf';
-            case 'doc':
-            case 'docx':
-                return 'application/msword';
-            case 'xlsx':
-            case 'xls':
-                return 'application/excel';
-            default:
-                return 'application/octet-stream';
-        }
+        if (!$path) return 'unknown';
+
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $mimeTypes = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'xls' => 'application/vnd.ms-excel',
+        ];
+
+        return $mimeTypes[$extension] ?? 'application/octet-stream';
     }
 
     private function getFileName($path)
