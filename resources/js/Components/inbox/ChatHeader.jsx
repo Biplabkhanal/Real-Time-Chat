@@ -23,6 +23,7 @@ const ChatHeader = ({
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showBlockModal, setShowBlockModal] = useState(false);
     const [isUserBlocked, setIsUserBlocked] = useState(false);
+    const [isBlockedByUser, setIsBlockedByUser] = useState(false);
     const { auth } = usePage().props;
     const dropdownRef = React.useRef();
 
@@ -73,7 +74,9 @@ const ChatHeader = ({
             const response = await axios.get(
                 `/block-status/${selectedUser.id}`
             );
-            setIsUserBlocked(response.data.isBlocked);
+            const { isBlocked, isBlockedByUser } = response.data;
+            setIsUserBlocked(isBlocked);
+            setIsBlockedByUser(isBlockedByUser);
         } catch (error) {
             console.error("Error checking block status:", error);
         }
@@ -153,11 +156,22 @@ const ChatHeader = ({
                                 <div className="py-1">
                                     <button
                                         onClick={toggleInfoSidebar}
-                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        disabled={isBlockedByUser}
+                                        className={`block w-full text-left px-4 py-2 text-sm ${
+                                            isBlockedByUser
+                                                ? "text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        }`}
                                     >
                                         {showInfoSidebar
                                             ? "Hide Conversation Info"
                                             : "View Conversation Info"}
+                                        {isBlockedByUser && (
+                                            <span className="block text-xs italic text-gray-400 dark:text-gray-500">
+                                                Not available - you've been
+                                                blocked
+                                            </span>
+                                        )}
                                     </button>
                                     <button
                                         onClick={() => openBlockConfirmation()}

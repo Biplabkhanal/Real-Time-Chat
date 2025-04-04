@@ -160,7 +160,7 @@ const ConversationSidebar = ({
             }`}
         >
             {/* Header */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div className="py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4">
                 <h3 className="font-medium text-gray-900 dark:text-white">
                     Conversation Info
                 </h3>
