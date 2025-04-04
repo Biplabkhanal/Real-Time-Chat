@@ -23,6 +23,11 @@ export default function Inbox({ auth, users }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [usersWithConversations, setUsersWithConversations] = useState([]);
     const [isloading, setIsLoading] = useState(true);
+    const [isBlocked, setIsBlocked] = useState(false);
+    const [blockStatus, setBlockStatus] = useState({
+        isBlocked: false,
+        isBlockedByUser: false,
+    });
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -118,16 +123,6 @@ export default function Inbox({ auth, users }) {
         }
     };
 
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            fetchOnlineStatus();
-        }, 15000);
-
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, []);
-
     const updateMyStatus = async () => {
         if (!auth.user) return;
 
@@ -221,6 +216,44 @@ export default function Inbox({ auth, users }) {
             setUsersWithConversations((prev) => [user, ...prev]);
         }
     };
+
+    useEffect(() => {
+        // Set up interval for online status updates
+        const onlineStatusInterval = setInterval(() => {
+            fetchOnlineStatus();
+        }, 15000);
+
+        let blockStatusInterval;
+        if (selectedUser?.id) {
+            checkBlockStatus();
+
+            blockStatusInterval = setInterval(() => {
+                checkBlockStatus();
+            }, 9000);
+        }
+
+        return () => {
+            clearInterval(onlineStatusInterval);
+            if (blockStatusInterval) {
+                clearInterval(blockStatusInterval);
+            }
+        };
+    }, [selectedUser]);
+
+    const checkBlockStatus = async () => {
+        try {
+            const response = await axios.get(
+                `/block-status/${selectedUser.id}`
+            );
+
+            const { isBlocked, isBlockedByUser } = response.data;
+            setBlockStatus({ isBlocked, isBlockedByUser });
+            setIsBlocked(isBlocked || isBlockedByUser);
+        } catch (error) {
+            console.error("Error checking block status:", error);
+        }
+    };
+
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="ChatSync - Inbox" />
@@ -313,11 +346,14 @@ export default function Inbox({ auth, users }) {
                                     attachments={attachments}
                                     setAttachments={setAttachments}
                                     sendMessage={handleSendMessage}
+                                    selectedUser={selectedUser}
                                 />
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">
-                                    Press Enter to send, Shift+Enter for new
-                                    line
-                                </p>
+                                {!isBlocked && (
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">
+                                        Press Enter to send, Shift+Enter for new
+                                        line
+                                    </p>
+                                )}
                             </div>
                         </>
                     )}

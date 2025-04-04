@@ -5,6 +5,8 @@ import FileUploadButton from "./FileUploadButton";
 import SendButton from "../icons/SendButton";
 import EmojiPicker from "emoji-picker-react";
 import VoiceButton from "../icons/VoiceMessageIcon";
+import axios from "axios";
+import { usePage } from "@inertiajs/react";
 
 const MessageInput = ({
     inputRef,
@@ -15,8 +17,15 @@ const MessageInput = ({
     attachments,
     setAttachments,
     sendMessage,
+    selectedUser,
 }) => {
+    const { auth } = usePage().props;
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [isBlocked, setIsBlocked] = useState(false);
+    const [blockStatus, setBlockStatus] = useState({
+        isBlocked: false,
+        isBlockedByUser: false,
+    });
     const emojiContainerRef = useRef(null);
 
     useEffect(() => {
@@ -34,6 +43,35 @@ const MessageInput = ({
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        let blockStatusInterval;
+        if (selectedUser?.id) {
+            checkBlockStatus();
+
+            blockStatusInterval = setInterval(() => {
+                checkBlockStatus();
+            }, 10000);
+        }
+        return () => {
+            if (blockStatusInterval) {
+                clearInterval(blockStatusInterval);
+            }
+        };
+    }, [selectedUser]);
+
+    const checkBlockStatus = async () => {
+        try {
+            const response = await axios.get(
+                `/block-status/${selectedUser.id}`
+            );
+            const { isBlocked, isBlockedByUser } = response.data;
+            setBlockStatus({ isBlocked, isBlockedByUser });
+            setIsBlocked(isBlocked || isBlockedByUser);
+        } catch (error) {
+            console.error("Error checking block status:", error);
+        }
+    };
+
     const onEmojiClick = (emojiObject) => {
         const cursor = inputRef.current.selectionStart;
         const text = messageInput;
@@ -42,6 +80,18 @@ const MessageInput = ({
         const newText = textBeforeCursor + emojiObject.emoji + textAfterCursor;
         setMessageInput(newText);
     };
+
+    if (isBlocked) {
+        return (
+            <div className="flex flex-col items-center p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
+                <p className="text-red-500 dark:text-red-400 font-medium text-center">
+                    {blockStatus.isBlocked
+                        ? "You have blocked this user. Unblock them to send messages."
+                        : "You cannot send messages to this user."}
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex items-center relative">

@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import ConversationDeleteModal from "./ChatHeader/ConversationDeleteModal";
 import MoreOptionsButton from "./ChatHeader/icons/MoreOptionsButton";
 import SearchButton from "./ChatHeader/icons/SearchButton";
+import BlockUserModal from "./ChatHeader/BlockUserModal";
 
 const ChatHeader = ({
     selectedUser,
@@ -17,6 +18,8 @@ const ChatHeader = ({
     const [showMediaModal, setShowMediaModal] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showBlockModal, setShowBlockModal] = useState(false);
+    const [isUserBlocked, setIsUserBlocked] = useState(false);
     const { auth } = usePage().props;
     const dropdownRef = React.useRef();
 
@@ -54,6 +57,45 @@ const ChatHeader = ({
                 error.response?.data?.message || "Failed to delete conversation"
             );
         }
+    };
+
+    useEffect(() => {
+        if (selectedUser?.id) {
+            checkBlockStatus();
+        }
+    }, [selectedUser]);
+
+    const checkBlockStatus = async () => {
+        try {
+            const response = await axios.get(
+                `/block-status/${selectedUser.id}`
+            );
+            setIsUserBlocked(response.data.isBlocked);
+        } catch (error) {
+            console.error("Error checking block status:", error);
+        }
+    };
+
+    const handleBlockUser = async () => {
+        try {
+            if (isUserBlocked) {
+                await axios.delete(`/unblock-user/${selectedUser.id}`);
+                setIsUserBlocked(false);
+            } else {
+                await axios.post("/block-user", {
+                    blocked_user_id: selectedUser.id,
+                });
+                setIsUserBlocked(true);
+            }
+            setShowBlockModal(false);
+        } catch (error) {
+            console.error("Error blocking/unblocking user:", error);
+            setShowBlockModal(false);
+        }
+    };
+
+    const openBlockConfirmation = () => {
+        setShowBlockModal(true);
     };
 
     return (
@@ -105,8 +147,13 @@ const ChatHeader = ({
                                     <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
                                         View profile
                                     </button>
-                                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        Block user
+                                    <button
+                                        onClick={() => openBlockConfirmation()}
+                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        {isUserBlocked
+                                            ? "Unblock user"
+                                            : "Block user"}
                                     </button>
                                     <button
                                         onClick={() => setShowDeleteModal(true)}
@@ -126,6 +173,16 @@ const ChatHeader = ({
                     userId={selectedUser.id}
                     onConfirm={handleDeleteConversation}
                     onCancel={() => setShowDeleteModal(false)}
+                />
+            )}
+
+            {showBlockModal && (
+                <BlockUserModal
+                    onConfirm={handleBlockUser}
+                    onCancel={() => setShowBlockModal(false)}
+                    userId={selectedUser.id}
+                    isBlocked={isUserBlocked}
+                    userName={selectedUser.name}
                 />
             )}
         </div>

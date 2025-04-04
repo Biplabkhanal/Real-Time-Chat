@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlockUserController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
@@ -46,6 +47,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+
+    Route::post('/block-user', [BlockUserController::class, 'blockUser']);
+    Route::delete('/unblock-user/{user}', [BlockUserController::class, 'unblockUser']);
+    Route::get('/block-status/{user}', [BlockUserController::class, 'checkBlockStatus']);
+    Route::get('/blocked-users', [BlockUserController::class, 'getBlockedUsers']);
 });
 
 require __DIR__ . '/auth.php';

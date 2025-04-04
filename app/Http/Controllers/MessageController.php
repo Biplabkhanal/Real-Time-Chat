@@ -30,6 +30,11 @@ class MessageController extends Controller
     public function store(Request $request, User $user)
     {
         try {
+
+            if (!$this->canSendMessage($user->id)) {
+                return response()->json(['error' => 'Cannot send message to this user'], 403);
+            }
+
             // Validate the request
             $validator = Validator::make($request->all(), [
                 'message' => 'nullable|string',
@@ -339,5 +344,22 @@ class MessageController extends Controller
         if (!$message) return '';
         preg_match('/https?:\/\/[^\s]+/', $message, $matches);
         return $matches[0] ?? '';
+    }
+
+    /**
+     * Check if messaging is allowed between users
+     */
+    private function canSendMessage($receiverId)
+    {
+        // Check if either user has blocked the other
+        $isBlocked = \App\Models\BlockedUser::where(function ($query) use ($receiverId) {
+            $query->where('user_id', Auth::id())
+                ->where('blocked_user_id', $receiverId);
+        })->orWhere(function ($query) use ($receiverId) {
+            $query->where('user_id', $receiverId)
+                ->where('blocked_user_id', Auth::id());
+        })->exists();
+
+        return !$isBlocked;
     }
 }

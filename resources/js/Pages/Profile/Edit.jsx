@@ -4,6 +4,7 @@ import DeleteUserForm from "./Partials/DeleteUserForm";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
 import UpdateAvatarForm from "./Partials/UpdateAvatarForm";
+import BlockedUsersForm from "./Partials/BlockedUsersForm";
 
 export default function Edit({ mustVerifyEmail, status }) {
     return (
@@ -22,6 +23,10 @@ export default function Edit({ mustVerifyEmail, status }) {
                             <hr className="border-gray-200/50 dark:border-gray-700/50" />
                             <UpdatePasswordForm className="w-full" />
                         </div>
+                    </div>
+
+                    <div className="w-full bg-white/50 dark:bg-gray-800/50 p-6 shadow-md border border-gray-200/50 dark:border-gray-700/50 sm:rounded-lg backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                        <BlockedUsersForm className="w-full" />
                     </div>
 
                     <div className="w-full bg-white/50 dark:bg-gray-800/50 p-6 shadow-md border border-red-200/50 dark:border-red-700/50 sm:rounded-lg backdrop-blur-sm hover:shadow-lg transition-all duration-300">

@@ -90,4 +90,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+    public function blockedUsers()
+    {
+        return $this->hasMany(BlockedUser::class, 'user_id');
+    }
+
+    public function blockedBy()
+    {
+        return $this->hasMany(BlockedUser::class, 'blocked_user_id');
+    }
 }
