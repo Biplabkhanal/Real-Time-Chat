@@ -188,31 +188,32 @@ export default function Inbox({ auth, users }) {
         setSelectedUser(user);
     };
 
-    const handleConversationDeleted = () => {
-        setCurrentMessages([]);
+    const fetchUsersWithConversations = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get("/users-with-conversations");
+            setUsersWithConversations(response.data);
+        } catch (error) {
+            console.error("Error fetching users with conversations:", error);
+            setUsersWithConversations(users);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
-        const fetchUsersWithConversations = async () => {
-            setIsLoading(true);
-            try {
-                // Fetch users who have at least one message with the current user
-                const response = await axios.get("/users-with-conversations");
-                setUsersWithConversations(response.data);
-            } catch (error) {
-                console.error(
-                    "Error fetching users with conversations:",
-                    error
-                );
-                // Fallback to all users if the API fails
-                setUsersWithConversations(users);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchUsersWithConversations();
     }, []);
+
+    const handleConversationDeleted = (userId) => {
+        setCurrentMessages([]);
+        setUsersWithConversations((prevUsers) =>
+            prevUsers.filter((user) => user.id !== userId)
+        );
+
+        setSelectedUser(null);
+        fetchUsersWithConversations();
+    };
 
     const addToUsersList = (user) => {
         const userExists = usersWithConversations.some((u) => u.id === user.id);
