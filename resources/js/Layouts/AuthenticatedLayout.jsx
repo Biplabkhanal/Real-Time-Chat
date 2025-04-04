@@ -41,7 +41,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <NavLink
                                     href={route("inbox")}
                                     active={route().current("inbox")}
-                                    className="inline-flex items-center px-1 pt-1 border-b-2 text-xl font-medium leading-5 text-gray-200 hover:text-white focus:outline-none focus:text-white transition duration-150 ease-in-out"
+                                    className="inline-flex items-center px-1 pt-1 border-b-2 text-xl font-medium leading-5 text-white hover:text-white focus:outline-none focus:text-white transition duration-150 ease-in-out"
                                     activeClassName="border-indigo-400 text-white"
                                 >
                                     Inbox
