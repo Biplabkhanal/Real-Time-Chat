@@ -372,6 +372,111 @@ class MessageController extends Controller
         ]);
     }
 
+
+    /**
+     * Export conversation history
+     */
+    public function exportConversation(Request $request, User $user)
+    {
+        $format = $request->query('format', 'pdf');
+        $currentUserId = Auth::id();
+        $otherUserId = $user->id;
+
+        // Get all messages between the users
+        $messages = $this->getConversationMessages($currentUserId, $otherUserId);
+
+        if ($messages->isEmpty()) {
+            return response()->json(['error' => 'No messages to export'], 404);
+        }
+
+        // Format user names
+        $currentUser = Auth::user();
+        $otherUser = $user;
+
+        if ($format === 'csv') {
+            return $this->exportToCsv($messages, $currentUser, $otherUser);
+        } else {
+            return $this->exportToPdf($messages, $currentUser, $otherUser);
+        }
+    }
+
+    /**
+     * Export to CSV format
+     */
+    private function exportToCsv($messages, $currentUser, $otherUser)
+    {
+        $filename = 'conversation_with_' . $otherUser->name . '_' . date('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($messages, $currentUser, $otherUser) {
+            $file = fopen('php://output', 'w');
+
+            // Add CSV headers
+            fputcsv($file, ['Timestamp', 'Sender', 'Message', 'Attachment']);
+
+            foreach ($messages as $message) {
+                $sender = ($message->sender_id === $currentUser->id) ? $currentUser->name : $otherUser->name;
+                $attachment = !empty($message->attachment) ? 'Yes' : 'No';
+
+                fputcsv($file, [
+                    $message->created_at->format('Y-m-d H:i:s'),
+                    $sender,
+                    $message->message,
+                    $attachment
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export to PDF format
+     */
+    public function exportToPdf($messages, $currentUser, $otherUser)
+    {
+        // Process messages to encode image attachments
+        foreach ($messages as $message) {
+            if (!empty($message->attachment)) {
+                $attachmentPath = is_object($message->attachment)
+                    ? $message->attachment->path ?? ''
+                    : $message->attachment;
+
+                if (is_string($attachmentPath) && !empty($attachmentPath)) {
+                    $fileExtension = pathinfo($attachmentPath, PATHINFO_EXTENSION);
+                    $isImage = in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+
+                    if ($isImage) {
+                        $fullPath = storage_path('app/public/chat_attachments/' . $attachmentPath);
+                        if (file_exists($fullPath)) {
+                            $fileContent = file_get_contents($fullPath);
+                            $base64 = base64_encode($fileContent);
+                            $mime = mime_content_type($fullPath);
+                            $message->imageData = "data:$mime;base64,$base64";
+                        }
+                    }
+                }
+            }
+        }
+
+        $pdf = PDF::loadView('exports.conversation', [
+            'messages' => $messages,
+            'currentUser' => $currentUser,
+            'otherUser' => $otherUser
+        ]);
+
+        return $pdf->download('conversation_' . $currentUser->id . '_' . $otherUser->id . '.pdf');
+    }
+
     // Helper methods
     private function getFileType($path)
     {

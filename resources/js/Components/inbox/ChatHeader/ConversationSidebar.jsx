@@ -7,6 +7,7 @@ import ErrorDisplay from "./ErrorDisplay";
 import MediaGrid from "./MediaGrid";
 import DocumentsList from "./DocumentsList";
 import LinksList from "./LinksList";
+import ExportConversationModal from "./ExportConversationModal";
 
 const ConversationSidebar = ({
     isOpen,
@@ -23,6 +24,8 @@ const ConversationSidebar = ({
     const [mediaFiles, setMediaFiles] = useState([]);
     const [mediaLoading, setMediaLoading] = useState(true);
     const [mediaError, setMediaError] = useState(null);
+
+    const [showExportModal, setShowExportModal] = useState(false);
 
     useEffect(() => {
         if (isOpen && selectedUser?.id) {
@@ -478,6 +481,31 @@ const ConversationSidebar = ({
                                                         {selectedUser.name}
                                                     </span>
                                                 </button>
+
+                                                {/* Export conversation button */}
+                                                <button
+                                                    className="w-full flex items-center justify-center space-x-2 py-2 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                                                    onClick={() =>
+                                                        setShowExportModal(true)
+                                                    }
+                                                >
+                                                    <svg
+                                                        className="w-5 h-5 text-gray-500"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth="2"
+                                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                                        />
+                                                    </svg>
+                                                    <span className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                                        Export Conversation
+                                                    </span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -495,6 +523,13 @@ const ConversationSidebar = ({
                     activeTab === "documents" ||
                     activeTab === "links") && (
                     <div className="h-full">{renderMediaContent()}</div>
+                )}
+
+                {showExportModal && (
+                    <ExportConversationModal
+                        userId={selectedUser.id}
+                        onClose={() => setShowExportModal(false)}
+                    />
                 )}
             </div>
         </div>
