@@ -182,8 +182,10 @@ export default function Inbox({ auth, users }) {
     }, []);
 
     const handleUserSelect = (user) => {
+        if (selectedUser && selectedUser.id !== user.id) {
+            setShowInfoSidebar(false);
+        }
         setSelectedUser(user);
-        setShowInfoSidebar(false);
     };
 
     const fetchUsersWithConversations = async () => {
@@ -288,7 +290,7 @@ export default function Inbox({ auth, users }) {
                     <UserList
                         filteredUsers={usersWithConversations}
                         selectedUser={selectedUser}
-                        setSelectedUser={setSelectedUser}
+                        setSelectedUser={handleUserSelect}
                         onlineUsers={onlineUsers}
                         isLoading={isLoading}
                     />
