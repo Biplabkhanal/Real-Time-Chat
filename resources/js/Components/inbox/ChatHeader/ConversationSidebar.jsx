@@ -8,6 +8,7 @@ import MediaGrid from "./MediaGrid";
 import DocumentsList from "./DocumentsList";
 import LinksList from "./LinksList";
 import ExportConversationModal from "./ExportConversationModal";
+import ConversationAnalytics from "./ConversationAnalytics";
 
 const ConversationSidebar = ({
     isOpen,
@@ -173,6 +174,10 @@ const ConversationSidebar = ({
             return <LinksList files={filterByType("links")} />;
         }
 
+        if (activeTab === "analytics") {
+            return <ConversationAnalytics userId={selectedUser.id} />;
+        }
+
         return null;
     };
 
@@ -217,6 +222,7 @@ const ConversationSidebar = ({
                         { id: "images", label: "Images" },
                         { id: "documents", label: "Documents" },
                         { id: "links", label: "Links" },
+                        { id: "analytics", label: "Analytics" },
                     ]}
                 />
             </div>
@@ -541,7 +547,8 @@ const ConversationSidebar = ({
 
                 {(activeTab === "images" ||
                     activeTab === "documents" ||
-                    activeTab === "links") && (
+                    activeTab === "links" ||
+                    activeTab === "analytics") && (
                     <div className="h-full">{renderMediaContent()}</div>
                 )}
 

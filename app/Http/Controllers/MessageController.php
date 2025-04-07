@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class MessageController extends Controller
 {
@@ -474,6 +475,80 @@ class MessageController extends Controller
         ]);
 
         return $pdf->download('conversation_' . $currentUser->id . '_' . $otherUser->id . '.pdf');
+    }
+
+    /**
+     * Get conversation analytics data
+     */
+    public function getConversationAnalytics(User $user)
+    {
+        try {
+            $currentUserId = Auth::id();
+            $otherUserId = $user->id;
+
+            // Get all messages in the conversation
+            $messages = Message::where(function ($query) use ($currentUserId, $otherUserId) {
+                $query->where('sender_id', $currentUserId)
+                    ->where('recipient_id', $otherUserId);
+            })->orWhere(function ($query) use ($currentUserId, $otherUserId) {
+                $query->where('sender_id', $otherUserId)
+                    ->where('recipient_id', $currentUserId);
+            })->orderBy('created_at', 'asc')->get();
+
+            $last7Days = [];
+            $today = Carbon::now();
+
+            for ($i = 6; $i >= 0; $i--) {
+                $date = $today->copy()->subDays($i);
+                $last7Days[$date->format('Y-m-d')] = 0;
+            }
+
+            $messagesByDay = $messages->filter(function ($message) use ($today) {
+                return $message->created_at->diffInDays($today) <= 6;
+            })->groupBy(function ($message) {
+                return $message->created_at->format('Y-m-d');
+            });
+
+            foreach ($messagesByDay as $date => $msgs) {
+                if (isset($last7Days[$date])) {
+                    $last7Days[$date] = count($msgs);
+                }
+            }
+
+            $sentByCurrentUser = $messages->where('sender_id', $currentUserId)->count();
+            $sentByOtherUser = $messages->count() - $sentByCurrentUser;
+
+            $heatmapData = [];
+            for ($day = 0; $day < 7; $day++) {
+                $heatmapData[$day] = array_fill(0, 24, 0);
+            }
+
+            foreach ($messages as $message) {
+                $dayOfWeek = $message->created_at->dayOfWeek;
+                $hour = $message->created_at->hour;
+                $heatmapData[$dayOfWeek][$hour]++;
+            }
+
+            return response()->json([
+                'messagesByDay' => [
+                    'labels' => array_map(function ($date) {
+                        return Carbon::parse($date)->format('D, M j');
+                    }, array_keys($last7Days)),
+                    'data' => array_values($last7Days)
+                ],
+                'messageDistribution' => [
+                    'labels' => ['You', $user->name],
+                    'data' => [$sentByCurrentUser, $sentByOtherUser]
+                ],
+                'heatmapData' => [
+                    'data' => $heatmapData,
+                    'daysOfWeek' => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error getting conversation analytics: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     // Helper methods
