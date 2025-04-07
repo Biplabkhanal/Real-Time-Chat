@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MessageController extends Controller
 {

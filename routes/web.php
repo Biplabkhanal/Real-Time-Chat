@@ -41,7 +41,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/conversation-stats/{user}', [MessageController::class, 'getConversationStats']);
     Route::get('/export-conversation/{user}', [MessageController::class, 'exportConversation'])->name('export.conversation');
 
-
     Route::post('/upload-file', [FileUploadController::class, 'upload'])->name('upload.file');
 
     Route::get('/users/status', [UserStatusController::class, 'getOnlineUsers']);
