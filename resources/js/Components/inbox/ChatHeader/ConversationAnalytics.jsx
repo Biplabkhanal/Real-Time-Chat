@@ -205,7 +205,7 @@ const ConversationAnalytics = ({ userId }) => {
                     <div className="w-full border-t border-gray-300 dark:border-gray-500"></div>
                 </div>
                 <div className="relative flex justify-center">
-                    <span className="bg-white dark:bg-gray-900 px-3 text-lg text-gray-400 dark:text-gray-300">
+                    <span className="bg-white dark:bg-gray-900 px-3 text-md text-gray-400 dark:text-gray-300">
                         Message Per Day
                     </span>
                 </div>
@@ -239,7 +239,7 @@ const ConversationAnalytics = ({ userId }) => {
                     <div className="w-full border-t border-gray-300 dark:border-gray-500"></div>
                 </div>
                 <div className="relative flex justify-center">
-                    <span className="bg-white dark:bg-gray-900 px-3 text-lg text-gray-400 dark:text-gray-300">
+                    <span className="bg-white dark:bg-gray-900 px-3 text-md text-gray-400 dark:text-gray-300">
                         Message Distribution
                     </span>
                 </div>
@@ -264,7 +264,7 @@ const ConversationAnalytics = ({ userId }) => {
                     <div className="w-full border-t border-gray-300 dark:border-gray-500"></div>
                 </div>
                 <div className="relative flex justify-center">
-                    <span className="bg-white dark:bg-gray-900 px-3 text-lg text-gray-400 dark:text-gray-300">
+                    <span className="bg-white dark:bg-gray-900 px-3 text-md text-gray-400 dark:text-gray-300">
                         Activity Heatmap
                     </span>
                 </div>
