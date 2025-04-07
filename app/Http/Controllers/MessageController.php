@@ -452,17 +452,15 @@ class MessageController extends Controller
                     ? $message->attachment->path ?? ''
                     : $message->attachment;
 
-                if (is_string($attachmentPath) && !empty($attachmentPath)) {
+                if (!empty($attachmentPath)) {
                     $fileExtension = pathinfo($attachmentPath, PATHINFO_EXTENSION);
                     $isImage = in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
 
                     if ($isImage) {
-                        $fullPath = storage_path('app/public/chat_attachments/' . $attachmentPath);
+                        $fullPath = storage_path('storage/app/public/chat_attachments' . $attachmentPath);
                         if (file_exists($fullPath)) {
-                            $fileContent = file_get_contents($fullPath);
-                            $base64 = base64_encode($fileContent);
-                            $mime = mime_content_type($fullPath);
-                            $message->imageData = "data:$mime;base64,$base64";
+                            $imageData = base64_encode(file_get_contents($fullPath));
+                            $message->imageData = 'data:image/' . $fileExtension . ';base64,' . $imageData;
                         }
                     }
                 }

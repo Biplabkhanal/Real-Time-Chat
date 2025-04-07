@@ -169,7 +169,7 @@
                             @if ($isImage && isset($message->imageData))
                                 <img src="{{ $message->imageData }}" alt="Image">
                             @elseif ($isImage)
-                                <img src="{{ asset('storage/chat_attachments/' . $attachmentPath) }}" alt="Image">
+                                <div class="attachment-icon">[Image not available]</div>
                             @elseif (!empty($fileName))
                                 <div class="attachment-icon">
                                     {{ $fileName }}

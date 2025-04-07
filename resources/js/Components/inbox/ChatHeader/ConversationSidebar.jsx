@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import moment from "moment";
 import TabNavigation from "./TabNavigation ";
@@ -26,6 +26,26 @@ const ConversationSidebar = ({
     const [mediaError, setMediaError] = useState(null);
 
     const [showExportModal, setShowExportModal] = useState(false);
+    const exportModalRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                exportModalRef.current &&
+                !exportModalRef.current.contains(event.target)
+            ) {
+                setShowExportModal(false);
+            }
+        }
+
+        if (showExportModal) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showExportModal]);
 
     useEffect(() => {
         if (isOpen && selectedUser?.id) {
@@ -526,10 +546,14 @@ const ConversationSidebar = ({
                 )}
 
                 {showExportModal && (
-                    <ExportConversationModal
-                        userId={selectedUser.id}
-                        onClose={() => setShowExportModal(false)}
-                    />
+                    <div className="modal-overlay">
+                        <div ref={exportModalRef}>
+                            <ExportConversationModal
+                                userId={selectedUser.id}
+                                onClose={() => setShowExportModal(false)}
+                            />
+                        </div>
+                    </div>
                 )}
             </div>
         </div>
