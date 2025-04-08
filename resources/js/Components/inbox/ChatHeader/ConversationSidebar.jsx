@@ -9,6 +9,7 @@ import DocumentsList from "./DocumentsList";
 import LinksList from "./LinksList";
 import ExportConversationModal from "./ExportConversationModal";
 import ConversationAnalytics from "./ConversationAnalytics";
+import ThemeSettings from "./ThemeSettings";
 
 const ConversationSidebar = ({
     isOpen,
@@ -178,6 +179,10 @@ const ConversationSidebar = ({
             return <ConversationAnalytics userId={selectedUser.id} />;
         }
 
+        if (activeTab === "theme") {
+            return <ThemeSettings />;
+        }
+
         return null;
     };
 
@@ -223,6 +228,7 @@ const ConversationSidebar = ({
                         { id: "documents", label: "Documents" },
                         { id: "links", label: "Links" },
                         { id: "analytics", label: "Analytics" },
+                        { id: "theme", label: "Theme" },
                     ]}
                 />
             </div>
@@ -548,7 +554,8 @@ const ConversationSidebar = ({
                 {(activeTab === "images" ||
                     activeTab === "documents" ||
                     activeTab === "links" ||
-                    activeTab === "analytics") && (
+                    activeTab === "analytics" ||
+                    activeTab === "theme") && (
                     <div className="h-full">{renderMediaContent()}</div>
                 )}
 
