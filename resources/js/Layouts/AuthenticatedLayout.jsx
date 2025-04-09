@@ -3,13 +3,110 @@ import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage } from "@inertiajs/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [showNotifications, setShowNotifications] = useState(false);
+
+    useEffect(() => {
+        // Fetch notifications when component mounts
+        fetchNotifications();
+
+        // Listen for new messages
+        window.Echo.private(`message.${user.id}`).listen("MessageSent", (e) => {
+            // Create a notification from the message event
+            const newNotification = {
+                id: `temp-${Date.now()}`, // Temporary ID until we refetch
+                sender: e.user,
+                content: "sent you a message",
+                created_at: new Date().toISOString(),
+                is_read: false,
+            };
+
+            // Update the UI immediately
+            setNotifications((prev) => [newNotification, ...prev]);
+            setUnreadCount((prevCount) => prevCount + 1);
+
+            // Refetch to get the real notification IDs
+            setTimeout(fetchNotifications, 1000);
+        });
+
+        // Clean up on unmount
+        return () => {
+            window.Echo.leave(`message.${user.id}`);
+        };
+    }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            const response = await axios.get(route("notifications.index"));
+            setNotifications(response.data.notifications);
+            setUnreadCount(response.data.unreadCount);
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        }
+    };
+
+    const markAsRead = async (notificationId) => {
+        try {
+            await axios.post(
+                route("notifications.markAsRead", { id: notificationId })
+            );
+            setNotifications(
+                notifications.map((notification) =>
+                    notification.id === notificationId
+                        ? { ...notification, is_read: true }
+                        : notification
+                )
+            );
+            setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
+        } catch (error) {
+            console.error("Error marking notification as read:", error);
+        }
+    };
+
+    const markAllAsRead = async () => {
+        try {
+            await axios.post(route("notifications.markAllAsRead"));
+            setNotifications(
+                notifications.map((notification) => ({
+                    ...notification,
+                    is_read: true,
+                }))
+            );
+            setUnreadCount(0);
+        } catch (error) {
+            console.error("Error marking all notifications as read:", error);
+        }
+    };
+
+    const toggleNotifications = () => {
+        setShowNotifications(!showNotifications);
+    };
+
+    // Close notifications dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                showNotifications &&
+                !event.target.closest(".notification-container")
+            ) {
+                setShowNotifications(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showNotifications]);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -50,6 +147,119 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                            <div className="notification-container relative">
+                                <button
+                                    onClick={toggleNotifications}
+                                    className="relative p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3"
+                                >
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 flex h-5 w-5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-5 w-5 bg-indigo-500 justify-center items-center text-xs text-white">
+                                                {unreadCount > 99
+                                                    ? "99+"
+                                                    : unreadCount}
+                                            </span>
+                                        </span>
+                                    )}
+                                    <svg
+                                        className="h-6 w-6"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                                        />
+                                    </svg>
+                                </button>
+
+                                {/* Notifications dropdown */}
+                                {showNotifications && (
+                                    <div className="notification-container absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
+                                        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+                                            <h3 className="text-lg font-semibold text-white">
+                                                Notifications
+                                            </h3>
+                                            {unreadCount > 0 && (
+                                                <button
+                                                    onClick={markAllAsRead}
+                                                    className="text-xs text-blue-400 hover:text-blue-300"
+                                                >
+                                                    Mark all as read
+                                                </button>
+                                            )}
+                                        </div>
+                                        {notifications.length === 0 ? (
+                                            <div className="p-4 text-center text-gray-400">
+                                                No notifications
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                {notifications.map(
+                                                    (notification, index) => (
+                                                        <div
+                                                            key={
+                                                                notification.id ||
+                                                                index
+                                                            }
+                                                            className={`p-4 border-b border-gray-700 hover:bg-gray-700 cursor-pointer ${
+                                                                !notification.is_read
+                                                                    ? "bg-gray-700/50"
+                                                                    : ""
+                                                            }`}
+                                                            onClick={() =>
+                                                                notification.id &&
+                                                                !notification.id
+                                                                    .toString()
+                                                                    .startsWith(
+                                                                        "temp-"
+                                                                    )
+                                                                    ? markAsRead(
+                                                                          notification.id
+                                                                      )
+                                                                    : null
+                                                            }
+                                                        >
+                                                            <div className="flex items-center">
+                                                                <div className="flex-shrink-0">
+                                                                    <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
+                                                                        {notification.sender?.name?.charAt(
+                                                                            0
+                                                                        ) ||
+                                                                            "?"}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="ml-3">
+                                                                    <p className="text-sm font-medium text-white">
+                                                                        {notification
+                                                                            .sender
+                                                                            ?.name ||
+                                                                            "User"}{" "}
+                                                                        {
+                                                                            notification.content
+                                                                        }
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-400">
+                                                                        {new Date(
+                                                                            notification.created_at
+                                                                        ).toLocaleString()}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
@@ -97,6 +307,29 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="-me-2 flex items-center sm:hidden">
+                            <button className="relative p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
+                                <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 justify-center items-center text-xs text-white">
+                                        3
+                                    </span>
+                                </span>
+                                <svg
+                                    className="h-5 w-5"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                                    />
+                                </svg>
+                            </button>
+
                             <button
                                 onClick={() =>
                                     setShowingNavigationDropdown(

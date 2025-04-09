@@ -3,6 +3,7 @@
 use App\Http\Controllers\BlockUserController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserStatusController;
@@ -54,6 +55,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/unblock-user/{user}', [BlockUserController::class, 'unblockUser']);
     Route::get('/block-status/{user}', [BlockUserController::class, 'checkBlockStatus']);
     Route::get('/blocked-users', [BlockUserController::class, 'getBlockedUsers']);
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
 
 require __DIR__ . '/auth.php';
