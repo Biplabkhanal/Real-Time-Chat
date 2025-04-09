@@ -12,6 +12,7 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = Notification::where('user_id', Auth::id())
+            ->orderBy('is_read', 'asc')
             ->with('sender')
             ->orderBy('created_at', 'desc')
             ->take(10)
