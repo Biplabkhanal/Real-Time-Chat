@@ -15,29 +15,23 @@ export default function AuthenticatedLayout({ header, children }) {
     const [showNotifications, setShowNotifications] = useState(false);
 
     useEffect(() => {
-        // Fetch notifications when component mounts
         fetchNotifications();
 
-        // Listen for new messages
         window.Echo.private(`message.${user.id}`).listen("MessageSent", (e) => {
-            // Create a notification from the message event
             const newNotification = {
-                id: `temp-${Date.now()}`, // Temporary ID until we refetch
+                id: `temp-${Date.now()}`,
                 sender: e.user,
                 content: "sent you a message",
                 created_at: new Date().toISOString(),
                 is_read: false,
             };
 
-            // Update the UI immediately
             setNotifications((prev) => [newNotification, ...prev]);
             setUnreadCount((prevCount) => prevCount + 1);
 
-            // Refetch to get the real notification IDs
             setTimeout(fetchNotifications, 1000);
         });
 
-        // Clean up on unmount
         return () => {
             window.Echo.leave(`message.${user.id}`);
         };
@@ -54,7 +48,6 @@ export default function AuthenticatedLayout({ header, children }) {
     };
 
     const markAsRead = async (notificationId, event) => {
-        // Prevent the notification click event from triggering
         if (event) {
             event.stopPropagation();
         }
@@ -219,18 +212,29 @@ export default function AuthenticatedLayout({ header, children }) {
                                                         >
                                                             <div className="flex items-center">
                                                                 <div className="flex-shrink-0">
-                                                                    <div
-                                                                        className={`w-10 h-10 rounded-full ${
-                                                                            !notification.is_read
-                                                                                ? "bg-indigo-500"
-                                                                                : "bg-gray-600"
-                                                                        } flex items-center justify-center text-white font-bold`}
-                                                                    >
-                                                                        {notification.sender?.name?.charAt(
-                                                                            0
-                                                                        ) ||
-                                                                            "?"}
-                                                                    </div>
+                                                                    {notification
+                                                                        .sender
+                                                                        ?.avatar ? (
+                                                                        <img
+                                                                            src={`/storage/${notification.sender.avatar}`}
+                                                                            alt={
+                                                                                notification
+                                                                                    .sender
+                                                                                    ?.name ||
+                                                                                "User"
+                                                                            }
+                                                                            className="w-10 h-10 rounded-full object-cover border-2 border-gray-700"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
+                                                                            {notification.sender?.name
+                                                                                ?.charAt(
+                                                                                    0
+                                                                                )
+                                                                                .toUpperCase() ||
+                                                                                "?"}
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                                 <div className="ml-3 flex-grow">
                                                                     <p
