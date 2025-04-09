@@ -53,7 +53,12 @@ export default function AuthenticatedLayout({ header, children }) {
         }
     };
 
-    const markAsRead = async (notificationId) => {
+    const markAsRead = async (notificationId, event) => {
+        // Prevent the notification click event from triggering
+        if (event) {
+            event.stopPropagation();
+        }
+
         try {
             await axios.post(
                 route("notifications.markAsRead", { id: notificationId })
@@ -90,7 +95,6 @@ export default function AuthenticatedLayout({ header, children }) {
         setShowNotifications(!showNotifications);
     };
 
-    // Close notifications dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -207,35 +211,35 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                 notification.id ||
                                                                 index
                                                             }
-                                                            className={`p-4 border-b border-gray-700 hover:bg-gray-700 cursor-pointer ${
+                                                            className={`p-4 border-b border-gray-700 hover:bg-gray-700 cursor-pointer relative ${
                                                                 !notification.is_read
-                                                                    ? "bg-gray-700/50"
-                                                                    : ""
+                                                                    ? "bg-gray-700/50 border-l-4 border-l-blue-500"
+                                                                    : "opacity-80"
                                                             }`}
-                                                            onClick={() =>
-                                                                notification.id &&
-                                                                !notification.id
-                                                                    .toString()
-                                                                    .startsWith(
-                                                                        "temp-"
-                                                                    )
-                                                                    ? markAsRead(
-                                                                          notification.id
-                                                                      )
-                                                                    : null
-                                                            }
                                                         >
                                                             <div className="flex items-center">
                                                                 <div className="flex-shrink-0">
-                                                                    <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
+                                                                    <div
+                                                                        className={`w-10 h-10 rounded-full ${
+                                                                            !notification.is_read
+                                                                                ? "bg-indigo-500"
+                                                                                : "bg-gray-600"
+                                                                        } flex items-center justify-center text-white font-bold`}
+                                                                    >
                                                                         {notification.sender?.name?.charAt(
                                                                             0
                                                                         ) ||
                                                                             "?"}
                                                                     </div>
                                                                 </div>
-                                                                <div className="ml-3">
-                                                                    <p className="text-sm font-medium text-white">
+                                                                <div className="ml-3 flex-grow">
+                                                                    <p
+                                                                        className={`text-sm font-medium ${
+                                                                            !notification.is_read
+                                                                                ? "text-white"
+                                                                                : "text-gray-300"
+                                                                        }`}
+                                                                    >
                                                                         {notification
                                                                             .sender
                                                                             ?.name ||
@@ -250,6 +254,40 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                         ).toLocaleString()}
                                                                     </p>
                                                                 </div>
+                                                                {/* Mark as read button */}
+                                                                {!notification.is_read &&
+                                                                    notification.id &&
+                                                                    !notification.id
+                                                                        .toString()
+                                                                        .startsWith(
+                                                                            "temp-"
+                                                                        ) && (
+                                                                        <button
+                                                                            onClick={(
+                                                                                e
+                                                                            ) =>
+                                                                                markAsRead(
+                                                                                    notification.id,
+                                                                                    e
+                                                                                )
+                                                                            }
+                                                                            className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white py-1 px-1 rounded text-center transition-colors duration-150 ml-2 flex-shrink-0"
+                                                                            title="Mark as read"
+                                                                        >
+                                                                            <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                className="h-3 w-3"
+                                                                                viewBox="0 0 20 20"
+                                                                                fill="currentColor"
+                                                                            >
+                                                                                <path
+                                                                                    fillRule="evenodd"
+                                                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                                    clipRule="evenodd"
+                                                                                />
+                                                                            </svg>
+                                                                        </button>
+                                                                    )}
                                                             </div>
                                                         </div>
                                                     )
@@ -306,14 +344,22 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
                         </div>
 
+                        {/* Mobile notifications - update with correct unreadCount */}
                         <div className="-me-2 flex items-center sm:hidden">
-                            <button className="relative p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
-                                <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 justify-center items-center text-xs text-white">
-                                        3
+                            <button
+                                onClick={toggleNotifications}
+                                className="relative p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2"
+                            >
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 justify-center items-center text-xs text-white">
+                                            {unreadCount > 99
+                                                ? "99+"
+                                                : unreadCount}
+                                        </span>
                                     </span>
-                                </span>
+                                )}
                                 <svg
                                     className="h-5 w-5"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -371,6 +417,143 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile notifications dropdown */}
+                {showNotifications && (
+                    <div className="sm:hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center pt-16">
+                        <div className="notification-container bg-gray-800 border border-gray-700 rounded-md shadow-lg w-11/12 max-h-[80vh] overflow-y-auto">
+                            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+                                <h3 className="text-lg font-semibold text-white">
+                                    Notifications
+                                </h3>
+                                <div className="flex space-x-2">
+                                    {unreadCount > 0 && (
+                                        <button
+                                            onClick={markAllAsRead}
+                                            className="text-xs text-blue-400 hover:text-blue-300"
+                                        >
+                                            Mark all as read
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() =>
+                                            setShowNotifications(false)
+                                        }
+                                        className="text-gray-400 hover:text-white"
+                                    >
+                                        <svg
+                                            className="h-5 w-5"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            {notifications.length === 0 ? (
+                                <div className="p-4 text-center text-gray-400">
+                                    No notifications
+                                </div>
+                            ) : (
+                                <div>
+                                    {notifications.map(
+                                        (notification, index) => (
+                                            <div
+                                                key={notification.id || index}
+                                                className={`p-4 border-b border-gray-700 hover:bg-gray-700 cursor-pointer relative ${
+                                                    !notification.is_read
+                                                        ? "bg-gray-700/50 border-l-4 border-l-blue-500"
+                                                        : "opacity-80"
+                                                }`}
+                                                onClick={() =>
+                                                    handleNotificationClick(
+                                                        notification
+                                                    )
+                                                }
+                                            >
+                                                <div className="flex items-center">
+                                                    <div className="flex-shrink-0">
+                                                        <div
+                                                            className={`w-10 h-10 rounded-full ${
+                                                                !notification.is_read
+                                                                    ? "bg-indigo-500"
+                                                                    : "bg-gray-600"
+                                                            } flex items-center justify-center text-white font-bold`}
+                                                        >
+                                                            {notification.sender?.name?.charAt(
+                                                                0
+                                                            ) || "?"}
+                                                        </div>
+                                                    </div>
+                                                    <div className="ml-3 flex-grow">
+                                                        <p
+                                                            className={`text-sm font-medium ${
+                                                                !notification.is_read
+                                                                    ? "text-white"
+                                                                    : "text-gray-300"
+                                                            }`}
+                                                        >
+                                                            {notification.sender
+                                                                ?.name ||
+                                                                "User"}{" "}
+                                                            {
+                                                                notification.content
+                                                            }
+                                                        </p>
+                                                        <p className="text-xs text-gray-400">
+                                                            {new Date(
+                                                                notification.created_at
+                                                            ).toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                    {/* Mark as read button */}
+                                                    {!notification.is_read &&
+                                                        notification.id &&
+                                                        !notification.id
+                                                            .toString()
+                                                            .startsWith(
+                                                                "temp-"
+                                                            ) && (
+                                                            <button
+                                                                onClick={(e) =>
+                                                                    markAsRead(
+                                                                        notification.id,
+                                                                        e
+                                                                    )
+                                                                }
+                                                                className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white py-1 px-2 rounded text-center transition-colors duration-150 ml-2 flex-shrink-0"
+                                                                title="Mark as read"
+                                                            >
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    className="h-4 w-4"
+                                                                    viewBox="0 0 20 20"
+                                                                    fill="currentColor"
+                                                                >
+                                                                    <path
+                                                                        fillRule="evenodd"
+                                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                        clipRule="evenodd"
+                                                                    />
+                                                                </svg>
+                                                            </button>
+                                                        )}
+                                                </div>
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 <div
                     className={
