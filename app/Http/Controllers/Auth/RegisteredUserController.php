@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -43,6 +45,20 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
+
+        $existingUsers = User::where('id', '!=', $user->id)->get();
+
+        foreach ($existingUsers as $existingUser) {
+            Notification::create([
+                'user_id' => $existingUser->id,
+                'sender_id' => $user->id,
+                'type' => 'user_registered',
+                'content' => 'has registered as a new user. Say hello!',
+                'is_read' => false,
+            ]);
+
+            event(new UserRegistered($user, $existingUser));
+        }
 
         Auth::login($user);
 

@@ -32,8 +32,28 @@ export default function AuthenticatedLayout({ header, children }) {
             setTimeout(fetchNotifications, 1000);
         });
 
+        window.Echo.private(`user-activity.${user.id}`).listen(
+            "user.registered",
+            (e) => {
+                const newNotification = {
+                    id: `temp-${Date.now()}`,
+                    sender: e.user,
+                    content: e.message || "has registered as a new user",
+                    created_at: e.timestamp || new Date().toISOString(),
+                    type: "user_registered",
+                    is_read: false,
+                };
+
+                setNotifications((prev) => [newNotification, ...prev]);
+                setUnreadCount((prevCount) => prevCount + 1);
+
+                setTimeout(fetchNotifications, 1000);
+            }
+        );
+
         return () => {
             window.Echo.leave(`message.${user.id}`);
+            window.Echo.leave(`user-activity.${user.id}`);
         };
     }, []);
 
