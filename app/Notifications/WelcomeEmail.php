@@ -36,11 +36,7 @@ class WelcomeEmail extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Welcome to Our Application')
-            ->greeting('Hello ' . $notifiable->name . '!')
-            ->line('Thank you for registering with our application.')
-            ->line('We are excited to have you on board.')
-            ->action('Get Started', url('/dashboard'))
-            ->line('If you have any questions, feel free to contact us.');
+            ->view('emails.welcome', ['user' => $notifiable]);
     }
 
     /**

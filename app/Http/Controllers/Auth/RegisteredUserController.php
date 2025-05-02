@@ -6,11 +6,13 @@ use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\User;
+use App\Notifications\WelcomeEmail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -45,6 +47,14 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
+
+        // Send welcome email with error handling
+        try {
+            $user->notify(new WelcomeEmail());
+            Log::info('Welcome email notification dispatched for user: ' . $user->email);
+        } catch (\Exception $e) {
+            Log::error('Failed to send welcome email: ' . $e->getMessage());
+        }
 
         $existingUsers = User::where('id', '!=', $user->id)->get();
 
