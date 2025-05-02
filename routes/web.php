@@ -7,8 +7,10 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserStatusController;
+use App\Mail\TestMail;
 use App\Models\Review;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,6 +22,14 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
         'reviews' => Review::with('user')->latest()->paginate(6)
     ]);
+});
+
+Route::get('/test-mail', function () {
+    $name = 'Biplab Khanal';
+
+    Mail::to('khanalbiplab@gmail.com')->send(new TestMail($name));
+
+    return 'Test email sent!';
 });
 
 Route::get('/dashboard', function () {
