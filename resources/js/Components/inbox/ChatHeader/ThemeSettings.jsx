@@ -10,26 +10,6 @@ const ThemeSettings = () => {
         { id: "system", name: "System", icon: "computer" },
     ];
 
-    // Apply system preference if system is selected
-    React.useEffect(() => {
-        if (theme === "system") {
-            const isDark = window.matchMedia(
-                "(prefers-color-scheme: dark)"
-            ).matches;
-            document.documentElement.classList.toggle("dark", isDark);
-
-            const mediaQuery = window.matchMedia(
-                "(prefers-color-scheme: dark)"
-            );
-            const handleChange = (e) => {
-                document.documentElement.classList.toggle("dark", e.matches);
-            };
-
-            mediaQuery.addEventListener("change", handleChange);
-            return () => mediaQuery.removeEventListener("change", handleChange);
-        }
-    }, [theme]);
-
     return (
         <div className="p-4">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
