@@ -49,7 +49,7 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                             <span className="inline-flex rounded-md">
                                                 <button
                                                     type="button"
-                                                    className="inline-flex items-center rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-200 transition duration-150 ease-in-out hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                    className="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-700 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                                 >
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
@@ -70,8 +70,8 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                             </span>
                                         </Dropdown.Trigger>
 
-                                        <Dropdown.Content contentClasses="bg-gray-800 border border-gray-700 rounded-md shadow-lg py-1 text-gray-200 w-64">
-                                            <div className=" py-1">
+                                        <Dropdown.Content contentClasses="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1 text-gray-700 dark:text-gray-200 w-64">
+                                            <div className="py-1">
                                                 <ThemeSettings />
                                             </div>
                                         </Dropdown.Content>
@@ -86,7 +86,7 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                                     <span className="inline-flex rounded-md">
                                                         <button
                                                             type="button"
-                                                            className="inline-flex items-center rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-200 transition duration-150 ease-in-out hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                            className="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-700 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                                         >
                                                             {user.name}
 
@@ -106,10 +106,10 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                                     </span>
                                                 </Dropdown.Trigger>
 
-                                                <Dropdown.Content contentClasses="bg-gray-800 border border-gray-700 rounded-md shadow-lg py-1 text-gray-200">
+                                                <Dropdown.Content contentClasses="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1 text-gray-700 dark:text-gray-200">
                                                     <Dropdown.Link
                                                         href={route("inbox")}
-                                                        className="block px-4 py-2 text-sm hover:bg-gray-700 text-white hover:text-white focus:bg-gray-700 focus:text-white active:bg-gray-700 active:text-white transition ease-in-out duration-150"
+                                                        className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
                                                     >
                                                         Inbox
                                                     </Dropdown.Link>
@@ -117,7 +117,7 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                                         href={route(
                                                             "profile.edit"
                                                         )}
-                                                        className="block px-4 py-2 text-sm hover:bg-gray-700 text-white hover:text-white focus:bg-gray-700 focus:text-white active:bg-gray-700 active:text-white transition ease-in-out duration-150"
+                                                        className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
                                                     >
                                                         Profile
                                                     </Dropdown.Link>
@@ -125,7 +125,7 @@ export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
                                                         href={route("logout")}
                                                         method="post"
                                                         as="button"
-                                                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-white hover:text-white focus:bg-gray-700 focus:text-white active:bg-gray-700 active:text-white transition ease-in-out duration-150"
+                                                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
                                                     >
                                                         Log Out
                                                     </Dropdown.Link>

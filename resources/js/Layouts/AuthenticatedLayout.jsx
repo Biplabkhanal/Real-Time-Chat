@@ -127,7 +127,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-700 bg-gray-900">
+            <nav className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
@@ -155,8 +155,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <NavLink
                                     href={route("inbox")}
                                     active={route().current("inbox")}
-                                    className="inline-flex items-center px-1 pt-1 border-b-2 text-xl font-medium leading-5 text-white hover:text-white focus:outline-none focus:text-white transition duration-150 ease-in-out"
-                                    activeClassName="border-indigo-400 text-white"
+                                    className="inline-flex items-center px-1 pt-1 border-b-2 text-xl font-medium leading-5 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:outline-none focus:text-gray-900 dark:focus:text-white transition duration-150 ease-in-out"
+                                    activeClassName="border-indigo-400 text-gray-900 dark:text-white"
                                 >
                                     Inbox
                                 </NavLink>
@@ -170,7 +170,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-200 transition duration-150 ease-in-out hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                                                className="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-700 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                             >
                                                 {user.name}
 
@@ -190,10 +190,16 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </span>
                                     </Dropdown.Trigger>
 
-                                    <Dropdown.Content contentClasses="bg-gray-800 border border-gray-700 rounded-md shadow-lg py-1 text-gray-200">
+                                    <Dropdown.Content contentClasses="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1 text-gray-700 dark:text-gray-200">
+                                        <Dropdown.Link
+                                            href={route("inbox")}
+                                            className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
+                                        >
+                                            Inbox
+                                        </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route("profile.edit")}
-                                            className="block px-4 py-2 text-sm hover:bg-gray-700 text-white hover:text-white focus:bg-gray-700 focus:text-white active:bg-gray-700 active:text-white transition ease-in-out duration-150"
+                                            className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
                                         >
                                             Profile
                                         </Dropdown.Link>
@@ -201,7 +207,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route("logout")}
                                             method="post"
                                             as="button"
-                                            className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-white hover:text-white focus:bg-gray-700 focus:text-white active:bg-gray-700 active:text-white transition ease-in-out duration-150"
+                                            className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
                                         >
                                             Log Out
                                         </Dropdown.Link>
@@ -211,7 +217,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             <div className="notification-container relative">
                                 <button
                                     onClick={toggleNotifications}
-                                    className="relative p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-4"
+                                    className="relative p-1 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-4"
                                 >
                                     {unreadCount > 0 && (
                                         <span className="absolute -top-1 -right-1 flex h-5 w-5">
@@ -241,22 +247,22 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                 {/* Notifications dropdown */}
                                 {showNotifications && (
-                                    <div className="notification-container absolute  mt-2 w-80 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
-                                        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-                                            <h3 className="text-lg font-semibold text-white">
+                                    <div className="notification-container absolute mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
+                                        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                                 Notifications
                                             </h3>
                                             {unreadCount > 0 && (
                                                 <button
                                                     onClick={markAllAsRead}
-                                                    className="text-xs text-blue-400 hover:text-blue-300"
+                                                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                                                 >
                                                     Mark all as read
                                                 </button>
                                             )}
                                         </div>
                                         {notifications.length === 0 ? (
-                                            <div className="p-4 text-center text-gray-400">
+                                            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                                                 No notifications
                                             </div>
                                         ) : (
@@ -268,9 +274,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                 notification.id ||
                                                                 index
                                                             }
-                                                            className={`p-4 border-b border-gray-700 hover:bg-gray-700 cursor-pointer relative ${
+                                                            className={`p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer relative ${
                                                                 !notification.is_read
-                                                                    ? "bg-gray-700/50 border-l-4 border-l-blue-500"
+                                                                    ? "bg-gray-50 dark:bg-gray-700/50 border-l-4 border-l-blue-500"
                                                                     : "opacity-80"
                                                             }`}
                                                         >
@@ -287,7 +293,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                                     ?.name ||
                                                                                 "User"
                                                                             }
-                                                                            className="w-10 h-10 rounded-full object-cover border-2 border-gray-700"
+                                                                            className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
                                                                         />
                                                                     ) : (
                                                                         <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
@@ -304,8 +310,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                     <p
                                                                         className={`text-sm font-medium ${
                                                                             !notification.is_read
-                                                                                ? "text-white"
-                                                                                : "text-gray-300"
+                                                                                ? "text-gray-900 dark:text-white"
+                                                                                : "text-gray-700 dark:text-gray-300"
                                                                         }`}
                                                                     >
                                                                         {notification
@@ -316,7 +322,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                                             notification.content
                                                                         }
                                                                     </p>
-                                                                    <p className="text-xs text-gray-400">
+                                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
                                                                         {new Date(
                                                                             notification.created_at
                                                                         ).toLocaleString()}
