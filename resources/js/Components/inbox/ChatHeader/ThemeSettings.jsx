@@ -13,7 +13,7 @@ const ThemeSettings = () => {
     return (
         <div className="p-4">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
-                Theme Settings
+                Change Theme
             </h3>
 
             <div className="space-y-4">
@@ -76,39 +76,6 @@ const ThemeSettings = () => {
                             <span className="text-sm">{themeOption.name}</span>
                         </button>
                     ))}
-                </div>
-
-                <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                        Color Scheme
-                    </h4>
-                    <div className="flex space-x-2">
-                        {["blue", "purple", "green", "red", "amber"].map(
-                            (color) => (
-                                <button
-                                    key={color}
-                                    className={`w-8 h-8 rounded-full transition-transform hover:scale-110 ${
-                                        color === "blue"
-                                            ? "bg-blue-500"
-                                            : color === "purple"
-                                            ? "bg-purple-500"
-                                            : color === "green"
-                                            ? "bg-green-500"
-                                            : color === "red"
-                                            ? "bg-red-500"
-                                            : "bg-amber-500"
-                                    }`}
-                                    onClick={() => {
-                                        // In a real implementation, you would set an accent color in your theme context
-                                        console.log(`Color ${color} selected`);
-                                    }}
-                                />
-                            )
-                        )}
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                        Color scheme feature coming soon
-                    </p>
                 </div>
             </div>
         </div>
