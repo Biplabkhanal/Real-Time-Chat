@@ -52,7 +52,7 @@
 
         .content {
             padding: 35px;
-            color: #4a4a4a;
+            color: #4a4a4a !important;
         }
 
         .welcome-message {
@@ -97,10 +97,10 @@
         .button {
             display: inline-block;
             background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
-            color: white;
+            color: white !important;
             padding: 10px 30px;
             text-decoration: none;
-            border-radius: 50px;
+            border-radius: 10px !important;
             font-weight: 600;
             font-size: 14px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -120,6 +120,7 @@
             color: #777;
             border-top: 1px solid #eee;
         }
+
 
         .social-links {
             margin: 15px 0;
@@ -156,34 +157,37 @@
 
             <p>If you have any questions or need assistance, our support team is always ready to help!</p>
 
-            <p>Cheers,<br>The ChatSync Team</p>
+            <p><b>Cheers,<br>The ChatSync Team</b></p>
         </div>
 
         <div class="footer">
-            <div class="social-links">
+            <div class="social-links" style="margin: 15px 0; text-align: center;">
                 <a href="#"
-                    style="display: inline-block;  margin:0 1px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
+                    style="display: inline-block;  margin:0 2px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
                     <img src="{{ $message->embed(public_path('images/facebook.png')) }}" width="23" height="23"
                         alt="Facebook" style="vertical-align: middle; margin-top: 8px;">
                 </a>
                 <a href="#"
-                    style="display: inline-block; margin:0 1px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
+                    style="display: inline-block; margin:0 2px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
                     <img src="{{ $message->embed(public_path('images/twitter.png')) }}" width="23" height="23"
                         alt="Twitter" style="vertical-align: middle; margin-top: 8px;">
                 </a>
                 <a href="#"
-                    style="display: inline-block; margin:0 1px; width: 35px; height: 35px;text-align: center; line-height: 36px; text-decoration: none;">
+                    style="display: inline-block; margin:0 2px; width: 35px; height: 35px;text-align: center; line-height: 36px; text-decoration: none;">
                     <img src="{{ $message->embed(public_path('images/linkedin.png')) }}" width="23" height="23"
                         alt="LinkedIn" style="vertical-align: middle; margin-top: 8px;">
                 </a>
                 <a href="#"
-                    style="display: inline-block; margin:0 1px; width: 35px; height: 35px;text-align: center; line-height: 36px; text-decoration: none;">
+                    style="display: inline-block; margin:0 2px; width: 35px; height: 35px;text-align: center; line-height: 36px; text-decoration: none;">
                     <img src="{{ $message->embed(public_path('images/insta.png')) }}" width="23" height="23"
                         alt="Instagram" style="vertical-align: middle; margin-top: 8px;">
                 </a>
             </div>
             <p>© {{ date('Y') }} ChatSync. All rights reserved.</p>
             <p>Kathmandu, Nepal</p>
+            <p style="color: #df1c1c;">
+                This is an automated email, please do not reply to this message.***
+            </p>
         </div>
     </div>
 </body>
