@@ -25,14 +25,14 @@
 
         .header {
             text-align: center;
-            padding: 30px 0;
+            padding: 10px 0;
             background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
             color: white;
         }
 
         .logo-container {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .logo-svg {
@@ -40,6 +40,7 @@
             margin: 0 auto 15px;
             display: block;
         }
+
 
         .header h1 {
             margin: 0;
@@ -119,26 +120,6 @@
             margin: 15px 0;
             text-align: center;
         }
-
-        .social-icon {
-            display: inline-block;
-            margin: 0 8px;
-            width: 36px;
-            height: 36px;
-            background-color: #6e8efb;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 36px;
-            color: white;
-            font-size: 16px;
-            text-decoration: none;
-        }
-
-        .social-icon img,
-        .social-icon svg {
-            vertical-align: middle;
-            margin-top: 8px;
-        }
     </style>
 </head>
 
@@ -146,11 +127,8 @@
     <div class="container">
         <div class="header">
             <div class="logo-container">
-                <svg class="logo-svg" width="60" height="60" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="white" fill-rule="evenodd"
-                        d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-                        clip-rule="evenodd" />
-                </svg>
+                <img src="{{ $message->embed(public_path('images/chatsync.png')) }}" alt="ChatSync Logo" class="logo-svg"
+                    width="80" height="80">
             </div>
             <h1>Welcome to ChatSync!</h1>
         </div>
@@ -179,24 +157,24 @@
         <div class="footer">
             <div class="social-links" style="margin: 15px 0; text-align: center;">
                 <a href="#"
-                    style="display: inline-block; margin: 0 8px; width: 36px; height: 36px; background-color: #1877F2; border-radius: 50%; text-align: center; line-height: 36px; text-decoration: none;">
-                    <img src="{{ url(asset('images/facebook.png')) }}" width="20" height="20" alt="Facebook"
-                        style="vertical-align: middle; margin-top: 8px;">
+                    style="display: inline-block;  margin:0 1px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
+                    <img src="{{ $message->embed(public_path('images/facebook.png')) }}" width="23" height="23"
+                        alt="Facebook" style="vertical-align: middle; margin-top: 8px;">
                 </a>
                 <a href="#"
-                    style="display: inline-block; margin: 0 8px; width: 36px; height: 36px; background-color: #1DA1F2; border-radius: 50%; text-align: center; line-height: 36px; text-decoration: none;">
-                    <img src="{{ url(asset('images/twitter.png')) }}" width="20" height="20" alt="Twitter"
-                        style="vertical-align: middle; margin-top: 8px;">
+                    style="display: inline-block; margin:0 1px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
+                    <img src="{{ $message->embed(public_path('images/twitter.png')) }}" width="23" height="23"
+                        alt="Twitter" style="vertical-align: middle; margin-top: 8px;">
                 </a>
                 <a href="#"
-                    style="display: inline-block; margin: 0 8px; width: 36px; height: 36px; background-color: #0A66C2; border-radius: 50%; text-align: center; line-height: 36px; text-decoration: none;">
-                    <img src="{{ url(asset('images/linkedin.png')) }}" width="20" height="20" alt="LinkedIn"
-                        style="vertical-align: middle; margin-top: 8px;">
+                    style="display: inline-block; margin:0 1px; width: 35px; height: 35px;text-align: center; line-height: 36px; text-decoration: none;">
+                    <img src="{{ $message->embed(public_path('images/linkedin.png')) }}" width="23" height="23"
+                        alt="LinkedIn" style="vertical-align: middle; margin-top: 8px;">
                 </a>
                 <a href="#"
-                    style="display: inline-block; margin: 0 8px; width: 36px; height: 36px; background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737, #FCAF45, #FFDC80); border-radius: 50%; text-align: center; line-height: 36px; text-decoration: none;">
-                    <img src="{{ url(asset('images/insta.png')) }}" width="20" height="20" alt="Instagram"
-                        style="vertical-align: middle; margin-top: 8px;">
+                    style="display: inline-block; margin:0 1px; width: 35px; height: 35px;text-align: center; line-height: 36px; text-decoration: none;">
+                    <img src="{{ $message->embed(public_path('images/insta.png')) }}" width="23" height="23"
+                        alt="Instagram" style="vertical-align: middle; margin-top: 8px;">
                 </a>
             </div>
             <p>© {{ date('Y') }} ChatSync. All rights reserved.</p>
