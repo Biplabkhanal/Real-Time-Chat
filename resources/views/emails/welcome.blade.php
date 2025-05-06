@@ -89,15 +89,20 @@
             color: #6e8efb;
         }
 
+        .button-container {
+            text-align: center;
+            margin: 35px 0;
+        }
+
         .button {
             display: inline-block;
             background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
             color: white;
-            padding: 12px 30px;
+            padding: 10px 30px;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 600;
-            margin: 20px 0;
+            font-size: 14px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 10px rgba(106, 142, 251, 0.3);
         }
@@ -108,7 +113,7 @@
         }
 
         .footer {
-            padding: 25px;
+            padding: 15px;
             background-color: #f7f7fd;
             text-align: center;
             font-size: 12px;
@@ -145,9 +150,9 @@
 
             <p>Get started in just one click:</p>
 
-            <p style="text-align: center;">
+            <div class="button-container">
                 <a href="{{ url('/inbox') }}" class="button">Launch ChatSync</a>
-            </p>
+            </div>
 
             <p>If you have any questions or need assistance, our support team is always ready to help!</p>
 
@@ -155,7 +160,7 @@
         </div>
 
         <div class="footer">
-            <div class="social-links" style="margin: 15px 0; text-align: center;">
+            <div class="social-links">
                 <a href="#"
                     style="display: inline-block;  margin:0 1px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
                     <img src="{{ $message->embed(public_path('images/facebook.png')) }}" width="23" height="23"

@@ -1,4 +1,3 @@
-<!-- filepath: /home/biplab/Desktop/real-time-chat-app/resources/views/emails/reset-password.blade.php -->
 <!DOCTYPE html>
 <html>
 
@@ -27,11 +26,21 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
+        .logo-container {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo-svg {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            margin: 0 auto 15px;
+            display: block;
+        }
+
         .header {
             text-align: center;
-            padding: 25px 0;
             background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
-            color: white;
+            padding: 10px 0 !important;
         }
 
 
@@ -41,29 +50,28 @@
             font-size: 28px;
             letter-spacing: 0.5px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            color: white !important;
+            text-align: center !important;
         }
 
         .content {
-            padding: 40px;
+            padding: 31px !important;
             color: #4a4a4a;
-            font-size: 15px;
         }
 
         .welcome-message {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             margin-bottom: 25px;
-            margin-top: 25px;
             color: #333;
         }
 
         .highlight {
             background-color: #f3f0ff;
             border-left: 4px solid #a777e3;
-            padding: 20px;
-            margin: 25px 0;
+            padding: 15px;
+            margin: 20px 0;
             border-radius: 0 8px 8px 0;
-            font-size: 16px;
         }
 
         .time-warning {
@@ -96,13 +104,12 @@
 
 
         .footer {
-            padding: 40px;
+            padding: 15px;
             background-color: #f7f7fd;
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
             color: #777;
             border-top: 1px solid #eee;
-            margin: 0 !important;
             width: 600px !important;
         }
 
@@ -116,38 +123,29 @@
             background-color: #eee;
             margin: 25px 0;
         }
-
-        @media only screen and (max-width: 600px) {
-            .content {
-                padding: 25px;
-            }
-
-            .button {
-                padding: 12px 30px;
-                font-size: 15px;
-            }
-
-            .welcome-message {
-                font-size: 20px;
-            }
-        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="text-align: center; margin: 0 auto; width: 100%;">ChatSync</h1>
+            <div class="logo-container">
+                <img src="{{ $message->embed(public_path('images/chatsync.png')) }}" alt="ChatSync Logo" class="logo-svg"
+                    width="80" height="80">
+            </div>
+            <h1>ChatSync</h1>
         </div>
 
         <div class="content">
             <div class="welcome-message">Hello {{ $user->name ?? 'there' }}! 👋</div>
 
-            <p>We received a request to reset your ChatSync account password. We're here to help you regain access to
+            <p>We received a request to reset your ChatSync account password. We're here to help you regain access
+                to
                 your account safely.</p>
 
             <div class="highlight">
-                Please click the button below to set a new password. <span class="time-warning">This link will expire in
+                Please click the button below to set a new password. <span class="time-warning">This link will
+                    expire in
                     60 seconds</span> for security purposes.
             </div>
 
@@ -161,9 +159,31 @@
         </div>
 
         <div class="footer">
-            <p style="padding-top:10px">© {{ date('Y') }} ChatSync. All rights reserved.</p>
+            <div class="social-links" style="margin: 15px 0; text-align: center;">
+                <a href="#"
+                    style="display: inline-block;  margin:0 2px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
+                    <img src="{{ $message->embed(public_path('images/facebook.png')) }}" width="23" height="23"
+                        alt="Facebook" style="vertical-align: middle; margin-top: 8px;">
+                </a>
+                <a href="#"
+                    style="display: inline-block; margin:0 2px; width: 35px; height: 35px; text-align: center; line-height: 36px; text-decoration: none;">
+                    <img src="{{ $message->embed(public_path('images/twitter.png')) }}" width="23" height="23"
+                        alt="Twitter" style="vertical-align: middle; margin-top: 8px;">
+                </a>
+                <a href="#"
+                    style="display: inline-block; margin:0 2px; width: 35px; height: 35px;text-align: center; line-height: 36px; text-decoration: none;">
+                    <img src="{{ $message->embed(public_path('images/linkedin.png')) }}" width="23" height="23"
+                        alt="LinkedIn" style="vertical-align: middle; margin-top: 8px;">
+                </a>
+                <a href="#"
+                    style="display: inline-block; margin:0 2px; width: 35px; height: 35px;text-align: center; line-height: 36px; text-decoration: none;">
+                    <img src="{{ $message->embed(public_path('images/insta.png')) }}" width="23" height="23"
+                        alt="Instagram" style="vertical-align: middle; margin-top: 8px;">
+                </a>
+            </div>
+            <p>© {{ date('Y') }} ChatSync. All rights reserved.</p>
             <p>Kathmandu, Nepal</p>
-            <p style="color: #df1c1c; padding-bottom: 10px;">
+            <p style="color: #df1c1c; padding-bottom: 12px;">
                 This is an automated email, please do not reply to this message.***
             </p>
         </div>
