@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { Head, router } from "@inertiajs/react";
 import { toast } from "react-hot-toast";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
@@ -6,6 +6,71 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
 import TextInput from "@/Components/TextInput";
+
+const UserCard = memo(({ user, onSendFriendRequest, isLoading }) => (
+    <div className="p-4 bg-gray-800 rounded-lg">
+        <div className="flex items-center space-x-4 mb-3">
+            {user.avatar ? (
+                <img
+                    src={`/storage/${user.avatar}`}
+                    alt={user.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                />
+            ) : (
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                    {user.name.charAt(0).toUpperCase()}
+                </div>
+            )}
+            <div>
+                <h4 className="font-medium text-white">{user.name}</h4>
+                <p className="text-sm text-gray-400">{user.email}</p>
+            </div>
+        </div>
+        <div className="flex justify-end">
+            {user.is_friend ? (
+                <span className="text-sm text-green-400">Friend</span>
+            ) : user.has_sent_request || user.has_pending_request ? (
+                <span className="text-sm text-gray-400">Request Sent</span>
+            ) : user.has_received_request ? (
+                <span className="text-sm text-blue-400">Request Received</span>
+            ) : (
+                <PrimaryButton
+                    onClick={() => onSendFriendRequest(user.id)}
+                    disabled={isLoading}
+                    className="text-sm"
+                >
+                    {isLoading ? (
+                        <>
+                            <svg
+                                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                            Sending...
+                        </>
+                    ) : (
+                        "Add Friend"
+                    )}
+                </PrimaryButton>
+            )}
+        </div>
+    </div>
+));
 
 export default function FriendRequests({
     auth,
@@ -18,7 +83,7 @@ export default function FriendRequests({
     const [searchResults, setSearchResults] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
-    const [processing, setProcessing] = useState(false);
+    const [loadingUsers, setLoadingUsers] = useState(new Set());
     const [pendingRequests, setPendingRequests] = useState(
         initialPendingRequests || []
     );
@@ -105,84 +170,93 @@ export default function FriendRequests({
         }
     }, [searchQuery]);
 
-    const sendFriendRequest = async (userId, retryCount = 0) => {
-        setProcessing(true);
-        try {
-            const csrfToken = getCsrfToken();
+    const sendFriendRequest = useCallback(
+        async (userId, retryCount = 0) => {
+            setLoadingUsers((prev) => new Set(prev).add(userId));
+            try {
+                const csrfToken = getCsrfToken();
 
-            if (!csrfToken) {
-                toast.error("CSRF token not found. Please refresh the page.");
-                return;
-            }
-
-            const response = await fetch(`/friend-request/send/${userId}`, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": csrfToken,
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-            });
-
-            if (response.status === 419 && retryCount === 0) {
-                const refreshed = await refreshCsrfToken();
-                if (refreshed) {
-                    return sendFriendRequest(userId, 1);
-                } else {
+                if (!csrfToken) {
                     toast.error(
-                        "CSRF token expired. Please refresh the page and try again."
+                        "CSRF token not found. Please refresh the page."
                     );
                     return;
                 }
-            }
 
-            const data = await response.json();
-
-            if (response.ok) {
-                toast.success(data.message);
-                if (searchQuery.trim() === "") {
-                    setAllUsers((users) =>
-                        users.map((user) =>
-                            user.id === userId
-                                ? { ...user, has_sent_request: true }
-                                : user
-                        )
-                    );
-                } else {
-                    setSearchResults((results) =>
-                        results.map((user) =>
-                            user.id === userId
-                                ? { ...user, has_sent_request: true }
-                                : user
-                        )
-                    );
-                }
-            } else {
-                console.error("Error response:", data);
+                const response = await fetch(`/friend-request/send/${userId}`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                });
 
                 if (response.status === 419 && retryCount === 0) {
                     const refreshed = await refreshCsrfToken();
                     if (refreshed) {
                         return sendFriendRequest(userId, 1);
+                    } else {
+                        toast.error(
+                            "CSRF token expired. Please refresh the page and try again."
+                        );
+                        return;
                     }
-                    toast.error(
-                        "CSRF token mismatch. Please refresh the page and try again."
-                    );
-                } else {
-                    toast.error(
-                        data.error ||
-                            data.message ||
-                            "Failed to send friend request"
-                    );
                 }
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    toast.success(data.message);
+                    if (searchQuery.trim() === "") {
+                        setAllUsers((users) =>
+                            users.map((user) =>
+                                user.id === userId
+                                    ? { ...user, has_sent_request: true }
+                                    : user
+                            )
+                        );
+                    } else {
+                        setSearchResults((results) =>
+                            results.map((user) =>
+                                user.id === userId
+                                    ? { ...user, has_sent_request: true }
+                                    : user
+                            )
+                        );
+                    }
+                } else {
+                    console.error("Error response:", data);
+
+                    if (response.status === 419 && retryCount === 0) {
+                        const refreshed = await refreshCsrfToken();
+                        if (refreshed) {
+                            return sendFriendRequest(userId, 1);
+                        }
+                        toast.error(
+                            "CSRF token mismatch. Please refresh the page and try again."
+                        );
+                    } else {
+                        toast.error(
+                            data.error ||
+                                data.message ||
+                                "Failed to send friend request"
+                        );
+                    }
+                }
+            } catch (error) {
+                console.error("Error sending friend request:", error);
+                toast.error("Error sending friend request: " + error.message);
+            } finally {
+                setLoadingUsers((prev) => {
+                    const newSet = new Set(prev);
+                    newSet.delete(userId);
+                    return newSet;
+                });
             }
-        } catch (error) {
-            console.error("Error sending friend request:", error);
-            toast.error("Error sending friend request: " + error.message);
-        } finally {
-            setProcessing(false);
-        }
-    };
+        },
+        [searchQuery]
+    );
 
     const acceptFriendRequest = async (requestId) => {
         try {
@@ -390,64 +464,16 @@ export default function FriendRequests({
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {usersToDisplay.map((user) => (
-                                            <div
+                                            <UserCard
                                                 key={user.id}
-                                                className="p-4 bg-gray-800 rounded-lg"
-                                            >
-                                                <div className="flex items-center space-x-4 mb-3">
-                                                    {user.avatar ? (
-                                                        <img
-                                                            src={`/storage/${user.avatar}`}
-                                                            alt={user.name}
-                                                            className="w-12 h-12 rounded-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                                                            {user.name
-                                                                .charAt(0)
-                                                                .toUpperCase()}
-                                                        </div>
-                                                    )}
-                                                    <div>
-                                                        <h4 className="font-medium text-white">
-                                                            {user.name}
-                                                        </h4>
-                                                        <p className="text-sm text-gray-400">
-                                                            {user.email}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-end">
-                                                    {user.is_friend ? (
-                                                        <span className="text-sm text-green-400">
-                                                            Friend
-                                                        </span>
-                                                    ) : user.has_sent_request ||
-                                                      user.has_pending_request ? (
-                                                        <span className="text-sm text-gray-400">
-                                                            Request Sent
-                                                        </span>
-                                                    ) : user.has_received_request ? (
-                                                        <span className="text-sm text-blue-400">
-                                                            Request Received
-                                                        </span>
-                                                    ) : (
-                                                        <PrimaryButton
-                                                            onClick={() =>
-                                                                sendFriendRequest(
-                                                                    user.id
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                processing
-                                                            }
-                                                            className="text-sm"
-                                                        >
-                                                            Add Friend
-                                                        </PrimaryButton>
-                                                    )}
-                                                </div>
-                                            </div>
+                                                user={user}
+                                                onSendFriendRequest={
+                                                    sendFriendRequest
+                                                }
+                                                isLoading={loadingUsers.has(
+                                                    user.id
+                                                )}
+                                            />
                                         ))}
                                     </div>
 
