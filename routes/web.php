@@ -11,7 +11,6 @@ use App\Http\Controllers\UserStatusController;
 use App\Mail\TestMail;
 use App\Models\Review;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -82,6 +81,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/friends', [FriendRequestController::class, 'friends'])->name('friends.index');
     Route::delete('/friend/remove/{friend}', [FriendRequestController::class, 'removeFriend'])->name('friend.remove');
     Route::get('/users/search', [FriendRequestController::class, 'searchUsers'])->name('users.search');
+
+    // CSRF token refresh route
+    Route::get('/csrf-token', function () {
+        return response()->json(['csrf_token' => csrf_token()]);
+    })->name('csrf-token');
 });
 
 require __DIR__ . '/auth.php';

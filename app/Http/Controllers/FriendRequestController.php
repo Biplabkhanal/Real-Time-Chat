@@ -92,12 +92,20 @@ class FriendRequestController extends Controller
                 Log::warning('Failed to broadcast friend request accepted event: ' . $e->getMessage());
             }
 
+            if (request()->header('X-Inertia')) {
+                return redirect()->back()->with('success', 'Friend request accepted');
+            }
+
             return response()->json(['message' => 'Friend request accepted']);
         } catch (\Exception $e) {
             Log::error('Error accepting friend request: ' . $e->getMessage(), [
                 'friend_request_id' => $friendRequest->id,
                 'user_id' => Auth::id()
             ]);
+
+            if (request()->header('X-Inertia')) {
+                return redirect()->back()->withErrors(['error' => 'Failed to accept friend request. Please try again.']);
+            }
 
             return response()->json(['error' => 'Failed to accept friend request. Please try again.'], 500);
         }
@@ -111,14 +119,24 @@ class FriendRequestController extends Controller
         $currentUser = Auth::user();
 
         if ($friendRequest->receiver_id !== $currentUser->id) {
+            if (request()->header('X-Inertia')) {
+                return redirect()->back()->withErrors(['error' => 'Unauthorized']);
+            }
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         if (!$friendRequest->isPending()) {
+            if (request()->header('X-Inertia')) {
+                return redirect()->back()->withErrors(['error' => 'Friend request is no longer pending']);
+            }
             return response()->json(['error' => 'Friend request is no longer pending'], 400);
         }
 
         $friendRequest->decline();
+
+        if (request()->header('X-Inertia')) {
+            return redirect()->back()->with('success', 'Friend request declined');
+        }
 
         return response()->json(['message' => 'Friend request declined']);
     }
@@ -130,17 +148,14 @@ class FriendRequestController extends Controller
     {
         $currentUser = Auth::user();
 
-        // Check if current user is the sender
         if ($friendRequest->sender_id !== $currentUser->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Check if request is still pending
         if (!$friendRequest->isPending()) {
             return response()->json(['error' => 'Friend request is no longer pending'], 400);
         }
 
-        // Delete the request
         $friendRequest->delete();
 
         return response()->json(['message' => 'Friend request cancelled']);

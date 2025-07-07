@@ -11,6 +11,7 @@ export default function FriendRequests({
     auth,
     pendingRequests: initialPendingRequests,
     friends: initialFriends,
+    csrf_token,
 }) {
     const [activeTab, setActiveTab] = useState("addFriend");
     const [searchQuery, setSearchQuery] = useState("");
@@ -22,6 +23,46 @@ export default function FriendRequests({
         initialPendingRequests || []
     );
     const [friends, setFriends] = useState(initialFriends || []);
+
+    const getCsrfToken = () => {
+        if (csrf_token) {
+            return csrf_token;
+        }
+
+        const metaToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
+
+        if (metaToken) {
+            return metaToken;
+        }
+
+        console.error("CSRF token not found in props or meta tag");
+        return null;
+    };
+
+    const refreshCsrfToken = async () => {
+        try {
+            const response = await fetch("/csrf-token", {
+                method: "GET",
+                credentials: "same-origin",
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const metaTag = document.querySelector(
+                    'meta[name="csrf-token"]'
+                );
+                if (metaTag && data.csrf_token) {
+                    metaTag.setAttribute("content", data.csrf_token);
+                }
+                return true;
+            }
+        } catch (error) {
+            console.error("Failed to refresh CSRF token:", error);
+        }
+        return false;
+    };
 
     const fetchAllUsers = async () => {
         try {
@@ -64,15 +105,12 @@ export default function FriendRequests({
         }
     }, [searchQuery]);
 
-    const sendFriendRequest = async (userId) => {
+    const sendFriendRequest = async (userId, retryCount = 0) => {
         setProcessing(true);
         try {
-            const csrfToken = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content");
+            const csrfToken = getCsrfToken();
 
             if (!csrfToken) {
-                console.error("CSRF token not found");
                 toast.error("CSRF token not found. Please refresh the page.");
                 return;
             }
@@ -85,6 +123,18 @@ export default function FriendRequests({
                     Accept: "application/json",
                 },
             });
+
+            if (response.status === 419 && retryCount === 0) {
+                const refreshed = await refreshCsrfToken();
+                if (refreshed) {
+                    return sendFriendRequest(userId, 1);
+                } else {
+                    toast.error(
+                        "CSRF token expired. Please refresh the page and try again."
+                    );
+                    return;
+                }
+            }
 
             const data = await response.json();
 
@@ -109,11 +159,22 @@ export default function FriendRequests({
                 }
             } else {
                 console.error("Error response:", data);
-                toast.error(
-                    data.error ||
-                        data.message ||
-                        "Failed to send friend request"
-                );
+
+                if (response.status === 419 && retryCount === 0) {
+                    const refreshed = await refreshCsrfToken();
+                    if (refreshed) {
+                        return sendFriendRequest(userId, 1);
+                    }
+                    toast.error(
+                        "CSRF token mismatch. Please refresh the page and try again."
+                    );
+                } else {
+                    toast.error(
+                        data.error ||
+                            data.message ||
+                            "Failed to send friend request"
+                    );
+                }
             }
         } catch (error) {
             console.error("Error sending friend request:", error);
@@ -125,58 +186,34 @@ export default function FriendRequests({
 
     const acceptFriendRequest = async (requestId) => {
         try {
-            const csrfToken = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content");
-
-            if (!csrfToken) {
-                console.error("CSRF token not found");
-                toast.error("CSRF token not found. Please refresh the page.");
-                return;
-            }
-
-            const response = await fetch(
+            router.post(
                 `/friend-request/accept/${requestId}`,
+                {},
                 {
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
+                    preserveScroll: true,
+                    onSuccess: (page) => {
+                        toast.success("Friend request accepted successfully!");
+                        setPendingRequests((prev) =>
+                            prev.filter((req) => req.id !== requestId)
+                        );
+                        if (page.props.friends) {
+                            setFriends(page.props.friends);
+                        }
+                    },
+                    onError: (errors) => {
+                        console.error(
+                            "Error accepting friend request:",
+                            errors
+                        );
+                        const errorMessage =
+                            Object.values(errors)[0] ||
+                            "Failed to accept friend request";
+                        toast.error(errorMessage);
                     },
                 }
             );
-
-            let data;
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-                data = await response.json();
-            } else {
-                const text = await response.text();
-                console.error("Non-JSON response received:", text);
-                toast.error("Server returned an invalid response");
-                return;
-            }
-
-            if (response.ok) {
-                toast.success(
-                    data.message || "Friend request accepted successfully!"
-                );
-                setPendingRequests((prev) =>
-                    prev.filter((req) => req.id !== requestId)
-                );
-                window.location.reload();
-            } else {
-                console.error("Error response:", data);
-                toast.error(
-                    data.error ||
-                        data.message ||
-                        `Failed to accept friend request (${response.status})`
-                );
-            }
         } catch (error) {
             console.error("Error accepting friend request:", error);
-            console.error("Error stack:", error.stack);
             toast.error(
                 "Error accepting friend request: " +
                     (error.message || "Unknown error")
@@ -186,57 +223,54 @@ export default function FriendRequests({
 
     const declineFriendRequest = async (requestId) => {
         try {
-            const response = await fetch(
+            router.post(
                 `/friend-request/decline/${requestId}`,
+                {},
                 {
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": document
-                            .querySelector('meta[name="csrf-token"]')
-                            .getAttribute("content"),
-                        "Content-Type": "application/json",
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        toast.success("Friend request declined");
+                        setPendingRequests((prev) =>
+                            prev.filter((req) => req.id !== requestId)
+                        );
+                    },
+                    onError: (errors) => {
+                        console.error(
+                            "Error declining friend request:",
+                            errors
+                        );
+                        const errorMessage =
+                            Object.values(errors)[0] ||
+                            "Failed to decline friend request";
+                        toast.error(errorMessage);
                     },
                 }
             );
-
-            const data = await response.json();
-
-            if (response.ok) {
-                toast.success(data.message);
-                setPendingRequests((prev) =>
-                    prev.filter((req) => req.id !== requestId)
-                );
-            } else {
-                toast.error(data.error || "Failed to decline friend request");
-            }
         } catch (error) {
+            console.error("Error declining friend request:", error);
             toast.error("Error declining friend request");
         }
     };
 
     const removeFriend = async (friendId) => {
         try {
-            const response = await fetch(`/friend/remove/${friendId}`, {
-                method: "DELETE",
-                headers: {
-                    "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute("content"),
-                    "Content-Type": "application/json",
+            router.delete(`/friend/remove/${friendId}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success("Friend removed successfully");
+                    setFriends((prev) =>
+                        prev.filter((friend) => friend.id !== friendId)
+                    );
+                },
+                onError: (errors) => {
+                    console.error("Error removing friend:", errors);
+                    const errorMessage =
+                        Object.values(errors)[0] || "Failed to remove friend";
+                    toast.error(errorMessage);
                 },
             });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                toast.success(data.message);
-                setFriends((prev) =>
-                    prev.filter((friend) => friend.id !== friendId)
-                );
-            } else {
-                toast.error(data.error || "Failed to remove friend");
-            }
         } catch (error) {
+            console.error("Error removing friend:", error);
             toast.error("Error removing friend");
         }
     };
