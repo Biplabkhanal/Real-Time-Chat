@@ -2,6 +2,7 @@ import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
+import FriendRequestsContent from "@/Components/FriendRequestsContent";
 import { Link, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 
@@ -13,6 +14,7 @@ export default function AuthenticatedLayout({ header, children }) {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [showFriendRequests, setShowFriendRequests] = useState(false);
 
     useEffect(() => {
         fetchNotifications();
@@ -154,12 +156,28 @@ export default function AuthenticatedLayout({ header, children }) {
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
                                     href={route("inbox")}
-                                    active={route().current("inbox")}
-                                    className="inline-flex items-center px-1 pt-1 border-b-2 text-xl font-medium leading-5 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:outline-none focus:text-gray-900 dark:focus:text-white transition duration-150 ease-in-out"
-                                    activeClassName="border-indigo-400 text-gray-900 dark:text-white"
+                                    active={
+                                        route().current("inbox") &&
+                                        !showFriendRequests
+                                    }
+                                    className=" font-medium leading-5 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:outline-none focus:text-gray-900 dark:focus:text-white"
                                 >
                                     Inbox
                                 </NavLink>
+                                <button
+                                    onClick={() =>
+                                        setShowFriendRequests(
+                                            !showFriendRequests
+                                        )
+                                    }
+                                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-xsm font-medium leading-5 transition duration-150 ease-in-out ${
+                                        showFriendRequests
+                                            ? "border-indigo-400 text-gray-900 dark:text-white"
+                                            : "border-transparent text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:outline-none focus:text-gray-900 dark:focus:text-white hover:border-gray-300"
+                                    }`}
+                                >
+                                    Friends
+                                </button>
                             </div>
                         </div>
 
@@ -624,7 +642,14 @@ export default function AuthenticatedLayout({ header, children }) {
                 </header>
             )}
 
-            <main>{children}</main>
+            {showFriendRequests ? (
+                <FriendRequestsContent
+                    auth={usePage().props.auth}
+                    onClose={() => setShowFriendRequests(false)}
+                />
+            ) : (
+                <main>{children}</main>
+            )}
         </div>
     );
 }

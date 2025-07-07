@@ -22,7 +22,9 @@ class MessageController extends Controller
      */
     public function inbox()
     {
-        $users = User::where('id', '!=', Auth::id())->get();
+        $currentUser = Auth::user();
+        // Only show friends in the inbox
+        $users = $currentUser->friends()->get();
         return Inertia::render('Inbox', ['users' => $users]);
     }
 
@@ -596,6 +598,8 @@ class MessageController extends Controller
      */
     private function canSendMessage($receiverId)
     {
+        $currentUser = Auth::user();
+
         // Check if either user has blocked the other
         $isBlocked = \App\Models\BlockedUser::where(function ($query) use ($receiverId) {
             $query->where('user_id', Auth::id())
@@ -605,6 +609,9 @@ class MessageController extends Controller
                 ->where('blocked_user_id', Auth::id());
         })->exists();
 
-        return !$isBlocked;
+        // Check if users are friends
+        $areFriends = $currentUser->isFriendsWith($receiverId);
+
+        return !$isBlocked && $areFriends;
     }
 }

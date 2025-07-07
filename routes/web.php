@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BlockUserController;
 use App\Http\Controllers\FileUploadController;
+use App\Http\Controllers\FriendRequestController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
@@ -69,6 +70,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+
+    // Friend Request Routes
+    Route::get('/friend-requests', [FriendRequestController::class, 'index'])->name('friend-requests.index');
+    Route::post('/friend-request/send/{user}', [FriendRequestController::class, 'send'])->name('friend-request.send');
+    Route::post('/friend-request/accept/{friendRequest}', [FriendRequestController::class, 'accept'])->name('friend-request.accept');
+    Route::post('/friend-request/decline/{friendRequest}', [FriendRequestController::class, 'decline'])->name('friend-request.decline');
+    Route::delete('/friend-request/cancel/{friendRequest}', [FriendRequestController::class, 'cancel'])->name('friend-request.cancel');
+    Route::get('/friend-requests/pending', [FriendRequestController::class, 'pending'])->name('friend-requests.pending');
+    Route::get('/friends', [FriendRequestController::class, 'friends'])->name('friends.index');
+    Route::delete('/friend/remove/{friend}', [FriendRequestController::class, 'removeFriend'])->name('friend.remove');
+    Route::get('/users/search', [FriendRequestController::class, 'searchUsers'])->name('users.search');
 });
 
 require __DIR__ . '/auth.php';

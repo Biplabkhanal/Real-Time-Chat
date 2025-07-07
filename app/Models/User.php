@@ -105,4 +105,68 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class);
     }
+
+    // Friend Request Relationships
+    public function sentFriendRequests()
+    {
+        return $this->hasMany(FriendRequest::class, 'sender_id');
+    }
+
+    public function receivedFriendRequests()
+    {
+        return $this->hasMany(FriendRequest::class, 'receiver_id');
+    }
+
+    public function friendships()
+    {
+        return $this->hasMany(Friendship::class, 'user_id');
+    }
+
+    // Get all friends
+    public function friends()
+    {
+        return $this->belongsToMany(User::class, 'friendships', 'user_id', 'friend_id')
+            ->withTimestamps()
+            ->select('users.id', 'users.name', 'users.email', 'users.avatar', 'users.is_online', 'users.last_seen_at');
+    }
+
+    // Check if user is friends with another user
+    public function isFriendsWith($userId)
+    {
+        return $this->belongsToMany(User::class, 'friendships', 'user_id', 'friend_id')
+            ->where('friend_id', $userId)
+            ->exists();
+    }
+
+    // Check if user has sent a friend request to another user
+    public function hasSentFriendRequestTo($userId)
+    {
+        return $this->sentFriendRequests()
+            ->where('receiver_id', $userId)
+            ->where('status', 'pending')
+            ->exists();
+    }
+
+    // Check if user has received a friend request from another user
+    public function hasReceivedFriendRequestFrom($userId)
+    {
+        return $this->receivedFriendRequests()
+            ->where('sender_id', $userId)
+            ->where('status', 'pending')
+            ->exists();
+    }
+
+    // Get pending friend requests received by user
+    public function pendingFriendRequests()
+    {
+        return $this->receivedFriendRequests()
+            ->where('status', 'pending')
+            ->with('sender');
+    }
+
+    // Check if users can message each other (they must be friends)
+    public function canMessageUser($userId)
+    {
+        return $this->isFriendsWith($userId);
+    }
 }
