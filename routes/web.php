@@ -11,6 +11,7 @@ use App\Http\Controllers\UserStatusController;
 use App\Mail\TestMail;
 use App\Models\Review;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;

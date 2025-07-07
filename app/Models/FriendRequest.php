@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class FriendRequest extends Model
 {
@@ -39,18 +40,38 @@ class FriendRequest extends Model
      */
     public function accept()
     {
-        $this->update(['status' => 'accepted']);
+        DB::beginTransaction();
 
-        // Create friendship relationships (bidirectional)
-        Friendship::create([
-            'user_id' => $this->sender_id,
-            'friend_id' => $this->receiver_id,
-        ]);
+        try {
+            $this->update(['status' => 'accepted']);
 
-        Friendship::create([
-            'user_id' => $this->receiver_id,
-            'friend_id' => $this->sender_id,
-        ]);
+            $existingFriendship1 = Friendship::where('user_id', $this->sender_id)
+                ->where('friend_id', $this->receiver_id)
+                ->first();
+
+            $existingFriendship2 = Friendship::where('user_id', $this->receiver_id)
+                ->where('friend_id', $this->sender_id)
+                ->first();
+
+            if (!$existingFriendship1) {
+                Friendship::create([
+                    'user_id' => $this->sender_id,
+                    'friend_id' => $this->receiver_id,
+                ]);
+            }
+
+            if (!$existingFriendship2) {
+                Friendship::create([
+                    'user_id' => $this->receiver_id,
+                    'friend_id' => $this->sender_id,
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Models\FriendRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class FriendRequestController extends Controller
@@ -19,17 +20,14 @@ class FriendRequestController extends Controller
     {
         $currentUser = Auth::user();
 
-        // Check if user is trying to send request to themselves
         if ($currentUser->id === $user->id) {
             return response()->json(['error' => 'You cannot send a friend request to yourself'], 400);
         }
 
-        // Check if they are already friends
         if ($currentUser->isFriendsWith($user->id)) {
             return response()->json(['error' => 'You are already friends with this user'], 400);
         }
 
-        // Check if a friend request already exists
         $existingRequest = FriendRequest::where(function ($query) use ($currentUser, $user) {
             $query->where('sender_id', $currentUser->id)
                 ->where('receiver_id', $user->id);
@@ -43,7 +41,6 @@ class FriendRequestController extends Controller
                 return response()->json(['error' => 'Friend request already exists'], 400);
             }
             if ($existingRequest->status === 'declined') {
-                // Update existing declined request to pending
                 $existingRequest->update([
                     'sender_id' => $currentUser->id,
                     'receiver_id' => $user->id,
@@ -51,7 +48,6 @@ class FriendRequestController extends Controller
                 ]);
             }
         } else {
-            // Create new friend request
             $friendRequest = FriendRequest::create([
                 'sender_id' => $currentUser->id,
                 'receiver_id' => $user->id,
@@ -59,8 +55,11 @@ class FriendRequestController extends Controller
             ]);
         }
 
-        // Broadcast friend request event
-        broadcast(new FriendRequestReceived($user, $currentUser))->toOthers();
+        try {
+            broadcast(new FriendRequestReceived($user, $currentUser))->toOthers();
+        } catch (\Exception $e) {
+            Log::warning('Failed to broadcast friend request event: ' . $e->getMessage());
+        }
 
         return response()->json(['message' => 'Friend request sent successfully']);
     }
@@ -70,25 +69,38 @@ class FriendRequestController extends Controller
      */
     public function accept(FriendRequest $friendRequest)
     {
-        $currentUser = Auth::user();
+        try {
+            $currentUser = Auth::user();
 
-        // Check if current user is the receiver
-        if ($friendRequest->receiver_id !== $currentUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            if ($friendRequest->receiver_id !== $currentUser->id) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            if (!$friendRequest->isPending()) {
+                return response()->json(['error' => 'Friend request is no longer pending'], 400);
+            }
+
+            if ($currentUser->isFriendsWith($friendRequest->sender_id)) {
+                return response()->json(['error' => 'You are already friends with this user'], 400);
+            }
+
+            $friendRequest->accept();
+
+            try {
+                broadcast(new FriendRequestAccepted($friendRequest->sender, $currentUser))->toOthers();
+            } catch (\Exception $e) {
+                Log::warning('Failed to broadcast friend request accepted event: ' . $e->getMessage());
+            }
+
+            return response()->json(['message' => 'Friend request accepted']);
+        } catch (\Exception $e) {
+            Log::error('Error accepting friend request: ' . $e->getMessage(), [
+                'friend_request_id' => $friendRequest->id,
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json(['error' => 'Failed to accept friend request. Please try again.'], 500);
         }
-
-        // Check if request is still pending
-        if (!$friendRequest->isPending()) {
-            return response()->json(['error' => 'Friend request is no longer pending'], 400);
-        }
-
-        // Accept the request
-        $friendRequest->accept();
-
-        // Broadcast friend request accepted event
-        broadcast(new FriendRequestAccepted($friendRequest->sender, $currentUser))->toOthers();
-
-        return response()->json(['message' => 'Friend request accepted']);
     }
 
     /**
@@ -98,17 +110,14 @@ class FriendRequestController extends Controller
     {
         $currentUser = Auth::user();
 
-        // Check if current user is the receiver
         if ($friendRequest->receiver_id !== $currentUser->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Check if request is still pending
         if (!$friendRequest->isPending()) {
             return response()->json(['error' => 'Friend request is no longer pending'], 400);
         }
 
-        // Decline the request
         $friendRequest->decline();
 
         return response()->json(['message' => 'Friend request declined']);
@@ -167,12 +176,10 @@ class FriendRequestController extends Controller
     {
         $currentUser = Auth::user();
 
-        // Check if they are actually friends
         if (!$currentUser->isFriendsWith($friend->id)) {
             return response()->json(['error' => 'You are not friends with this user'], 400);
         }
 
-        // Remove friendship (both directions)
         $currentUser->friendships()->where('friend_id', $friend->id)->delete();
         $friend->friendships()->where('friend_id', $currentUser->id)->delete();
 
@@ -189,7 +196,6 @@ class FriendRequestController extends Controller
 
         $query = User::where('id', '!=', $currentUser->id);
 
-        // If search query is provided, filter by name or email
         if (!empty($search)) {
             $query->where(function ($subQuery) use ($search) {
                 $subQuery->where('name', 'LIKE', "%{$search}%")
@@ -197,13 +203,12 @@ class FriendRequestController extends Controller
             });
             $query->limit(10);
         } else {
-            // If no search query, return all non-friend users
-            $query->limit(20); // Show more users when not searching
+
+            $query->limit(20);
         }
 
         $users = $query->get(['id', 'name', 'email', 'avatar']);
 
-        // Add friendship status for each user
         $users = $users->map(function ($user) use ($currentUser) {
             $user->is_friend = $currentUser->isFriendsWith($user->id);
             $user->has_sent_request = $currentUser->hasSentFriendRequestTo($user->id);
@@ -211,7 +216,6 @@ class FriendRequestController extends Controller
             return $user;
         });
 
-        // Filter out friends when no search query (show only non-friends)
         if (empty($search)) {
             $users = $users->filter(function ($user) {
                 return !$user->is_friend;
