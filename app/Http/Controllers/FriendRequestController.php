@@ -73,14 +73,23 @@ class FriendRequestController extends Controller
             $currentUser = Auth::user();
 
             if ($friendRequest->receiver_id !== $currentUser->id) {
+                if (request()->header('X-Inertia')) {
+                    return redirect()->back()->withErrors(['error' => 'Unauthorized']);
+                }
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
             if (!$friendRequest->isPending()) {
+                if (request()->header('X-Inertia')) {
+                    return redirect()->back()->withErrors(['error' => 'Friend request is no longer pending']);
+                }
                 return response()->json(['error' => 'Friend request is no longer pending'], 400);
             }
 
             if ($currentUser->isFriendsWith($friendRequest->sender_id)) {
+                if (request()->header('X-Inertia')) {
+                    return redirect()->back()->withErrors(['error' => 'You are already friends with this user']);
+                }
                 return response()->json(['error' => 'You are already friends with this user'], 400);
             }
 
@@ -192,11 +201,18 @@ class FriendRequestController extends Controller
         $currentUser = Auth::user();
 
         if (!$currentUser->isFriendsWith($friend->id)) {
+            if (request()->header('X-Inertia')) {
+                return redirect()->back()->withErrors(['error' => 'You are not friends with this user']);
+            }
             return response()->json(['error' => 'You are not friends with this user'], 400);
         }
 
         $currentUser->friendships()->where('friend_id', $friend->id)->delete();
         $friend->friendships()->where('friend_id', $currentUser->id)->delete();
+
+        if (request()->header('X-Inertia')) {
+            return redirect()->back()->with('success', 'Friend removed successfully');
+        }
 
         return response()->json(['message' => 'Friend removed successfully']);
     }
