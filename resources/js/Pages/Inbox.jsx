@@ -24,7 +24,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
     const [lastSeen, setLastSeen] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [usersWithConversations, setUsersWithConversations] = useState([]);
-    const [isloading, setIsLoading] = useState(true);
+    const [isUsersLoading, setIsUsersLoading] = useState(true);
     const [isBlocked, setIsBlocked] = useState(false);
     const [blockStatus, setBlockStatus] = useState({
         isBlocked: false,
@@ -190,7 +190,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
     };
 
     const fetchUsersWithConversations = async () => {
-        setIsLoading(true);
+        setIsUsersLoading(true);
         try {
             const response = await axios.get("/users-with-conversations");
             setUsersWithConversations(response.data);
@@ -198,7 +198,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
             console.error("Error fetching users with conversations:", error);
             setUsersWithConversations(users);
         } finally {
-            setIsLoading(false);
+            setIsUsersLoading(false);
         }
     };
 
@@ -303,9 +303,13 @@ export default function Inbox({ auth, users, selectedUserId }) {
                                 <h2 className="text-gray-800 dark:text-white">
                                     Chats
                                 </h2>
-                                <span className="bg-blue-500 text-white text-xs px-1 py-0 rounded-full">
-                                    {usersWithConversations.length}
-                                </span>
+                                {isUsersLoading ? (
+                                    <div className="w-6 h-4 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse"></div>
+                                ) : (
+                                    <span className="bg-blue-500 text-white text-xs px-1 py-0 rounded-full">
+                                        {usersWithConversations.length}
+                                    </span>
+                                )}
                             </div>
                             <AddButton onClick={() => setIsModalOpen(true)} />
                             <UserModal
@@ -324,7 +328,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
                             selectedUser={selectedUser}
                             setSelectedUser={handleUserSelect}
                             onlineUsers={onlineUsers}
-                            isLoading={isLoading}
+                            isLoading={isUsersLoading}
                         />
                     </div>
 
