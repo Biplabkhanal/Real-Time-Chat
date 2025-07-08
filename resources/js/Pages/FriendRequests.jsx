@@ -8,7 +8,13 @@ import DangerButton from "@/Components/DangerButton";
 import TextInput from "@/Components/TextInput";
 
 const UserCard = memo(
-    ({ user, onSendFriendRequest, onCancelFriendRequest, isLoading }) => (
+    ({
+        user,
+        onSendFriendRequest,
+        onCancelFriendRequest,
+        onAcceptFriendRequest,
+        isLoading,
+    }) => (
         <div className="p-4 bg-gray-800 rounded-lg">
             <div className="flex items-center space-x-4 mb-3">
                 {user.avatar ? (
@@ -87,9 +93,57 @@ const UserCard = memo(
                         )}
                     </div>
                 ) : user.has_received_request ? (
-                    <span className="text-sm text-blue-400">
-                        Request Received
-                    </span>
+                    <PrimaryButton
+                        onClick={() =>
+                            onAcceptFriendRequest(user.received_request_id)
+                        }
+                        disabled={isLoading}
+                        className="text-sm flex items-center"
+                    >
+                        {isLoading ? (
+                            <>
+                                <svg
+                                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                </svg>
+                                Accepting...
+                            </>
+                        ) : (
+                            <>
+                                <svg
+                                    className="w-4 h-4 mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M5 13l4 4L19 7"
+                                    />
+                                </svg>
+                                Accept
+                            </>
+                        )}
+                    </PrimaryButton>
                 ) : (
                     <PrimaryButton
                         onClick={() => onSendFriendRequest(user.id)}
@@ -439,6 +493,7 @@ export default function FriendRequests({
     );
 
     const acceptFriendRequest = async (requestId) => {
+        setLoadingUsers((prev) => new Set(prev).add(requestId));
         try {
             router.post(
                 `/friend-request/accept/${requestId}`,
@@ -453,6 +508,25 @@ export default function FriendRequests({
                         if (page.props.friends) {
                             setFriends(page.props.friends);
                         }
+
+                        // Update user lists to reflect the new friendship
+                        const updateUserState = (users) =>
+                            users.map((user) =>
+                                user.received_request_id === requestId
+                                    ? {
+                                          ...user,
+                                          has_received_request: false,
+                                          received_request_id: null,
+                                          is_friend: true,
+                                      }
+                                    : user
+                            );
+
+                        if (searchQuery.trim() === "") {
+                            setAllUsers(updateUserState);
+                        } else {
+                            setSearchResults(updateUserState);
+                        }
                     },
                     onError: (errors) => {
                         console.error(
@@ -464,6 +538,13 @@ export default function FriendRequests({
                             "Failed to accept friend request";
                         toast.error(errorMessage);
                     },
+                    onFinish: () => {
+                        setLoadingUsers((prev) => {
+                            const newSet = new Set(prev);
+                            newSet.delete(requestId);
+                            return newSet;
+                        });
+                    },
                 }
             );
         } catch (error) {
@@ -472,6 +553,11 @@ export default function FriendRequests({
                 "Error accepting friend request: " +
                     (error.message || "Unknown error")
             );
+            setLoadingUsers((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(requestId);
+                return newSet;
+            });
         }
     };
 
@@ -653,10 +739,16 @@ export default function FriendRequests({
                                                 onCancelFriendRequest={
                                                     cancelFriendRequest
                                                 }
+                                                onAcceptFriendRequest={
+                                                    acceptFriendRequest
+                                                }
                                                 isLoading={
                                                     loadingUsers.has(user.id) ||
                                                     loadingUsers.has(
                                                         user.sent_request_id
+                                                    ) ||
+                                                    loadingUsers.has(
+                                                        user.received_request_id
                                                     )
                                                 }
                                             />

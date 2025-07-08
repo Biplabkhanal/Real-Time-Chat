@@ -258,6 +258,14 @@ class FriendRequestController extends Controller
                 $user->sent_request_id = $sentRequest ? $sentRequest->id : null;
             }
 
+            if ($user->has_received_request) {
+                $receivedRequest = $currentUser->receivedFriendRequests()
+                    ->where('sender_id', $user->id)
+                    ->where('status', 'pending')
+                    ->first();
+                $user->received_request_id = $receivedRequest ? $receivedRequest->id : null;
+            }
+
             return $user;
         });
 
