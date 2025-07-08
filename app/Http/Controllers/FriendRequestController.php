@@ -61,7 +61,12 @@ class FriendRequestController extends Controller
             Log::warning('Failed to broadcast friend request event: ' . $e->getMessage());
         }
 
-        return response()->json(['message' => 'Friend request sent successfully']);
+        $requestId = $existingRequest ? $existingRequest->id : $friendRequest->id;
+
+        return response()->json([
+            'message' => 'Friend request sent successfully',
+            'request_id' => $requestId
+        ]);
     }
 
     /**
@@ -244,6 +249,15 @@ class FriendRequestController extends Controller
             $user->is_friend = $currentUser->isFriendsWith($user->id);
             $user->has_sent_request = $currentUser->hasSentFriendRequestTo($user->id);
             $user->has_received_request = $currentUser->hasReceivedFriendRequestFrom($user->id);
+
+            if ($user->has_sent_request) {
+                $sentRequest = $currentUser->sentFriendRequests()
+                    ->where('receiver_id', $user->id)
+                    ->where('status', 'pending')
+                    ->first();
+                $user->sent_request_id = $sentRequest ? $sentRequest->id : null;
+            }
+
             return $user;
         });
 

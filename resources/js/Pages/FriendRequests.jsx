@@ -7,92 +7,150 @@ import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
 import TextInput from "@/Components/TextInput";
 
-const UserCard = memo(({ user, onSendFriendRequest, isLoading }) => (
-    <div className="p-4 bg-gray-800 rounded-lg">
-        <div className="flex items-center space-x-4 mb-3">
-            {user.avatar ? (
-                <img
-                    src={`/storage/${user.avatar}`}
-                    alt={user.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                />
-            ) : (
-                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                    {user.name.charAt(0).toUpperCase()}
+const UserCard = memo(
+    ({ user, onSendFriendRequest, onCancelFriendRequest, isLoading }) => (
+        <div className="p-4 bg-gray-800 rounded-lg">
+            <div className="flex items-center space-x-4 mb-3">
+                {user.avatar ? (
+                    <img
+                        src={`/storage/${user.avatar}`}
+                        alt={user.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                    />
+                ) : (
+                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                        {user.name.charAt(0).toUpperCase()}
+                    </div>
+                )}
+                <div>
+                    <h4 className="font-medium text-white">{user.name}</h4>
+                    <p className="text-sm text-gray-400">{user.email}</p>
                 </div>
-            )}
-            <div>
-                <h4 className="font-medium text-white">{user.name}</h4>
-                <p className="text-sm text-gray-400">{user.email}</p>
+            </div>
+            <div className="flex justify-end">
+                {user.is_friend ? (
+                    <span className="text-sm text-green-400">Friend</span>
+                ) : user.has_sent_request || user.has_pending_request ? (
+                    <div className="flex space-x-2">
+                        {user.sent_request_id && (
+                            <DangerButton
+                                onClick={() =>
+                                    onCancelFriendRequest(user.sent_request_id)
+                                }
+                                disabled={isLoading}
+                                className="text-xs px-2 py-1 flex items-center"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <svg
+                                            className="animate-spin -ml-1 mr-2 h-3 w-3 text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                            ></path>
+                                        </svg>
+                                        Canceling...
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg
+                                            className="w-3 h-3 mr-1"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                        Cancel
+                                    </>
+                                )}
+                            </DangerButton>
+                        )}
+                    </div>
+                ) : user.has_received_request ? (
+                    <span className="text-sm text-blue-400">
+                        Request Received
+                    </span>
+                ) : (
+                    <PrimaryButton
+                        onClick={() => onSendFriendRequest(user.id)}
+                        disabled={isLoading}
+                        className="text-sm flex items-center"
+                    >
+                        {isLoading ? (
+                            <>
+                                <svg
+                                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                </svg>
+                                Sending...
+                            </>
+                        ) : (
+                            <>
+                                <svg
+                                    className="w-4 h-4 mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                    />
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M20 8v6M23 11h-6"
+                                    />
+                                </svg>
+                                Add Friend
+                            </>
+                        )}
+                    </PrimaryButton>
+                )}
             </div>
         </div>
-        <div className="flex justify-end">
-            {user.is_friend ? (
-                <span className="text-sm text-green-400">Friend</span>
-            ) : user.has_sent_request || user.has_pending_request ? (
-                <span className="text-sm text-gray-400">Request Sent</span>
-            ) : user.has_received_request ? (
-                <span className="text-sm text-blue-400">Request Received</span>
-            ) : (
-                <PrimaryButton
-                    onClick={() => onSendFriendRequest(user.id)}
-                    disabled={isLoading}
-                    className="text-sm flex items-center"
-                >
-                    {isLoading ? (
-                        <>
-                            <svg
-                                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                ></circle>
-                                <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                ></path>
-                            </svg>
-                            Sending...
-                        </>
-                    ) : (
-                        <>
-                            <svg
-                                className="w-4 h-4 mr-2"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                />
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M20 8v6M23 11h-6"
-                                />
-                            </svg>
-                            Add Friend
-                        </>
-                    )}
-                </PrimaryButton>
-            )}
-        </div>
-    </div>
-));
+    )
+);
 
 export default function FriendRequests({
     auth,
@@ -234,7 +292,11 @@ export default function FriendRequests({
                         setAllUsers((users) =>
                             users.map((user) =>
                                 user.id === userId
-                                    ? { ...user, has_sent_request: true }
+                                    ? {
+                                          ...user,
+                                          has_sent_request: true,
+                                          sent_request_id: data.request_id,
+                                      }
                                     : user
                             )
                         );
@@ -242,7 +304,11 @@ export default function FriendRequests({
                         setSearchResults((results) =>
                             results.map((user) =>
                                 user.id === userId
-                                    ? { ...user, has_sent_request: true }
+                                    ? {
+                                          ...user,
+                                          has_sent_request: true,
+                                          sent_request_id: data.request_id,
+                                      }
                                     : user
                             )
                         );
@@ -273,6 +339,98 @@ export default function FriendRequests({
                 setLoadingUsers((prev) => {
                     const newSet = new Set(prev);
                     newSet.delete(userId);
+                    return newSet;
+                });
+            }
+        },
+        [searchQuery]
+    );
+
+    const cancelFriendRequest = useCallback(
+        async (requestId, retryCount = 0) => {
+            setLoadingUsers((prev) => new Set(prev).add(requestId));
+            try {
+                const csrfToken = getCsrfToken();
+
+                if (!csrfToken) {
+                    toast.error(
+                        "CSRF token not found. Please refresh the page."
+                    );
+                    return;
+                }
+
+                const response = await fetch(
+                    `/friend-request/cancel/${requestId}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": csrfToken,
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                    }
+                );
+
+                if (response.status === 419 && retryCount === 0) {
+                    const refreshed = await refreshCsrfToken();
+                    if (refreshed) {
+                        return cancelFriendRequest(requestId, 1);
+                    } else {
+                        toast.error(
+                            "CSRF token expired. Please refresh the page and try again."
+                        );
+                        return;
+                    }
+                }
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    toast.success(data.message);
+
+                    // Update the user lists to remove the sent request status
+                    const updateUserState = (users) =>
+                        users.map((user) =>
+                            user.sent_request_id === requestId
+                                ? {
+                                      ...user,
+                                      has_sent_request: false,
+                                      sent_request_id: null,
+                                  }
+                                : user
+                        );
+
+                    if (searchQuery.trim() === "") {
+                        setAllUsers(updateUserState);
+                    } else {
+                        setSearchResults(updateUserState);
+                    }
+                } else {
+                    console.error("Error response:", data);
+
+                    if (response.status === 419 && retryCount === 0) {
+                        const refreshed = await refreshCsrfToken();
+                        if (refreshed) {
+                            return cancelFriendRequest(requestId, 1);
+                        }
+                        toast.error(
+                            "CSRF token mismatch. Please refresh the page and try again."
+                        );
+                    } else {
+                        toast.error(
+                            data.error ||
+                                data.message ||
+                                "Failed to cancel friend request"
+                        );
+                    }
+                }
+            } catch (error) {
+                console.error("Error canceling friend request:", error);
+                toast.error("Error canceling friend request: " + error.message);
+            } finally {
+                setLoadingUsers((prev) => {
+                    const newSet = new Set(prev);
+                    newSet.delete(requestId);
                     return newSet;
                 });
             }
@@ -492,9 +650,15 @@ export default function FriendRequests({
                                                 onSendFriendRequest={
                                                     sendFriendRequest
                                                 }
-                                                isLoading={loadingUsers.has(
-                                                    user.id
-                                                )}
+                                                onCancelFriendRequest={
+                                                    cancelFriendRequest
+                                                }
+                                                isLoading={
+                                                    loadingUsers.has(user.id) ||
+                                                    loadingUsers.has(
+                                                        user.sent_request_id
+                                                    )
+                                                }
                                             />
                                         ))}
                                     </div>
