@@ -918,7 +918,7 @@ export default function FriendRequests({
                                                     <SecondaryButton
                                                         onClick={() =>
                                                             router.visit(
-                                                                `/message/${friend.id}`
+                                                                `/inbox?user=${friend.id}`
                                                             )
                                                         }
                                                         className="flex-1 text-sm justify-center"

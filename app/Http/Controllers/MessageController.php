@@ -20,12 +20,16 @@ class MessageController extends Controller
     /**
      * Display inbox page with users
      */
-    public function inbox()
+    public function inbox(Request $request)
     {
         $currentUser = Auth::user();
-        // Only show friends in the inbox
         $users = $currentUser->friends()->get();
-        return Inertia::render('Inbox', ['users' => $users]);
+        $selectedUserId = $request->query('user');
+
+        return Inertia::render('Inbox', [
+            'users' => $users,
+            'selectedUserId' => $selectedUserId
+        ]);
     }
 
     /**

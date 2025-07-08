@@ -15,7 +15,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
-export default function Inbox({ auth, users }) {
+export default function Inbox({ auth, users, selectedUserId }) {
     const webSocketChannel = `message.${auth.user.id}`;
 
     const [selectedUser, setSelectedUser] = useState(null);
@@ -206,6 +206,35 @@ export default function Inbox({ auth, users }) {
         fetchUsersWithConversations();
     }, []);
 
+    useEffect(() => {
+        if (selectedUserId && users && users.length > 0) {
+            let userToSelect = usersWithConversations.find(
+                (user) => user.id === parseInt(selectedUserId)
+            );
+
+            if (!userToSelect) {
+                userToSelect = users.find(
+                    (user) => user.id === parseInt(selectedUserId)
+                );
+                if (userToSelect) {
+                    setUsersWithConversations((prev) => {
+                        const userExists = prev.some(
+                            (u) => u.id === userToSelect.id
+                        );
+                        if (!userExists) {
+                            return [userToSelect, ...prev];
+                        }
+                        return prev;
+                    });
+                }
+            }
+
+            if (userToSelect) {
+                setSelectedUser(userToSelect);
+            }
+        }
+    }, [selectedUserId, users, usersWithConversations]);
+
     const handleConversationDeleted = (userId) => {
         setCurrentMessages([]);
         setUsersWithConversations((prevUsers) =>
@@ -224,7 +253,6 @@ export default function Inbox({ auth, users }) {
     };
 
     useEffect(() => {
-        // Set up interval for online status updates
         const onlineStatusInterval = setInterval(() => {
             fetchOnlineStatus();
         }, 15000);
