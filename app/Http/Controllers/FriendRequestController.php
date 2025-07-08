@@ -40,7 +40,7 @@ class FriendRequestController extends Controller
             if ($existingRequest->status === 'pending') {
                 return response()->json(['error' => 'Friend request already exists'], 400);
             }
-            if ($existingRequest->status === 'declined') {
+            if ($existingRequest->status === 'declined' || $existingRequest->status === 'accepted') {
                 $existingRequest->update([
                     'sender_id' => $currentUser->id,
                     'receiver_id' => $user->id,
