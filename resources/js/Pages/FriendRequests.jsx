@@ -6,6 +6,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
 import TextInput from "@/Components/TextInput";
+import LoadingSpinner from "@/Components/LoadingSpinner";
 
 const UserCard = memo(
     ({
@@ -222,6 +223,7 @@ export default function FriendRequests({
         initialPendingRequests || []
     );
     const [friends, setFriends] = useState(initialFriends || []);
+    const [loading, setLoading] = useState(true);
 
     const getCsrfToken = () => {
         if (csrf_token) {
@@ -270,6 +272,8 @@ export default function FriendRequests({
             setAllUsers(data || []);
         } catch (error) {
             console.error("Error fetching users:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -292,10 +296,12 @@ export default function FriendRequests({
     useEffect(() => {
         if (searchQuery.trim() === "") {
             setSearchResults([]);
+            setIsSearching(false);
             if (allUsers.length === 0) {
                 fetchAllUsers();
             }
         } else {
+            setIsSearching(true);
             const timeoutId = setTimeout(() => {
                 searchUsers();
             }, 300);
@@ -303,6 +309,11 @@ export default function FriendRequests({
             return () => clearTimeout(timeoutId);
         }
     }, [searchQuery]);
+
+    // Initialize data loading on component mount
+    useEffect(() => {
+        fetchAllUsers();
+    }, []);
 
     const sendFriendRequest = useCallback(
         async (userId, retryCount = 0) => {
@@ -634,329 +645,370 @@ export default function FriendRequests({
                             Friends & Requests
                         </h1>
                     </div>
-                    {/* Tab Navigation */}
-                    <div className="bg-gray-800 rounded-lg p-1 mb-6 flex space-x-1">
-                        <button
-                            onClick={() => setActiveTab("addFriend")}
-                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors duration-200 ${
-                                activeTab === "addFriend"
-                                    ? "bg-blue-600 text-white"
-                                    : "text-gray-300 hover:text-white hover:bg-gray-700"
-                            }`}
-                        >
-                            Add Friend
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("requests")}
-                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors duration-200 relative ${
-                                activeTab === "requests"
-                                    ? "bg-blue-600 text-white"
-                                    : "text-gray-300 hover:text-white hover:bg-gray-700"
-                            }`}
-                        >
-                            Friend Requests
-                            {pendingRequests.length > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                    {pendingRequests.length}
-                                </span>
-                            )}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("friends")}
-                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors duration-200 ${
-                                activeTab === "friends"
-                                    ? "bg-blue-600 text-white"
-                                    : "text-gray-300 hover:text-white hover:bg-gray-700"
-                            }`}
-                        >
-                            Friends ({friends.length})
-                        </button>
-                    </div>
 
-                    {/* Tab Content */}
-                    {activeTab === "addFriend" && (
-                        <div className="space-y-6">
-                            {/* Search Section */}
-                            <div className="bg-gray-900 rounded-lg p-6">
-                                <h2 className="text-lg font-medium text-white mb-4">
-                                    Search Users
-                                </h2>
-                                <div className="relative">
-                                    <TextInput
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) =>
-                                            setSearchQuery(e.target.value)
-                                        }
-                                        placeholder="Search by name or email..."
-                                        className="w-full pl-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
-                                    />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg
-                                            className="h-5 w-5 text-gray-400"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                            />
-                                        </svg>
-                                    </div>
-                                </div>
+                    {/* Loading State */}
+                    {loading && (
+                        <div className="min-h-[400px] flex items-center justify-center">
+                            <LoadingSpinner
+                                size="lg"
+                                text="Loading friends and requests..."
+                            />
+                        </div>
+                    )}
+
+                    {/* Main Content */}
+                    {!loading && (
+                        <>
+                            {/* Tab Navigation */}
+                            <div className="bg-gray-800 rounded-lg p-1 mb-6 flex space-x-1">
+                                <button
+                                    onClick={() => setActiveTab("addFriend")}
+                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                        activeTab === "addFriend"
+                                            ? "bg-blue-600 text-white"
+                                            : "text-gray-300 hover:text-white hover:bg-gray-700"
+                                    }`}
+                                >
+                                    Add Friend
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("requests")}
+                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors duration-200 relative ${
+                                        activeTab === "requests"
+                                            ? "bg-blue-600 text-white"
+                                            : "text-gray-300 hover:text-white hover:bg-gray-700"
+                                    }`}
+                                >
+                                    Friend Requests
+                                    {pendingRequests.length > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                            {pendingRequests.length}
+                                        </span>
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("friends")}
+                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                        activeTab === "friends"
+                                            ? "bg-blue-600 text-white"
+                                            : "text-gray-300 hover:text-white hover:bg-gray-700"
+                                    }`}
+                                >
+                                    Friends ({friends.length})
+                                </button>
                             </div>
 
-                            {/* Loading State */}
-                            {isSearching && (
-                                <div className="text-center py-8">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                                    <p className="text-gray-400 mt-2">
-                                        Searching...
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Search Results or All Users */}
-                            {!isSearching && (
-                                <div className="bg-gray-900 rounded-lg p-6">
-                                    <h3 className="text-lg font-medium text-white mb-4">
-                                        {searchQuery.trim() === ""
-                                            ? "All Users"
-                                            : "Search Results"}
-                                    </h3>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {usersToDisplay.map((user) => (
-                                            <UserCard
-                                                key={user.id}
-                                                user={user}
-                                                onSendFriendRequest={
-                                                    sendFriendRequest
-                                                }
-                                                onCancelFriendRequest={
-                                                    cancelFriendRequest
-                                                }
-                                                onAcceptFriendRequest={
-                                                    acceptFriendRequest
-                                                }
-                                                isLoading={
-                                                    loadingUsers.has(user.id) ||
-                                                    loadingUsers.has(
-                                                        user.sent_request_id
-                                                    ) ||
-                                                    loadingUsers.has(
-                                                        user.received_request_id
+                            {/* Tab Content */}
+                            {activeTab === "addFriend" && (
+                                <div className="space-y-6">
+                                    {/* Search Section */}
+                                    <div className="bg-gray-900 rounded-lg p-6">
+                                        <h2 className="text-lg font-medium text-white mb-4">
+                                            Search Users
+                                        </h2>
+                                        <div className="relative">
+                                            <TextInput
+                                                type="text"
+                                                value={searchQuery}
+                                                onChange={(e) =>
+                                                    setSearchQuery(
+                                                        e.target.value
                                                     )
                                                 }
+                                                placeholder="Search by name or email..."
+                                                className="w-full pl-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
                                             />
-                                        ))}
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg
+                                                    className="h-5 w-5 text-gray-400"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth="2"
+                                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    {/* Empty States */}
-                                    {searchQuery.trim() !== "" &&
-                                        !isSearching &&
-                                        searchResults.length === 0 && (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-400">
-                                                    No users found
-                                                </p>
-                                            </div>
-                                        )}
+                                    {/* Loading State */}
+                                    {(isSearching || loading) && (
+                                        <div className="text-center py-8">
+                                            <LoadingSpinner
+                                                size="md"
+                                                text={
+                                                    loading
+                                                        ? "Loading users..."
+                                                        : "Searching..."
+                                                }
+                                            />
+                                        </div>
+                                    )}
 
-                                    {searchQuery.trim() === "" &&
-                                        !isSearching &&
-                                        allUsers.length === 0 && (
-                                            <div className="text-center py-8">
-                                                <p className="text-gray-400">
-                                                    No users available to add
-                                                </p>
+                                    {/* Search Results or All Users */}
+                                    {!isSearching && !loading && (
+                                        <div className="bg-gray-900 rounded-lg p-6">
+                                            <h3 className="text-lg font-medium text-white mb-4">
+                                                {searchQuery.trim() === ""
+                                                    ? "All Users"
+                                                    : "Search Results"}
+                                            </h3>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {usersToDisplay.map((user) => (
+                                                    <UserCard
+                                                        key={user.id}
+                                                        user={user}
+                                                        onSendFriendRequest={
+                                                            sendFriendRequest
+                                                        }
+                                                        onCancelFriendRequest={
+                                                            cancelFriendRequest
+                                                        }
+                                                        onAcceptFriendRequest={
+                                                            acceptFriendRequest
+                                                        }
+                                                        isLoading={
+                                                            loadingUsers.has(
+                                                                user.id
+                                                            ) ||
+                                                            loadingUsers.has(
+                                                                user.sent_request_id
+                                                            ) ||
+                                                            loadingUsers.has(
+                                                                user.received_request_id
+                                                            )
+                                                        }
+                                                    />
+                                                ))}
                                             </div>
-                                        )}
+
+                                            {/* Empty States */}
+                                            {searchQuery.trim() !== "" &&
+                                                !isSearching &&
+                                                !loading &&
+                                                searchResults.length === 0 && (
+                                                    <div className="text-center py-8">
+                                                        <p className="text-gray-400">
+                                                            No users found
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                            {searchQuery.trim() === "" &&
+                                                !isSearching &&
+                                                !loading &&
+                                                allUsers.length === 0 && (
+                                                    <div className="text-center py-8">
+                                                        <p className="text-gray-400">
+                                                            No users available
+                                                            to add
+                                                        </p>
+                                                    </div>
+                                                )}
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                        </div>
-                    )}
 
-                    {activeTab === "requests" && (
-                        <div className="space-y-6">
-                            <div className="bg-gray-900 rounded-lg p-6">
-                                <h2 className="text-lg font-medium text-white mb-6">
-                                    Pending Friend Requests (
-                                    {pendingRequests.length})
-                                </h2>
+                            {activeTab === "requests" && (
+                                <div className="space-y-6">
+                                    <div className="bg-gray-900 rounded-lg p-6">
+                                        <h2 className="text-lg font-medium text-white mb-6">
+                                            Pending Friend Requests (
+                                            {pendingRequests.length})
+                                        </h2>
 
-                                {pendingRequests.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {pendingRequests.map((request) => (
-                                            <div
-                                                key={request.id}
-                                                className="flex items-center justify-between p-4 bg-gray-800 rounded-lg"
-                                            >
-                                                <div className="flex items-center space-x-4">
-                                                    {request.sender.avatar ? (
-                                                        <img
-                                                            src={`/storage/${request.sender.avatar}`}
-                                                            alt={
-                                                                request.sender
-                                                                    .name
-                                                            }
-                                                            className="w-12 h-12 rounded-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                                                            {request.sender.name
-                                                                .charAt(0)
-                                                                .toUpperCase()}
-                                                        </div>
-                                                    )}
-                                                    <div>
-                                                        <h4 className="font-medium text-white">
-                                                            {
-                                                                request.sender
-                                                                    .name
-                                                            }
-                                                        </h4>
-                                                        <p className="text-sm text-gray-400">
-                                                            {
-                                                                request.sender
-                                                                    .email
-                                                            }
-                                                        </p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {new Date(
-                                                                request.created_at
-                                                            ).toLocaleDateString()}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex space-x-2">
-                                                    <PrimaryButton
-                                                        onClick={() =>
-                                                            acceptFriendRequest(
-                                                                request.id
-                                                            )
-                                                        }
-                                                        className="text-sm"
-                                                    >
-                                                        Accept
-                                                    </PrimaryButton>
-                                                    <DangerButton
-                                                        onClick={() =>
-                                                            declineFriendRequest(
-                                                                request.id
-                                                            )
-                                                        }
-                                                        className="text-sm"
-                                                    >
-                                                        Decline
-                                                    </DangerButton>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-8">
-                                        <p className="text-gray-400">
-                                            No pending friend requests
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === "friends" && (
-                        <div className="space-y-6">
-                            <div className="bg-gray-900 rounded-lg p-6">
-                                <h2 className="text-lg font-medium text-white mb-6">
-                                    Your Friends ({friends.length})
-                                </h2>
-
-                                {friends.length > 0 ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {friends.map((friend) => (
-                                            <div
-                                                key={friend.id}
-                                                className="p-4 bg-gray-800 rounded-lg"
-                                            >
-                                                <div className="flex items-center space-x-4 mb-3">
-                                                    <div className="relative">
-                                                        {friend.avatar ? (
-                                                            <img
-                                                                src={`/storage/${friend.avatar}`}
-                                                                alt={
-                                                                    friend.name
-                                                                }
-                                                                className="w-12 h-12 rounded-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                                                                {friend.name
-                                                                    .charAt(0)
-                                                                    .toUpperCase()}
+                                        {pendingRequests.length > 0 ? (
+                                            <div className="space-y-4">
+                                                {pendingRequests.map(
+                                                    (request) => (
+                                                        <div
+                                                            key={request.id}
+                                                            className="flex items-center justify-between p-4 bg-gray-800 rounded-lg"
+                                                        >
+                                                            <div className="flex items-center space-x-4">
+                                                                {request.sender
+                                                                    .avatar ? (
+                                                                    <img
+                                                                        src={`/storage/${request.sender.avatar}`}
+                                                                        alt={
+                                                                            request
+                                                                                .sender
+                                                                                .name
+                                                                        }
+                                                                        className="w-12 h-12 rounded-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                                                                        {request.sender.name
+                                                                            .charAt(
+                                                                                0
+                                                                            )
+                                                                            .toUpperCase()}
+                                                                    </div>
+                                                                )}
+                                                                <div>
+                                                                    <h4 className="font-medium text-white">
+                                                                        {
+                                                                            request
+                                                                                .sender
+                                                                                .name
+                                                                        }
+                                                                    </h4>
+                                                                    <p className="text-sm text-gray-400">
+                                                                        {
+                                                                            request
+                                                                                .sender
+                                                                                .email
+                                                                        }
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-500">
+                                                                        {new Date(
+                                                                            request.created_at
+                                                                        ).toLocaleDateString()}
+                                                                    </p>
+                                                                </div>
                                                             </div>
-                                                        )}
-                                                        {friend.is_online && (
-                                                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full"></div>
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="font-medium text-white">
-                                                            {friend.name}
-                                                        </h4>
-                                                        <p className="text-sm text-gray-400">
-                                                            {friend.is_online
-                                                                ? "Online"
-                                                                : "Offline"}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex space-x-2">
-                                                    <SecondaryButton
-                                                        onClick={() =>
-                                                            router.visit(
-                                                                `/inbox?user=${friend.id}`
-                                                            )
-                                                        }
-                                                        className="flex-1 text-sm justify-center"
-                                                    >
-                                                        Message
-                                                    </SecondaryButton>
-                                                    <DangerButton
-                                                        onClick={() =>
-                                                            removeFriend(
-                                                                friend.id
-                                                            )
-                                                        }
-                                                        className="text-sm"
-                                                    >
-                                                        Remove
-                                                    </DangerButton>
-                                                </div>
+                                                            <div className="flex space-x-2">
+                                                                <PrimaryButton
+                                                                    onClick={() =>
+                                                                        acceptFriendRequest(
+                                                                            request.id
+                                                                        )
+                                                                    }
+                                                                    className="text-sm"
+                                                                >
+                                                                    Accept
+                                                                </PrimaryButton>
+                                                                <DangerButton
+                                                                    onClick={() =>
+                                                                        declineFriendRequest(
+                                                                            request.id
+                                                                        )
+                                                                    }
+                                                                    className="text-sm"
+                                                                >
+                                                                    Decline
+                                                                </DangerButton>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                )}
                                             </div>
-                                        ))}
+                                        ) : (
+                                            <div className="text-center py-8">
+                                                <p className="text-gray-400">
+                                                    No pending friend requests
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
-                                ) : (
-                                    <div className="text-center py-8">
-                                        <p className="text-gray-400">
-                                            No friends yet. Start by adding some
-                                            friends!
-                                        </p>
-                                        <button
-                                            onClick={() =>
-                                                setActiveTab("addFriend")
-                                            }
-                                            className="mt-4 text-blue-400 hover:text-blue-300"
-                                        >
-                                            Go to Add Friend
-                                        </button>
+                                </div>
+                            )}
+
+                            {activeTab === "friends" && (
+                                <div className="space-y-6">
+                                    <div className="bg-gray-900 rounded-lg p-6">
+                                        <h2 className="text-lg font-medium text-white mb-6">
+                                            Your Friends ({friends.length})
+                                        </h2>
+
+                                        {friends.length > 0 ? (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {friends.map((friend) => (
+                                                    <div
+                                                        key={friend.id}
+                                                        className="p-4 bg-gray-800 rounded-lg"
+                                                    >
+                                                        <div className="flex items-center space-x-4 mb-3">
+                                                            <div className="relative">
+                                                                {friend.avatar ? (
+                                                                    <img
+                                                                        src={`/storage/${friend.avatar}`}
+                                                                        alt={
+                                                                            friend.name
+                                                                        }
+                                                                        className="w-12 h-12 rounded-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                                                                        {friend.name
+                                                                            .charAt(
+                                                                                0
+                                                                            )
+                                                                            .toUpperCase()}
+                                                                    </div>
+                                                                )}
+                                                                {friend.is_online && (
+                                                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full"></div>
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="font-medium text-white">
+                                                                    {
+                                                                        friend.name
+                                                                    }
+                                                                </h4>
+                                                                <p className="text-sm text-gray-400">
+                                                                    {friend.is_online
+                                                                        ? "Online"
+                                                                        : "Offline"}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex space-x-2">
+                                                            <SecondaryButton
+                                                                onClick={() =>
+                                                                    router.visit(
+                                                                        `/inbox?user=${friend.id}`
+                                                                    )
+                                                                }
+                                                                className="flex-1 text-sm justify-center"
+                                                            >
+                                                                Message
+                                                            </SecondaryButton>
+                                                            <DangerButton
+                                                                onClick={() =>
+                                                                    removeFriend(
+                                                                        friend.id
+                                                                    )
+                                                                }
+                                                                className="text-sm"
+                                                            >
+                                                                Remove
+                                                            </DangerButton>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-8">
+                                                <p className="text-gray-400">
+                                                    No friends yet. Start by
+                                                    adding some friends!
+                                                </p>
+                                                <button
+                                                    onClick={() =>
+                                                        setActiveTab(
+                                                            "addFriend"
+                                                        )
+                                                    }
+                                                    className="mt-4 text-blue-400 hover:text-blue-300"
+                                                >
+                                                    Go to Add Friend
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
