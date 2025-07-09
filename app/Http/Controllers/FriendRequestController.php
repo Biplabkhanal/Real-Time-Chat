@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\FriendRequestReceived;
 use App\Events\FriendRequestAccepted;
 use App\Models\FriendRequest;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,6 +56,15 @@ class FriendRequestController extends Controller
             ]);
         }
 
+        Notification::create([
+            'user_id' => $user->id,
+            'sender_id' => $currentUser->id,
+            'type' => 'friend_request_received',
+            'content' => 'sent you a friend request',
+            'reference_id' => $existingRequest ? $existingRequest->id : $friendRequest->id,
+            'is_read' => false,
+        ]);
+
         try {
             broadcast(new FriendRequestReceived($user, $currentUser))->toOthers();
         } catch (\Exception $e) {
@@ -99,6 +109,15 @@ class FriendRequestController extends Controller
             }
 
             $friendRequest->accept();
+
+            Notification::create([
+                'user_id' => $friendRequest->sender_id,
+                'sender_id' => $currentUser->id,
+                'type' => 'friend_request_accepted',
+                'content' => 'accepted your friend request',
+                'reference_id' => $friendRequest->id,
+                'is_read' => false,
+            ]);
 
             try {
                 broadcast(new FriendRequestAccepted($friendRequest->sender, $currentUser))->toOthers();

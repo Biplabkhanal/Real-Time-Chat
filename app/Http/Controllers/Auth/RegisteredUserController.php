@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
-use App\Models\Notification;
 use App\Models\User;
 use App\Notifications\WelcomeEmail;
 use Illuminate\Auth\Events\Registered;
@@ -54,20 +52,6 @@ class RegisteredUserController extends Controller
             Log::info('Welcome email notification dispatched for user: ' . $user->email);
         } catch (\Exception $e) {
             Log::error('Failed to send welcome email: ' . $e->getMessage());
-        }
-
-        $existingUsers = User::where('id', '!=', $user->id)->get();
-
-        foreach ($existingUsers as $existingUser) {
-            Notification::create([
-                'user_id' => $existingUser->id,
-                'sender_id' => $user->id,
-                'type' => 'user_registered',
-                'content' => 'has registered as a new user. Say hello!',
-                'is_read' => false,
-            ]);
-
-            event(new UserRegistered($user, $existingUser));
         }
 
         Auth::login($user);

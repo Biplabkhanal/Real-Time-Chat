@@ -23,6 +23,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 sender: e.user,
                 content: "sent you a message",
                 created_at: new Date().toISOString(),
+                type: "message",
                 is_read: false,
             };
 
@@ -32,15 +33,34 @@ export default function AuthenticatedLayout({ header, children }) {
             setTimeout(fetchNotifications, 1000);
         });
 
-        window.Echo.private(`user-activity.${user.id}`).listen(
-            "user.registered",
+        window.Echo.private(`user.${user.id}`).listen(
+            "FriendRequestReceived",
             (e) => {
                 const newNotification = {
                     id: `temp-${Date.now()}`,
-                    sender: e.user,
-                    content: e.message || "has registered as a new user",
-                    created_at: e.timestamp || new Date().toISOString(),
-                    type: "user_registered",
+                    sender: e.sender,
+                    content: "sent you a friend request",
+                    created_at: new Date().toISOString(),
+                    type: "friend_request_received",
+                    is_read: false,
+                };
+
+                setNotifications((prev) => [newNotification, ...prev]);
+                setUnreadCount((prevCount) => prevCount + 1);
+
+                setTimeout(fetchNotifications, 1000);
+            }
+        );
+
+        window.Echo.private(`user.${user.id}`).listen(
+            "FriendRequestAccepted",
+            (e) => {
+                const newNotification = {
+                    id: `temp-${Date.now()}`,
+                    sender: e.accepter,
+                    content: "accepted your friend request",
+                    created_at: new Date().toISOString(),
+                    type: "friend_request_accepted",
                     is_read: false,
                 };
 
@@ -53,7 +73,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
         return () => {
             window.Echo.leave(`message.${user.id}`);
-            window.Echo.leave(`user-activity.${user.id}`);
+            window.Echo.leave(`user.${user.id}`);
         };
     }, []);
 
