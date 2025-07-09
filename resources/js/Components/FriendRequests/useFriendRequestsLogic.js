@@ -20,7 +20,7 @@ export const useFriendRequestsLogic = (
     const [loading, setLoading] = useState(true);
     const [loadingRequests, setLoadingRequests] = useState(false);
     const [loadingFriends, setLoadingFriends] = useState(false);
-    const [loadingAddFriend, setLoadingAddFriend] = useState(false);
+    const [loadingAddFriend, setLoadingAddFriend] = useState(true);
 
     const getCsrfToken = () => {
         if (csrf_token) {
@@ -113,22 +113,19 @@ export const useFriendRequestsLogic = (
 
     useEffect(() => {
         if (activeTab === "requests") {
-            setLoadingRequests(true);
             const timer = setTimeout(() => {
                 setLoadingRequests(false);
-            }, 800);
+            }, 500);
             return () => clearTimeout(timer);
         } else if (activeTab === "friends") {
-            setLoadingFriends(true);
             const timer = setTimeout(() => {
                 setLoadingFriends(false);
-            }, 800);
+            }, 500);
             return () => clearTimeout(timer);
         } else if (activeTab === "addFriend") {
-            setLoadingAddFriend(true);
             const timer = setTimeout(() => {
                 setLoadingAddFriend(false);
-            }, 800);
+            }, 500);
             return () => clearTimeout(timer);
         }
     }, [activeTab]);
@@ -444,9 +441,24 @@ export const useFriendRequestsLogic = (
 
     const usersToDisplay = searchQuery.trim() === "" ? allUsers : searchResults;
 
+    // Custom tab change handler to set loading states immediately
+    const handleTabChange = (newTab) => {
+        // Set loading state immediately before tab change
+        if (newTab === "requests") {
+            setLoadingRequests(true);
+        } else if (newTab === "friends") {
+            setLoadingFriends(true);
+        } else if (newTab === "addFriend") {
+            setLoadingAddFriend(true);
+        }
+
+        // Change the active tab
+        setActiveTab(newTab);
+    };
+
     return {
         activeTab,
-        setActiveTab,
+        setActiveTab: handleTabChange,
         searchQuery,
         setSearchQuery,
         searchResults,
