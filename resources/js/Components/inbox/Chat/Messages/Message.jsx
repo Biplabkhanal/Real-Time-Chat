@@ -3,7 +3,7 @@ import MessageOptions from "./MessageOptions";
 import MessageContent from "./MessageContent";
 import MessageAttachment from "./MessageAttachment";
 import MessageTimestamp from "./MessageTimestamp";
-import MessageDeleteModal from "./MessageDeleteModal";
+import MessageDeleteModal from "../../Modals/MessageDeleteModal";
 
 const Message = ({ message, isCurrentUser, onDelete }) => {
     const [showOptions, setShowOptions] = useState(false);

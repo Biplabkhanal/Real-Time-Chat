@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import TextArea from "./TextArea";
 import EmojiButton from "./EmojiButton";
 import FileUploadButton from "./FileUploadButton";
-import SendButton from "../icons/SendButton";
+import SendButton from "../../Shared/Icons/SendButton";
 import EmojiPicker from "emoji-picker-react";
-import VoiceButton from "../icons/VoiceMessageIcon";
+import VoiceButton from "../../Shared/Icons/VoiceMessageIcon";
 import axios from "axios";
 import { usePage } from "@inertiajs/react";
 

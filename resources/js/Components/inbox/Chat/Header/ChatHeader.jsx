@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import UserAvatar from "./UserAvatar";
-import UserStatus from "./UserStatus";
-import SharedMediaModal from "./Messages/SharedMediaModal";
+import UserAvatar from "../../UserList/UserAvatar";
+import UserStatus from "../../UserList/UserStatus";
+import SharedMediaModal from "../../Modals/SharedMediaModal";
 import { usePage } from "@inertiajs/react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import ConversationDeleteModal from "./ChatHeader/ConversationDeleteModal";
-import MoreOptionsButton from "./ChatHeader/icons/MoreOptionsButton";
-import SearchButton from "./ChatHeader/icons/SearchButton";
-import BlockUserModal from "./ChatHeader/BlockUserModal";
+import ConversationDeleteModal from "../../Modals/ConversationDeleteModal";
+import MoreOptionsButton from "../../Shared/Icons/MoreOptionsButton";
+import SearchButton from "../../Shared/Icons/SearchButton";
+import BlockUserModal from "../../Modals/BlockUserModal";
 
 const ChatHeader = ({
     selectedUser,

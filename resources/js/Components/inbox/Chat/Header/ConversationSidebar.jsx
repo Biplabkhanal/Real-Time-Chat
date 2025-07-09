@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import moment from "moment";
 import TabNavigation from "./TabNavigation ";
-import LoadingSpinner from "./icons/LoadingSpinner";
+import LoadingSpinner from "../../Shared/Icons/LoadingSpinner";
 import ErrorDisplay from "./ErrorDisplay";
 import MediaGrid from "./MediaGrid";
 import DocumentsList from "./DocumentsList";
 import LinksList from "./LinksList";
-import ExportConversationModal from "./ExportConversationModal";
+import ExportConversationModal from "../../Modals/ExportConversationModal";
 import ConversationAnalytics from "./ConversationAnalytics";
 import ThemeSettings from "./ThemeSettings";
 

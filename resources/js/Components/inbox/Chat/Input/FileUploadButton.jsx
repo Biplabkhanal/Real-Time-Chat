@@ -1,5 +1,5 @@
-import AttachmentIcon from "../icons/AttachmentIcon";
-import { useFileUpload } from "./useFileUpload";
+import AttachmentIcon from "../../Shared/Icons/AttachmentIcon";
+import { useFileUpload } from "../../hooks/useFileUpload";
 
 const FileUploadButton = ({ onFileSelect, existingAttachments }) => {
     const { handleFileUpload } = useFileUpload(onFileSelect);

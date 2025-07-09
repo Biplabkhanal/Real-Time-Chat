@@ -3,7 +3,7 @@ import CallToAction from "@/Components/CallToAction";
 import Dropdown from "@/Components/Dropdown";
 import FeaturesGrid from "@/Components/FeaturesGrid";
 import Hero from "@/Components/Hero";
-import ThemeSettings from "@/Components/inbox/ChatHeader/ThemeSettings";
+import ThemeSettings from "@/Components/inbox/Chat/Header/ThemeSettings";
 import ReviewSection from "@/Components/ReviewSection";
 import { Head, Link, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";

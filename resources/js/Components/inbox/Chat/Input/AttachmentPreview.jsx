@@ -1,7 +1,7 @@
 import React from "react";
-import AttachmentImage from "./AttachmentImage";
-import AttachmentFile from "./AttachmentFile";
-import RemoveButton from "../icons/RemoveButton";
+import AttachmentImage from "../Messages/AttachmentImage";
+import AttachmentFile from "../Messages/AttachmentFile";
+import RemoveButton from "../../Shared/Icons/RemoveButton";
 
 const AttachmentPreview = ({ attachments, onRemove }) => {
     if (attachments.length === 0) return null;

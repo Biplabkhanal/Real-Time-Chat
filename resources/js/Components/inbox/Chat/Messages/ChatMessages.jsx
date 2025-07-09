@@ -1,6 +1,6 @@
-import EmptyState from "./EmptyState";
-import ErrorState from "./ErrorState";
-import LoadingState from "./LoadingState";
+import EmptyState from "../../Shared/States/EmptyState";
+import ErrorState from "../../Shared/States/ErrorState";
+import LoadingState from "../../Shared/States/LoadingState";
 import Message from "./Message";
 
 const ChatMessages = ({

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { usePage } from "@inertiajs/react";
-import BlockUserModal from "@/Components/inbox/ChatHeader/BlockUserModal";
+import BlockUserModal from "@/Components/inbox/Modals/BlockUserModal";
 
 export default function BlockedUsersForm({ className = "" }) {
     const { auth } = usePage().props;

@@ -1,5 +1,5 @@
 import React from "react";
-import { useTheme } from "../customHooks/ThemeProvider";
+import { useTheme } from "../../hooks/ThemeProvider";
 
 const ThemeSettings = () => {
     const { theme, setTheme } = useTheme();

@@ -1,12 +1,12 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
-import TabNavigation from "../ChatHeader/TabNavigation ";
-import LoadingSpinner from "../ChatHeader/icons/LoadingSpinner";
-import ErrorDisplay from "../ChatHeader/ErrorDisplay";
-import MediaGrid from "../ChatHeader/MediaGrid";
-import DocumentsList from "../ChatHeader/DocumentsList";
-import LinksList from "../ChatHeader/LinksList";
+import TabNavigation from "../Chat/Header/TabNavigation ";
+import LoadingSpinner from "../Shared/Icons/LoadingSpinner";
+import ErrorDisplay from "../Chat/Header/ErrorDisplay";
+import MediaGrid from "../Chat/Header/MediaGrid";
+import DocumentsList from "../Chat/Header/DocumentsList";
+import LinksList from "../Chat/Header/LinksList";
 
 const SharedMediaModal = ({ isOpen, onClose, currentUserId, otherUserId }) => {
     const [mediaFiles, setMediaFiles] = useState([]);

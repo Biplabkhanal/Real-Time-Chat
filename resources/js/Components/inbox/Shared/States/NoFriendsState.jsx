@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import PrimaryButton from "../PrimaryButton";
+import PrimaryButton from "../../../PrimaryButton";
 
 export default function NoFriendsState() {
     return (

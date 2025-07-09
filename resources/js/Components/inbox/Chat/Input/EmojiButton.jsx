@@ -1,4 +1,4 @@
-import EmojiIcon from "../icons/EmojiIcon";
+import EmojiIcon from "../../Shared/Icons/EmojiIcon";
 
 const EmojiButton = ({ onClick }) => (
     <button

@@ -1,5 +1,5 @@
 import React from "react";
-import ChatIcon from "./icons/ChatIcon";
+import ChatIcon from "../Icons/ChatIcon";
 
 const EmptyChatState = () => (
     <div className="h-full flex justify-center items-center flex-col space-y-4 p-6">
