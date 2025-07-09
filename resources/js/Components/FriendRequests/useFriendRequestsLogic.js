@@ -432,6 +432,7 @@ export const useFriendRequestsLogic = (
     };
 
     const removeFriend = async (friendId) => {
+        setLoadingUsers((prev) => new Set(prev).add(friendId));
         try {
             router.delete(`/friend/remove/${friendId}`, {
                 preserveScroll: true,
@@ -447,10 +448,22 @@ export const useFriendRequestsLogic = (
                         Object.values(errors)[0] || "Failed to remove friend";
                     toast.error(errorMessage);
                 },
+                onFinish: () => {
+                    setLoadingUsers((prev) => {
+                        const newSet = new Set(prev);
+                        newSet.delete(friendId);
+                        return newSet;
+                    });
+                },
             });
         } catch (error) {
             console.error("Error removing friend:", error);
             toast.error("Error removing friend");
+            setLoadingUsers((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(friendId);
+                return newSet;
+            });
         }
     };
 
