@@ -20,6 +20,8 @@ export default function FriendRequests({
         setSearchQuery,
         isSearching,
         loadingUsers,
+        acceptingUsers,
+        decliningUsers,
         pendingRequests,
         friends,
         loading,
@@ -97,6 +99,7 @@ export default function FriendRequests({
                                     onCancelFriendRequest={cancelFriendRequest}
                                     onAcceptFriendRequest={acceptFriendRequest}
                                     loadingUsers={loadingUsers}
+                                    acceptingUsers={acceptingUsers}
                                 />
                             )}
 
@@ -105,7 +108,8 @@ export default function FriendRequests({
                                     pendingRequests={pendingRequests}
                                     onAcceptRequest={acceptFriendRequest}
                                     onDeclineRequest={declineFriendRequest}
-                                    loadingUsers={loadingUsers}
+                                    acceptingUsers={acceptingUsers}
+                                    decliningUsers={decliningUsers}
                                     loading={loadingRequests}
                                 />
                             )}

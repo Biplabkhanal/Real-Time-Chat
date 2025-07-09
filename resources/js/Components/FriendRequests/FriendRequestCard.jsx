@@ -3,7 +3,13 @@ import UserAvatar from "./UserAvatar";
 import ActionButton from "./ActionButton";
 
 const FriendRequestCard = memo(
-    ({ request, onAcceptRequest, onDeclineRequest, isLoading = false }) => {
+    ({
+        request,
+        onAcceptRequest,
+        onDeclineRequest,
+        isAccepting = false,
+        isDeclining = false,
+    }) => {
         return (
             <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
                 <div className="flex items-center space-x-4">
@@ -24,7 +30,7 @@ const FriendRequestCard = memo(
                     <ActionButton
                         type="primary"
                         onClick={() => onAcceptRequest(request.id)}
-                        isLoading={isLoading}
+                        isLoading={isAccepting}
                         loadingText="Accepting..."
                         size="sm"
                     >
@@ -33,7 +39,7 @@ const FriendRequestCard = memo(
                     <ActionButton
                         type="danger"
                         onClick={() => onDeclineRequest(request.id)}
-                        isLoading={isLoading}
+                        isLoading={isDeclining}
                         loadingText="Declining..."
                         size="sm"
                     >

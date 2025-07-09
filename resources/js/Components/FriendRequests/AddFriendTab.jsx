@@ -16,6 +16,7 @@ const AddFriendTab = memo(
         onCancelFriendRequest,
         onAcceptFriendRequest,
         loadingUsers,
+        acceptingUsers,
     }) => {
         return (
             <div className="space-y-6">
@@ -59,7 +60,7 @@ const AddFriendTab = memo(
                                         loadingUsers.has(
                                             user.sent_request_id
                                         ) ||
-                                        loadingUsers.has(
+                                        acceptingUsers.has(
                                             user.received_request_id
                                         )
                                     }

@@ -9,7 +9,8 @@ const FriendRequestsTab = memo(
         pendingRequests,
         onAcceptRequest,
         onDeclineRequest,
-        loadingUsers,
+        acceptingUsers,
+        decliningUsers,
         loading,
     }) => {
         if (loading) {
@@ -42,7 +43,8 @@ const FriendRequestsTab = memo(
                                     request={request}
                                     onAcceptRequest={onAcceptRequest}
                                     onDeclineRequest={onDeclineRequest}
-                                    isLoading={loadingUsers.has(request.id)}
+                                    isAccepting={acceptingUsers.has(request.id)}
+                                    isDeclining={decliningUsers.has(request.id)}
                                 />
                             ))}
                         </div>

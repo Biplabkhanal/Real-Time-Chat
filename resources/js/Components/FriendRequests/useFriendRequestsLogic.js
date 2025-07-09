@@ -13,6 +13,8 @@ export const useFriendRequestsLogic = (
     const [allUsers, setAllUsers] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const [loadingUsers, setLoadingUsers] = useState(new Set());
+    const [acceptingUsers, setAcceptingUsers] = useState(new Set());
+    const [decliningUsers, setDecliningUsers] = useState(new Set());
     const [pendingRequests, setPendingRequests] = useState(
         initialPendingRequests || []
     );
@@ -318,7 +320,7 @@ export const useFriendRequestsLogic = (
     );
 
     const acceptFriendRequest = async (requestId) => {
-        setLoadingUsers((prev) => new Set(prev).add(requestId));
+        setAcceptingUsers((prev) => new Set(prev).add(requestId));
         try {
             router.post(
                 `/friend-request/accept/${requestId}`,
@@ -363,7 +365,7 @@ export const useFriendRequestsLogic = (
                         toast.error(errorMessage);
                     },
                     onFinish: () => {
-                        setLoadingUsers((prev) => {
+                        setAcceptingUsers((prev) => {
                             const newSet = new Set(prev);
                             newSet.delete(requestId);
                             return newSet;
@@ -377,7 +379,7 @@ export const useFriendRequestsLogic = (
                 "Error accepting friend request: " +
                     (error.message || "Unknown error")
             );
-            setLoadingUsers((prev) => {
+            setAcceptingUsers((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(requestId);
                 return newSet;
@@ -386,6 +388,7 @@ export const useFriendRequestsLogic = (
     };
 
     const declineFriendRequest = async (requestId) => {
+        setDecliningUsers((prev) => new Set(prev).add(requestId));
         try {
             router.post(
                 `/friend-request/decline/${requestId}`,
@@ -408,11 +411,23 @@ export const useFriendRequestsLogic = (
                             "Failed to decline friend request";
                         toast.error(errorMessage);
                     },
+                    onFinish: () => {
+                        setDecliningUsers((prev) => {
+                            const newSet = new Set(prev);
+                            newSet.delete(requestId);
+                            return newSet;
+                        });
+                    },
                 }
             );
         } catch (error) {
             console.error("Error declining friend request:", error);
             toast.error("Error declining friend request");
+            setDecliningUsers((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(requestId);
+                return newSet;
+            });
         }
     };
 
@@ -441,9 +456,7 @@ export const useFriendRequestsLogic = (
 
     const usersToDisplay = searchQuery.trim() === "" ? allUsers : searchResults;
 
-    // Custom tab change handler to set loading states immediately
     const handleTabChange = (newTab) => {
-        // Set loading state immediately before tab change
         if (newTab === "requests") {
             setLoadingRequests(true);
         } else if (newTab === "friends") {
@@ -452,7 +465,6 @@ export const useFriendRequestsLogic = (
             setLoadingAddFriend(true);
         }
 
-        // Change the active tab
         setActiveTab(newTab);
     };
 
@@ -465,6 +477,8 @@ export const useFriendRequestsLogic = (
         allUsers,
         isSearching,
         loadingUsers,
+        acceptingUsers,
+        decliningUsers,
         pendingRequests,
         friends,
         loading,
