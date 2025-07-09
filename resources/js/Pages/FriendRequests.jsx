@@ -23,6 +23,9 @@ export default function FriendRequests({
         pendingRequests,
         friends,
         loading,
+        loadingRequests,
+        loadingFriends,
+        loadingAddFriend,
         usersToDisplay,
         sendFriendRequest,
         cancelFriendRequest,
@@ -88,7 +91,7 @@ export default function FriendRequests({
                                     searchQuery={searchQuery}
                                     onSearchChange={setSearchQuery}
                                     isSearching={isSearching}
-                                    loading={loading}
+                                    loading={loadingAddFriend}
                                     usersToDisplay={usersToDisplay}
                                     onSendFriendRequest={sendFriendRequest}
                                     onCancelFriendRequest={cancelFriendRequest}
@@ -103,6 +106,7 @@ export default function FriendRequests({
                                     onAcceptRequest={acceptFriendRequest}
                                     onDeclineRequest={declineFriendRequest}
                                     loadingUsers={loadingUsers}
+                                    loading={loadingRequests}
                                 />
                             )}
 
@@ -114,6 +118,7 @@ export default function FriendRequests({
                                         setActiveTab("addFriend")
                                     }
                                     loadingUsers={loadingUsers}
+                                    loading={loadingFriends}
                                 />
                             )}
                         </>

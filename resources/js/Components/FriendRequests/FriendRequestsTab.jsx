@@ -1,9 +1,31 @@
 import { memo } from "react";
 import FriendRequestCard from "./FriendRequestCard";
 import EmptyState from "./EmptyState";
+import LoadingSpinner from "@/Components/LoadingSpinner";
 
 const FriendRequestsTab = memo(
-    ({ pendingRequests, onAcceptRequest, onDeclineRequest, loadingUsers }) => {
+    ({
+        pendingRequests,
+        onAcceptRequest,
+        onDeclineRequest,
+        loadingUsers,
+        loading,
+    }) => {
+        if (loading) {
+            return (
+                <div className="space-y-6">
+                    <div className="bg-gray-900 rounded-lg p-6">
+                        <div className="py-12">
+                            <LoadingSpinner
+                                size="md"
+                                text="Loading friend requests..."
+                            />
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="space-y-6">
                 <div className="bg-gray-900 rounded-lg p-6">

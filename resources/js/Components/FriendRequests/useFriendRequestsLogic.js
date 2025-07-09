@@ -18,6 +18,9 @@ export const useFriendRequestsLogic = (
     );
     const [friends, setFriends] = useState(initialFriends || []);
     const [loading, setLoading] = useState(true);
+    const [loadingRequests, setLoadingRequests] = useState(false);
+    const [loadingFriends, setLoadingFriends] = useState(false);
+    const [loadingAddFriend, setLoadingAddFriend] = useState(false);
 
     const getCsrfToken = () => {
         if (csrf_token) {
@@ -107,6 +110,28 @@ export const useFriendRequestsLogic = (
     useEffect(() => {
         fetchAllUsers();
     }, []);
+
+    useEffect(() => {
+        if (activeTab === "requests") {
+            setLoadingRequests(true);
+            const timer = setTimeout(() => {
+                setLoadingRequests(false);
+            }, 800);
+            return () => clearTimeout(timer);
+        } else if (activeTab === "friends") {
+            setLoadingFriends(true);
+            const timer = setTimeout(() => {
+                setLoadingFriends(false);
+            }, 800);
+            return () => clearTimeout(timer);
+        } else if (activeTab === "addFriend") {
+            setLoadingAddFriend(true);
+            const timer = setTimeout(() => {
+                setLoadingAddFriend(false);
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [activeTab]);
 
     const sendFriendRequest = useCallback(
         async (userId, retryCount = 0) => {
@@ -431,6 +456,9 @@ export const useFriendRequestsLogic = (
         pendingRequests,
         friends,
         loading,
+        loadingRequests,
+        loadingFriends,
+        loadingAddFriend,
         usersToDisplay,
         sendFriendRequest,
         cancelFriendRequest,
