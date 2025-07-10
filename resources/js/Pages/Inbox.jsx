@@ -58,6 +58,14 @@ export default function Inbox({ auth, users, selectedUserId }) {
     };
 
     useEffect(() => {
+        window.scrollToBottom = scrollToBottom;
+
+        return () => {
+            delete window.scrollToBottom;
+        };
+    }, []);
+
+    useEffect(() => {
         selectedUserRef.current = selectedUser;
         if (selectedUser) {
             getMessages();
@@ -66,9 +74,11 @@ export default function Inbox({ auth, users, selectedUserId }) {
     }, [selectedUser]);
 
     useEffect(() => {
-        setTimeout(() => {
-            scrollToBottom();
-        }, 100);
+        if (currentMessages.length > 0) {
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
+        }
     }, [currentMessages]);
 
     useEffect(() => {
@@ -146,7 +156,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
 
             getMessages(() => {
                 setIsUserSelectionLoading(false);
-            });
+            }, true);
             if (inputRef.current) inputRef.current.focus();
         }
     }, [selectedUser]);
@@ -154,7 +164,6 @@ export default function Inbox({ auth, users, selectedUserId }) {
     const handleDeleteClick = async (messageId) => {
         try {
             await axios.delete(`/message/${messageId}`);
-            await getMessages(() => {});
             toast.success("Message deleted successfully");
         } catch (error) {
             console.error("Error deleting message:", error);
@@ -163,28 +172,64 @@ export default function Inbox({ auth, users, selectedUserId }) {
             );
         }
     };
-
     useEffect(() => {
-        const channel = window.Echo.private(webSocketChannel);
-        channel
-            .listen("MessageSent", async () => {
-                await getMessages(() => {});
-            })
+        if (!window.Echo) {
+            console.error(
+                "Echo is not available. WebSocket listeners will not be set up."
+            );
+            return;
+        }
 
-            .listen("MessageDeleted", async (event) => {
-                if (event.isEntireConversation) {
-                    setCurrentMessages([]);
-                    toast.info("This conversation has been deleted.");
+        try {
+            const channel = window.Echo.private(webSocketChannel);
+
+            channel.listen("MessageSent", (e) => {
+                const isMessageForCurrentChat =
+                    selectedUserRef.current &&
+                    ((e.user.id === selectedUserRef.current.id &&
+                        e.message.recipient_id === auth.user.id) ||
+                        (e.message.sender_id === selectedUserRef.current.id &&
+                            e.message.recipient_id === auth.user.id));
+
+                if (isMessageForCurrentChat) {
+                    if (e.message && e.message.sender_id !== auth.user.id) {
+                        setCurrentMessages((prevMessages) => {
+                            const messageExists = prevMessages.some(
+                                (msg) => msg.id === e.message.id
+                            );
+                            if (messageExists) {
+                                return prevMessages;
+                            }
+                            return [...prevMessages, e.message];
+                        });
+
+                        setTimeout(scrollToBottom, 100);
+                    }
                 } else {
-                    await getMessages();
+                    toast.info(`New message from ${e.user.name}`);
+                    fetchUsersWithConversations();
                 }
             });
 
-        return () => {
-            channel.stopListening("MessageSent");
-            channel.stopListening("MessageDeleted");
-        };
-    }, []);
+            channel.listen("MessageDeleted", (event) => {
+                if (event.isEntireConversation) {
+                    setCurrentMessages([]);
+                    toast.info("This conversation has been deleted.");
+                } else if (event.messageId) {
+                    setCurrentMessages((prevMessages) =>
+                        prevMessages.filter((msg) => msg.id !== event.messageId)
+                    );
+                }
+            });
+
+            return () => {
+                channel.stopListening("MessageSent");
+                channel.stopListening("MessageDeleted");
+            };
+        } catch (error) {
+            console.error("Error setting up WebSocket listeners:", error);
+        }
+    }, [webSocketChannel, auth.user.id]);
 
     const handleUserSelect = (user) => {
         if (selectedUser && selectedUser.id !== user.id) {
@@ -293,6 +338,53 @@ export default function Inbox({ auth, users, selectedUserId }) {
             console.error("Error checking block status:", error);
         }
     };
+
+    useEffect(() => {
+        let pollingInterval;
+
+        if (selectedUser) {
+            pollingInterval = setInterval(() => {
+                if (!isLoading && selectedUserRef.current) {
+                    getMessages(null, false);
+                }
+            }, 3000);
+        }
+
+        return () => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
+        };
+    }, [selectedUser, isLoading]);
+
+    useEffect(() => {
+        const checkEchoConnectionStatus = () => {
+            let isConnected = false;
+
+            try {
+                if (window.Echo && window.Echo.connector) {
+                    if (
+                        window.Echo.connector.pusher &&
+                        window.Echo.connector.pusher.connection &&
+                        window.Echo.connector.pusher.connection.state ===
+                            "connected"
+                    ) {
+                        isConnected = true;
+                    }
+                }
+            } catch (error) {
+                console.error("Error checking Echo connection:", error);
+            }
+            window.isWebSocketConnected = isConnected;
+        };
+
+        checkEchoConnectionStatus();
+        const interval = setInterval(checkEchoConnectionStatus, 10000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
 
     return (
         <AuthenticatedLayout user={auth.user}>
