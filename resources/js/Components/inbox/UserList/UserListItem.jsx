@@ -1,9 +1,15 @@
 import React from "react";
 
 const UserListItem = ({ user, selectedUser, setSelectedUser, isOnline }) => {
+    const handleUserClick = () => {
+        if (user.id !== selectedUser?.id) {
+            setSelectedUser(user);
+        }
+    };
+
     return (
         <div
-            onClick={() => setSelectedUser(user)}
+            onClick={handleUserClick}
             className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors
                        ${
                            user.id === selectedUser?.id

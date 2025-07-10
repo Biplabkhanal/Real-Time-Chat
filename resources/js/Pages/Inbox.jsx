@@ -31,12 +31,14 @@ export default function Inbox({ auth, users, selectedUserId }) {
         isBlockedByUser: false,
     });
     const [showInfoSidebar, setShowInfoSidebar] = useState(false);
+    const [isUserSelectionLoading, setIsUserSelectionLoading] = useState(false);
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
     const inputRef = useRef(null);
     const {
         isLoading,
+        isSending,
         error,
         messageInput,
         setMessageInput,
@@ -142,7 +144,9 @@ export default function Inbox({ auth, users, selectedUserId }) {
             setMessageInput("");
             setAttachments([]);
 
-            getMessages();
+            getMessages(() => {
+                setIsUserSelectionLoading(false);
+            });
             if (inputRef.current) inputRef.current.focus();
         }
     }, [selectedUser]);
@@ -150,7 +154,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
     const handleDeleteClick = async (messageId) => {
         try {
             await axios.delete(`/message/${messageId}`);
-            await getMessages();
+            await getMessages(() => {});
             toast.success("Message deleted successfully");
         } catch (error) {
             console.error("Error deleting message:", error);
@@ -164,7 +168,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
         const channel = window.Echo.private(webSocketChannel);
         channel
             .listen("MessageSent", async () => {
-                await getMessages();
+                await getMessages(() => {});
             })
 
             .listen("MessageDeleted", async (event) => {
@@ -186,6 +190,8 @@ export default function Inbox({ auth, users, selectedUserId }) {
         if (selectedUser && selectedUser.id !== user.id) {
             setShowInfoSidebar(false);
         }
+        setIsUserSelectionLoading(true);
+        setCurrentMessages([]);
         setSelectedUser(user);
     };
 
@@ -357,7 +363,12 @@ export default function Inbox({ auth, users, selectedUserId }) {
 
                                 {/* Chat Messages */}
                                 <ChatMessages
-                                    isLoading={isLoading}
+                                    isLoading={
+                                        isLoading || isUserSelectionLoading
+                                    }
+                                    isUserSelectionLoading={
+                                        isUserSelectionLoading
+                                    }
                                     error={error}
                                     currentMessages={currentMessages}
                                     auth={auth}
@@ -391,7 +402,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
                                         messageInput={messageInput}
                                         setMessageInput={setMessageInput}
                                         handleKeyDown={handleKeyDown}
-                                        isLoading={isLoading}
+                                        isLoading={isSending}
                                         attachments={attachments}
                                         setAttachments={setAttachments}
                                         sendMessage={handleSendMessage}

@@ -17,12 +17,13 @@ export const useFilterUsers = (searchInput, users, setFilteredUsers) => {
 
 export const useMessageHandler = (selectedUserRef, inputRef) => {
     const [isLoading, setIsLoading] = useState(false);
+    const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState(null);
     const [messageInput, setMessageInput] = useState("");
     const [attachments, setAttachments] = useState([]);
     const [currentMessages, setCurrentMessages] = useState([]);
 
-    const getMessages = useCallback(async () => {
+    const getMessages = useCallback(async (onComplete) => {
         if (!selectedUserRef.current) return;
 
         setIsLoading(true);
@@ -38,13 +39,16 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
             console.error("Error fetching messages:", err);
         } finally {
             setIsLoading(false);
+            if (typeof onComplete === "function") {
+                onComplete();
+            }
         }
     }, []);
 
     const handleSendMessage = useCallback(async () => {
         if (messageInput.trim() === "" && attachments.length === 0) return;
 
-        setIsLoading(true);
+        setIsSending(true);
         setError(null);
 
         try {
@@ -53,11 +57,9 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
                 attachments: attachments,
             });
 
-            // Reset form
             setMessageInput("");
             setAttachments([]);
 
-            // Refresh messages and focus input
             await getMessages();
             if (inputRef.current) inputRef.current.focus();
 
@@ -67,7 +69,7 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
             console.error("Error sending message:", err);
             toast.error("Failed to send message");
         } finally {
-            setIsLoading(false);
+            setIsSending(false);
         }
     }, [messageInput, attachments]);
 
@@ -83,6 +85,7 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
 
     return {
         isLoading,
+        isSending,
         error,
         messageInput,
         setMessageInput,
