@@ -24,8 +24,22 @@ const ChatHeader = ({
     const [showBlockModal, setShowBlockModal] = useState(false);
     const [isUserBlocked, setIsUserBlocked] = useState(false);
     const [isBlockedByUser, setIsBlockedByUser] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const { auth } = usePage().props;
     const dropdownRef = React.useRef();
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+
+        return () => {
+            window.removeEventListener("resize", checkMobile);
+        };
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -105,6 +119,10 @@ const ChatHeader = ({
     };
 
     const toggleInfoSidebar = () => {
+        if (isMobile) {
+            return;
+        }
+
         setShowInfoSidebar(!showInfoSidebar);
         if (showDropdown) {
             setShowDropdown(false);
@@ -154,25 +172,27 @@ const ChatHeader = ({
                         {showDropdown && (
                             <div className="absolute right-0 mt-5 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
                                 <div className="py-1">
-                                    <button
-                                        onClick={toggleInfoSidebar}
-                                        disabled={isBlockedByUser}
-                                        className={`block w-full text-left px-4 py-2 text-sm ${
-                                            isBlockedByUser
-                                                ? "text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                        }`}
-                                    >
-                                        {showInfoSidebar
-                                            ? "Hide Conversation Info"
-                                            : "View Conversation Info"}
-                                        {isBlockedByUser && (
-                                            <span className="block text-xs italic text-gray-400 dark:text-gray-500">
-                                                * Not available - you've been
-                                                blocked
-                                            </span>
-                                        )}
-                                    </button>
+                                    {!isMobile && (
+                                        <button
+                                            onClick={toggleInfoSidebar}
+                                            disabled={isBlockedByUser}
+                                            className={`block w-full text-left px-4 py-2 text-sm ${
+                                                isBlockedByUser
+                                                    ? "text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                                                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            }`}
+                                        >
+                                            {showInfoSidebar
+                                                ? "Hide Conversation Info"
+                                                : "View Conversation Info"}
+                                            {isBlockedByUser && (
+                                                <span className="block text-xs italic text-gray-400 dark:text-gray-500">
+                                                    * Not available - you've
+                                                    been blocked
+                                                </span>
+                                            )}
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => openBlockConfirmation()}
                                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"

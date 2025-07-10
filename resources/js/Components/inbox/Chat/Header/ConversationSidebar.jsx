@@ -21,8 +21,21 @@ const ConversationSidebar = ({
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState("info");
+    const [isMobile, setIsMobile] = useState(false);
 
-    // Media-related state
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+
+        return () => {
+            window.removeEventListener("resize", checkMobile);
+        };
+    }, []);
+
     const [mediaFiles, setMediaFiles] = useState([]);
     const [mediaLoading, setMediaLoading] = useState(true);
     const [mediaError, setMediaError] = useState(null);
@@ -185,6 +198,10 @@ const ConversationSidebar = ({
 
         return null;
     };
+
+    if (isMobile) {
+        return null;
+    }
 
     return (
         <div
