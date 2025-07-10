@@ -206,7 +206,6 @@ export default function Inbox({ auth, users, selectedUserId }) {
                         setTimeout(scrollToBottom, 100);
                     }
                 } else {
-                    toast.info(`New message from ${e.user.name}`);
                     fetchUsersWithConversations();
                 }
             });

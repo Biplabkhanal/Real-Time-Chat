@@ -1,4 +1,3 @@
-import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
@@ -16,23 +15,6 @@ export default function AuthenticatedLayout({ header, children }) {
 
     useEffect(() => {
         fetchNotifications();
-
-        window.Echo.private(`message.${user.id}`).listen("MessageSent", (e) => {
-            const newNotification = {
-                id: `temp-${Date.now()}`,
-                sender: e.user,
-                content: "sent you a message",
-                created_at: new Date().toISOString(),
-                type: "message",
-                is_read: false,
-            };
-
-            setNotifications((prev) => [newNotification, ...prev]);
-            setUnreadCount((prevCount) => prevCount + 1);
-
-            setTimeout(fetchNotifications, 1000);
-        });
-
         window.Echo.private(`user.${user.id}`).listen(
             "FriendRequestReceived",
             (e) => {

@@ -22,14 +22,6 @@ class CreateMessageNotification implements ShouldQueue
      */
     public function handle(MessageSent $event): void
     {
-        // Create notification for recipient
-        Notification::create([
-            'user_id' => $event->message->recipient_id,
-            'type' => 'message',
-            'sender_id' => $event->message->sender_id,
-            'content' => 'sent you a message',
-            'reference_id' => $event->message->id,
-            'is_read' => false,
-        ]);
+        // Message notification functionality has been removed
     }
 }
