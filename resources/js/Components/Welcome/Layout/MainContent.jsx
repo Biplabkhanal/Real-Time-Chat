@@ -1,8 +1,8 @@
-import AppDemo from "@/Components/AppDemo";
-import CallToAction from "@/Components/CallToAction";
-import FeaturesGrid from "@/Components/FeaturesGrid";
-import Hero from "@/Components/Hero";
-import ReviewSection from "@/Components/ReviewSection";
+import AppDemo from "@/Components/Welcome/Body/AppDemo";
+import CallToAction from "@/Components/Welcome/Body/CallToAction";
+import FeaturesGrid from "@/Components/Welcome/Body/FeaturesGrid";
+import Hero from "@/Components/Welcome/Body/Hero";
+import ReviewSection from "@/Components/Welcome/Body/ReviewSection";
 
 export default function MainContent({ auth, reviews }) {
     return (
