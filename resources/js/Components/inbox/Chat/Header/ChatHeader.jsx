@@ -131,8 +131,8 @@ const ChatHeader = ({
 
     return (
         <div className="flex flex-col bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between p-3">
-                <div className="flex items-center">
+            <div className="flex items-center justify-between p-3 sm:p-3 p-[0.64rem]">
+                <div className="flex items-center flex-1">
                     <div>
                         <UserAvatar
                             name={selectedUser.name}
@@ -141,14 +141,31 @@ const ChatHeader = ({
                         />
                     </div>
                     <div className="ml-4 flex-1">
-                        <div className="font-bold text-gray-900 dark:text-white">
-                            {selectedUser.name}
-                        </div>
-                        <UserStatus
-                            isOnline={onlineUsers[selectedUser.id]}
-                            lastSeen={lastSeen}
-                            userId={selectedUser.id}
-                        />
+                        {isMobile ? (
+                            <div>
+                                <div className="font-bold text-gray-900 dark:text-white mb-1">
+                                    {selectedUser.name}
+                                </div>
+                                <UserStatus
+                                    isOnline={onlineUsers[selectedUser.id]}
+                                    lastSeen={lastSeen}
+                                    userId={selectedUser.id}
+                                    isMobile={true}
+                                />
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="font-bold text-gray-900 dark:text-white">
+                                    {selectedUser.name}
+                                </div>
+                                <UserStatus
+                                    isOnline={onlineUsers[selectedUser.id]}
+                                    lastSeen={lastSeen}
+                                    userId={selectedUser.id}
+                                    isMobile={false}
+                                />
+                            </div>
+                        )}
                     </div>
                     <SharedMediaModal
                         isOpen={showMediaModal}
@@ -160,9 +177,8 @@ const ChatHeader = ({
 
                 {/* Chat action buttons */}
                 <div className="flex items-center space-x-3">
-                    <SearchButton />
+                    {!isMobile && <SearchButton />}
 
-                    {/* More options dropdown */}
                     <div className="relative" ref={dropdownRef}>
                         <MoreOptionsButton
                             onClick={() => setShowDropdown(!showDropdown)}

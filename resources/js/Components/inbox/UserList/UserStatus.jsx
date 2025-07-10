@@ -1,17 +1,34 @@
 import React from "react";
 
-const UserStatus = ({ isOnline, lastSeen, userId }) => (
+const UserStatus = ({ isOnline, lastSeen, userId, isMobile }) => (
     <div className="text-xs">
         {isOnline ? (
-            <span className="text-green-500">Online</span>
+            isMobile ? (
+                <div className="text-green-500">Online</div>
+            ) : (
+                <span className="text-green-500">Online</span>
+            )
         ) : (
             <div>
-                <span className="text-gray-500">Offline</span>
-                <br />
+                <div className="text-gray-500">Offline</div>
                 {lastSeen[userId] && (
-                    <span className="text-gray-400">
-                        Last seen: {new Date(lastSeen[userId]).toLocaleString()}
-                    </span>
+                    <>
+                        {isMobile ? (
+                            <div className="text-gray-400">
+                                Last seen:{" "}
+                                {new Date(lastSeen[userId]).toLocaleString()}
+                            </div>
+                        ) : (
+                            <>
+                                <span className="text-gray-400">
+                                    Last seen:{" "}
+                                    {new Date(
+                                        lastSeen[userId]
+                                    ).toLocaleString()}
+                                </span>
+                            </>
+                        )}
+                    </>
                 )}
             </div>
         )}

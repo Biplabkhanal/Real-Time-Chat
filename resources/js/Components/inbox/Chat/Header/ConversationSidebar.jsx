@@ -205,7 +205,11 @@ const ConversationSidebar = ({
 
     return (
         <div
-            className={`w-1/4 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden ${
+            className={`${
+                isMobile
+                    ? "fixed inset-y-0 right-0 w-full sm:w-1/2 z-50"
+                    : "w-1/4"
+            } bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden ${
                 isOpen ? "translate-x-0" : "translate-x-full hidden"
             }`}
         >
