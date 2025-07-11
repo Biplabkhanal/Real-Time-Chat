@@ -32,6 +32,8 @@ export default function Inbox({ auth, users, selectedUserId }) {
     });
     const [showInfoSidebar, setShowInfoSidebar] = useState(false);
     const [isUserSelectionLoading, setIsUserSelectionLoading] = useState(false);
+    const [showSidebar, setShowSidebar] = useState(false); // Default to hiding sidebar on mobile
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // Track if current view is mobile
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -237,6 +239,14 @@ export default function Inbox({ auth, users, selectedUserId }) {
         setIsUserSelectionLoading(true);
         setCurrentMessages([]);
         setSelectedUser(user);
+
+        if (isMobile) {
+            setShowSidebar(false);
+        }
+    };
+
+    const toggleSidebar = () => {
+        setShowSidebar(!showSidebar);
     };
 
     const fetchUsersWithConversations = async () => {
@@ -281,6 +291,9 @@ export default function Inbox({ auth, users, selectedUserId }) {
 
             if (userToSelect) {
                 setSelectedUser(userToSelect);
+                if (window.innerWidth < 768) {
+                    setShowSidebar(false);
+                }
             }
         }
     }, [selectedUserId, users, usersWithConversations]);
@@ -385,6 +398,36 @@ export default function Inbox({ auth, users, selectedUserId }) {
         };
     }, []);
 
+    useEffect(() => {
+        const checkIsMobile = () => {
+            const mobileView = window.innerWidth < 768;
+            setIsMobile(mobileView);
+
+            if (!mobileView) {
+                setShowSidebar(true);
+            } else if (mobileView && selectedUser) {
+                setShowSidebar(false);
+            } else if (mobileView && !selectedUser) {
+                setShowSidebar(false);
+            }
+        };
+
+        checkIsMobile();
+
+        window.addEventListener("resize", checkIsMobile);
+        return () => window.removeEventListener("resize", checkIsMobile);
+    }, [selectedUser]);
+
+    useEffect(() => {
+        if (!isMobile) {
+            setShowSidebar(true);
+        } else if (isMobile && selectedUser) {
+            setShowSidebar(false);
+        } else if (isMobile && !selectedUser) {
+            setShowSidebar(false);
+        }
+    }, [isMobile, selectedUser]);
+
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="ChatSync - Inbox" />
@@ -393,8 +436,48 @@ export default function Inbox({ auth, users, selectedUserId }) {
                 <NoFriendsState />
             ) : (
                 <div className="h-[calc(100vh-64px)] flex bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                    {/* Mobile Toggle Button */}
+                    <button
+                        className={`md:hidden fixed top-[10rem] ${
+                            showSidebar ? "right-4" : "left-[0rem]"
+                        } z-50 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 flex items-center justify-center`}
+                        onClick={toggleSidebar}
+                        aria-label={
+                            showSidebar ? "Hide contacts" : "Show contacts"
+                        }
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-8 w-8 transition-transform duration-300"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={3}
+                        >
+                            {showSidebar ? (
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M15 19l-7-7 7-7"
+                                />
+                            ) : (
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            )}
+                        </svg>
+                    </button>
+
                     {/* Sidebar */}
-                    <div className="w-1/4 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+                    <div
+                        className={`${
+                            showSidebar ? "translate-x-0" : "-translate-x-full"
+                        } md:translate-x-0 md:w-1/4 w-full md:static fixed inset-y-0 left-0 z-40
+                        bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
+                        flex flex-col transition-transform duration-300 ease-in-out shadow-lg md:shadow-none`}
+                    >
                         <div className="px-4 py-[1.64rem] bg-gray-50 dark:bg-gray-900 font-bold text-lg border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <h2 className="text-gray-800 dark:text-white">
@@ -439,18 +522,19 @@ export default function Inbox({ auth, users, selectedUserId }) {
                             <EmptyChatState />
                         ) : (
                             <>
-                                {/* Chat Header */}
-                                <ChatHeader
-                                    selectedUser={selectedUser}
-                                    onlineUsers={onlineUsers}
-                                    lastSeen={lastSeen}
-                                    auth={auth}
-                                    onConversationDeleted={
-                                        handleConversationDeleted
-                                    }
-                                    showInfoSidebar={showInfoSidebar}
-                                    setShowInfoSidebar={setShowInfoSidebar}
-                                />
+                                <div className="relative">
+                                    <ChatHeader
+                                        selectedUser={selectedUser}
+                                        onlineUsers={onlineUsers}
+                                        lastSeen={lastSeen}
+                                        auth={auth}
+                                        onConversationDeleted={
+                                            handleConversationDeleted
+                                        }
+                                        showInfoSidebar={showInfoSidebar}
+                                        setShowInfoSidebar={setShowInfoSidebar}
+                                    />
+                                </div>
 
                                 {/* Chat Messages */}
                                 <ChatMessages

@@ -42,7 +42,7 @@ const UserList = ({
     }
 
     return (
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 overflow-y-auto py-4 px-11">
             {filteredUsers.map((user) => (
                 <UserListItem
                     key={user.id}

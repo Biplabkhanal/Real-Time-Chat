@@ -131,7 +131,7 @@ const ChatHeader = ({
 
     return (
         <div className="flex flex-col bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between p-3 sm:p-3 p-[0.64rem]">
+            <div className="flex items-center justify-between p-3 ">
                 <div className="flex items-center flex-1">
                     <div>
                         <UserAvatar
