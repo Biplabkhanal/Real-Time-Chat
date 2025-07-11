@@ -1,13 +1,19 @@
 import React from "react";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 
-export default function MobileMenu({ showingNavigationDropdown, user }) {
+export default function MobileMenu({
+    showingNavigationDropdown,
+    user,
+    onClose,
+}) {
     if (!showingNavigationDropdown) return null;
 
     return (
         <>
-            {/* Semi-transparent overlay */}
-            <div className="sm:hidden fixed inset-0 bg-black/40 z-40" />
+            <div
+                className="sm:hidden fixed inset-0 bg-black/40 z-40"
+                onClick={onClose}
+            />
 
             <div className="sm:hidden fixed top-16 inset-x-0 z-50">
                 <div className="border-t border-gray-200 dark:border-gray-700 pb-3 pt-4 shadow-lg bg-gray-50 dark:bg-gray-800">
@@ -32,6 +38,7 @@ export default function MobileMenu({ showingNavigationDropdown, user }) {
                             href={route("inbox")}
                             active={route().current("inbox")}
                             className="flex items-center"
+                            onClick={onClose}
                         >
                             <svg
                                 className="w-5 h-5 mr-2"
@@ -53,6 +60,7 @@ export default function MobileMenu({ showingNavigationDropdown, user }) {
                             href={route("friend-requests.index")}
                             active={route().current("friend-requests.index")}
                             className="flex items-center"
+                            onClick={onClose}
                         >
                             <svg
                                 className="w-5 h-5 mr-2"
@@ -73,6 +81,7 @@ export default function MobileMenu({ showingNavigationDropdown, user }) {
                         <ResponsiveNavLink
                             href={route("profile.edit")}
                             className="flex items-center"
+                            onClick={onClose}
                         >
                             <svg
                                 className="w-5 h-5 mr-2"
@@ -95,6 +104,7 @@ export default function MobileMenu({ showingNavigationDropdown, user }) {
                             href={route("logout")}
                             as="button"
                             className="flex items-center w-full"
+                            onClick={onClose}
                         >
                             <svg
                                 className="w-5 h-5 mr-2"

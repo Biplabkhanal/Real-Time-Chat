@@ -3,9 +3,6 @@ import { useState } from "react";
 import { Link } from "@inertiajs/react";
 import NavLink from "@/Components/NavLink";
 import Dropdown from "@/Components/Dropdown";
-
-// Import Components
-import NavigationMenu from "@/Layouts/Components/NavigationMenu";
 import MobileMenu from "@/Layouts/Components/MobileMenu";
 import Notifications from "@/Layouts/Components/Notifications";
 import NotificationButton from "@/Layouts/Components/NotificationButton";
@@ -16,7 +13,6 @@ export default function AuthenticatedLayout({ header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
-    // Import notification functionality from the Notifications hook
     const {
         notifications,
         unreadCount,
@@ -144,23 +140,20 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
                         </div>
 
-                        {/* Mobile Navigation Controls */}
                         <div className="-me-2 flex items-center sm:hidden">
-                            {/* Notification Button - Mobile */}
                             <NotificationButton
                                 unreadCount={unreadCount}
                                 onClick={toggleNotifications}
                                 isMobile={true}
                             />
 
-                            {/* Mobile Menu Button */}
                             <button
                                 onClick={() =>
                                     setShowingNavigationDropdown(
                                         (prev) => !prev
                                     )
                                 }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 dark:hover:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-gray-500 dark:focus:text-gray-100 focus:outline-none"
+                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 dark:hover:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-gray-500 dark:focus:text-gray-100 focus:outline-none cursor-pointer"
                             >
                                 <svg
                                     className="h-6 w-6"
@@ -196,7 +189,6 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </div>
 
-                {/* Mobile Notification Display */}
                 <NotificationDisplay
                     showNotifications={showNotifications}
                     notifications={notifications}
@@ -208,14 +200,13 @@ export default function AuthenticatedLayout({ header, children }) {
                     onClose={() => toggleNotifications()}
                 />
 
-                {/* Mobile Menu */}
                 <MobileMenu
                     showingNavigationDropdown={showingNavigationDropdown}
                     user={user}
+                    onClose={() => setShowingNavigationDropdown(false)}
                 />
             </nav>
 
-            {/* Main Content */}
             <main>{children}</main>
         </div>
     );
