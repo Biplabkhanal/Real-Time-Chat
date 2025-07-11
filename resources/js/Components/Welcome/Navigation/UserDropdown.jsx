@@ -5,18 +5,18 @@ export default function UserDropdown() {
     const user = usePage().props.auth.user;
 
     return (
-        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-            <div className="relative ms-3">
+        <div className="flex items-center w-full">
+            <div className="relative w-full">
                 <Dropdown>
                     <Dropdown.Trigger>
-                        <span className="inline-flex rounded-md">
+                        <span className="inline-flex rounded-md w-full">
                             <button
                                 type="button"
-                                className="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-700 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                className="inline-flex items-center justify-between w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-700 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
-                                {user.name}
+                                <span className="truncate">{user.name}</span>
                                 <svg
-                                    className="-me-0.5 ms-2 h-4 w-4"
+                                    className="-me-0.5 ms-2 h-4 w-4 flex-shrink-0"
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 20 20"
                                     fill="currentColor"
@@ -31,7 +31,7 @@ export default function UserDropdown() {
                         </span>
                     </Dropdown.Trigger>
 
-                    <Dropdown.Content contentClasses="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1 text-gray-700 dark:text-gray-200">
+                    <Dropdown.Content contentClasses="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1 text-gray-700 dark:text-gray-200 w-full min-w-48">
                         <Dropdown.Link
                             href={route("inbox")}
                             className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
