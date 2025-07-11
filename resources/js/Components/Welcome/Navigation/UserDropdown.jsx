@@ -1,8 +1,14 @@
 import Dropdown from "@/Components/Dropdown";
 import { usePage } from "@inertiajs/react";
 
-export default function UserDropdown() {
+export default function UserDropdown({ closeMobileMenu }) {
     const user = usePage().props.auth.user;
+
+    const handleMenuItemClick = () => {
+        if (closeMobileMenu) {
+            closeMobileMenu();
+        }
+    };
 
     return (
         <div className="flex items-center w-full">
@@ -34,12 +40,14 @@ export default function UserDropdown() {
                     <Dropdown.Content contentClasses="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1 text-gray-700 dark:text-gray-200 w-full min-w-48">
                         <Dropdown.Link
                             href={route("inbox")}
+                            onClick={handleMenuItemClick}
                             className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
                         >
                             Inbox
                         </Dropdown.Link>
                         <Dropdown.Link
                             href={route("profile.edit")}
+                            onClick={handleMenuItemClick}
                             className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
                         >
                             Profile
@@ -48,6 +56,7 @@ export default function UserDropdown() {
                             href={route("logout")}
                             method="post"
                             as="button"
+                            onClick={handleMenuItemClick}
                             className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-white active:bg-gray-100 dark:active:bg-gray-700 active:text-gray-900 dark:active:text-white transition ease-in-out duration-150"
                         >
                             Log Out

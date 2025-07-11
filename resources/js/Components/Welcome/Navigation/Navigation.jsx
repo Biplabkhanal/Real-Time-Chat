@@ -31,7 +31,15 @@ export default function Navigation({ auth }) {
             <nav className="-mx-3 flex flex-1 justify-end">
                 <div className="hidden sm:flex sm:items-center sm:space-x-2">
                     <ThemeDropdown />
-                    {auth.user ? <UserDropdown /> : <GuestNavigation />}
+                    {auth.user ? (
+                        <UserDropdown
+                            closeMobileMenu={() => setShowMobileMenu(false)}
+                        />
+                    ) : (
+                        <GuestNavigation
+                            closeMobileMenu={() => setShowMobileMenu(false)}
+                        />
+                    )}
                 </div>
 
                 <div className="sm:hidden">
@@ -97,7 +105,19 @@ export default function Navigation({ auth }) {
                             <ThemeDropdown />
                         </div>
                         <div className="px-3 py-2">
-                            {auth.user ? <UserDropdown /> : <GuestNavigation />}
+                            {auth.user ? (
+                                <UserDropdown
+                                    closeMobileMenu={() =>
+                                        setShowMobileMenu(false)
+                                    }
+                                />
+                            ) : (
+                                <GuestNavigation
+                                    closeMobileMenu={() =>
+                                        setShowMobileMenu(false)
+                                    }
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
