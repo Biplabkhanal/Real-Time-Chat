@@ -30,8 +30,8 @@ const UserModal = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl w-96 max-h-[500px] shadow-xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 md:p-0">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md md:w-96 max-h-[500px] shadow-xl mx-auto">
                 {/* Header */}
                 <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
                     <h3 className="text-xl dark:text-white">New Message</h3>

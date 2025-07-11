@@ -9,6 +9,7 @@ import ChatMessages from "@/Components/inbox/Chat/Messages/ChatMessages";
 import MessageInput from "@/Components/inbox/Chat/Input/MessageInput";
 import UserList from "@/Components/inbox/UserList/UserList";
 import UserModal from "@/Components/inbox/UserList/UserModal";
+import MobileToggleButton from "@/Components/inbox/Shared/MobileToggleButton";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import axios from "axios";
@@ -436,39 +437,10 @@ export default function Inbox({ auth, users, selectedUserId }) {
                 <NoFriendsState />
             ) : (
                 <div className="h-[calc(100vh-64px)] flex bg-gray-100 dark:bg-gray-900 overflow-hidden">
-                    {/* Mobile Toggle Button */}
-                    <button
-                        className={`md:hidden fixed top-[10rem] ${
-                            showSidebar ? "right-4" : "left-[0rem]"
-                        } z-50 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 flex items-center justify-center`}
-                        onClick={toggleSidebar}
-                        aria-label={
-                            showSidebar ? "Hide contacts" : "Show contacts"
-                        }
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-8 w-8 transition-transform duration-300"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={3}
-                        >
-                            {showSidebar ? (
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M15 19l-7-7 7-7"
-                                />
-                            ) : (
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9 5l7 7-7 7"
-                                />
-                            )}
-                        </svg>
-                    </button>
+                    <MobileToggleButton
+                        showSidebar={showSidebar}
+                        toggleSidebar={toggleSidebar}
+                    />
 
                     {/* Sidebar */}
                     <div
@@ -492,14 +464,6 @@ export default function Inbox({ auth, users, selectedUserId }) {
                                 )}
                             </div>
                             <AddButton onClick={() => setIsModalOpen(true)} />
-                            <UserModal
-                                isOpen={isModalOpen}
-                                onClose={() => setIsModalOpen(false)}
-                                users={filteredUsers}
-                                onSelect={handleUserSelect}
-                                onlineUsers={onlineUsers}
-                                addToUsersList={addToUsersList}
-                            />
                         </div>
 
                         {/* Contact List */}
@@ -603,6 +567,15 @@ export default function Inbox({ auth, users, selectedUserId }) {
                     )}
                 </div>
             )}
+
+            <UserModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                users={filteredUsers}
+                onSelect={handleUserSelect}
+                onlineUsers={onlineUsers}
+                addToUsersList={addToUsersList}
+            />
         </AuthenticatedLayout>
     );
 }

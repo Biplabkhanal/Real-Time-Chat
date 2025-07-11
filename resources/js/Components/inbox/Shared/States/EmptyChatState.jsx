@@ -25,7 +25,7 @@ const EmptyChatState = () => {
             </h3>
             <p className="text-gray-600 dark:text-gray-400 max-w-md text-center">
                 {isMobile
-                    ? "Tap the menu button to see your contacts and start chatting"
+                    ? "Tap the arrow icon to see your contacts and start chatting"
                     : "Select a contact from the list to start chatting"}
             </p>
         </div>
