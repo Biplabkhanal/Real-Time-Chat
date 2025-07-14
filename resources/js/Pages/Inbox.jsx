@@ -175,6 +175,11 @@ export default function Inbox({ auth, users, selectedUserId }) {
             );
         }
     };
+
+    const handleForwardMessage = (forwardedMessage) => {
+        // Optional: Show a toast notification
+        toast.info(`Message forwarded successfully`);
+    };
     useEffect(() => {
         if (!window.Echo) {
             console.error(
@@ -513,6 +518,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
                                     auth={auth}
                                     getMessages={getMessages}
                                     onDeleteMessage={handleDeleteClick}
+                                    onForwardMessage={handleForwardMessage}
                                     targetScrollRef={targetScrollRef}
                                 />
 

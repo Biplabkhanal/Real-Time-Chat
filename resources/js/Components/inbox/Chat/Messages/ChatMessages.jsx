@@ -11,6 +11,7 @@ const ChatMessages = ({
     auth,
     getMessages,
     onDeleteMessage,
+    onForwardMessage,
     targetScrollRef,
 }) => (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
@@ -36,6 +37,7 @@ const ChatMessages = ({
                         message={message}
                         isCurrentUser={message.sender_id === auth.user.id}
                         onDelete={onDeleteMessage}
+                        onForward={onForwardMessage}
                         auth={auth}
                     />
                 ))}

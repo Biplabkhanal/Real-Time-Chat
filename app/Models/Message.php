@@ -12,7 +12,8 @@ class Message extends Model
         'message',
         'attachment',
         'is_read',
-        'read_at'
+        'read_at',
+        'forwarded_from'
     ];
 
     protected $casts = [
@@ -50,5 +51,20 @@ class Message extends Model
     public function recipient()
     {
         return $this->belongsTo(User::class, 'recipient_id');
+    }
+
+    public function originalMessage()
+    {
+        return $this->belongsTo(Message::class, 'forwarded_from');
+    }
+
+    public function forwardedMessages()
+    {
+        return $this->hasMany(Message::class, 'forwarded_from');
+    }
+
+    public function isForwarded()
+    {
+        return !is_null($this->forwarded_from);
     }
 }

@@ -4,10 +4,12 @@ import MessageContent from "./MessageContent";
 import MessageAttachment from "./MessageAttachment";
 import MessageTimestamp from "./MessageTimestamp";
 import MessageDeleteModal from "../../Modals/MessageDeleteModal";
+import ForwardMessageModal from "../../Modals/ForwardMessageModal";
 
-const Message = ({ message, isCurrentUser, onDelete }) => {
+const Message = ({ message, isCurrentUser, onDelete, onForward }) => {
     const [showOptions, setShowOptions] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [forwardModalOpen, setForwardModalOpen] = useState(false);
 
     const toggleDropdown = () => setShowOptions(!showOptions);
 
@@ -17,9 +19,22 @@ const Message = ({ message, isCurrentUser, onDelete }) => {
         setShowOptions(false);
     };
 
+    const handleForward = (e) => {
+        e.preventDefault();
+        setForwardModalOpen(true);
+        setShowOptions(false);
+    };
+
     const handleDeleteConfirm = (messageId) => {
         onDelete(messageId);
         setDeleteModalOpen(false);
+    };
+
+    const handleForwardConfirm = (forwardedMessage) => {
+        if (onForward) {
+            onForward(forwardedMessage);
+        }
+        setForwardModalOpen(false);
     };
 
     const formatTime = (timestamp) => {
@@ -28,13 +43,11 @@ const Message = ({ message, isCurrentUser, onDelete }) => {
         const messageDate = new Date(timestamp);
         const now = new Date();
 
-        // Calculate time difference in milliseconds
         const diffMs = now - messageDate;
         const diffMins = Math.round(diffMs / 60000);
         const diffHours = Math.round(diffMs / 3600000);
         const diffDays = Math.round(diffMs / 86400000);
 
-        // Format based on how long ago
         if (diffMins < 1) {
             return "Just now";
         } else if (diffMins === 1) {
@@ -50,7 +63,6 @@ const Message = ({ message, isCurrentUser, onDelete }) => {
         } else if (diffDays < 7) {
             return `${diffDays} days ago`;
         } else {
-            // For older messages, show the actual date
             return messageDate.toLocaleDateString();
         }
     };
@@ -71,6 +83,7 @@ const Message = ({ message, isCurrentUser, onDelete }) => {
                 {isCurrentUser && (
                     <MessageOptions
                         onDelete={handleDelete}
+                        onForward={handleForward}
                         toggleDropdown={toggleDropdown}
                         showOptions={showOptions}
                     />
@@ -93,6 +106,14 @@ const Message = ({ message, isCurrentUser, onDelete }) => {
                         messageId={message.id}
                         onConfirm={handleDeleteConfirm}
                         onCancel={() => setDeleteModalOpen(false)}
+                    />
+                )}
+
+                {forwardModalOpen && (
+                    <ForwardMessageModal
+                        message={message}
+                        onClose={() => setForwardModalOpen(false)}
+                        onForward={handleForwardConfirm}
                     />
                 )}
             </div>

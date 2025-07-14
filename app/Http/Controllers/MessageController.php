@@ -166,6 +166,7 @@ class MessageController extends Controller
                 $query->where('sender_id', $user2Id)
                     ->where('recipient_id', $user1Id);
             })
+            ->with(['originalMessage.sender'])
             ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($message) {
@@ -553,6 +554,56 @@ class MessageController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error getting conversation analytics: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Forward a message to another user
+     */
+    public function forward(Request $request, Message $message)
+    {
+        try {
+            // Check if user can access this message
+            if ($message->sender_id !== Auth::id() && $message->recipient_id !== Auth::id()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'recipient_id' => 'required|exists:users,id',
+                'message' => 'nullable|string'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+
+            $recipientId = $request->recipient_id;
+
+            // Check if user can send message to recipient
+            if (!$this->canSendMessage($recipientId)) {
+                return response()->json(['error' => 'Cannot send message to this user'], 403);
+            }
+
+            // Create forwarded message
+            $forwardedMessage = new Message;
+            $forwardedMessage->sender_id = Auth::id();
+            $forwardedMessage->recipient_id = $recipientId;
+            $forwardedMessage->message = $request->message ?? $message->message;
+            $forwardedMessage->attachment = $message->attachment;
+            $forwardedMessage->forwarded_from = $message->id;
+            $forwardedMessage->save();
+
+            // Load relationships for response
+            $forwardedMessage->load(['sender', 'recipient', 'originalMessage.sender']);
+
+            // Broadcast the forwarded message
+            broadcast(new MessageSent($forwardedMessage, Auth::user()))->toOthers();
+
+            return response()->json($forwardedMessage);
+        } catch (\Exception $e) {
+            Log::error('Error forwarding message: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

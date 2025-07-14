@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const MessageOptions = ({ onDelete }) => {
+const MessageOptions = ({ onDelete, onForward }) => {
     const [showOptions, setShowOptions] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -52,6 +52,25 @@ const MessageOptions = ({ onDelete }) => {
                 </button>
                 {showOptions && (
                     <div className="dropdown-menu absolute right-0 bg-white dark:bg-gray-800 rounded shadow-lg z-10 border border-gray-200 dark:border-gray-700">
+                        <button
+                            onClick={onForward}
+                            className="flex items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
+                        >
+                            <svg
+                                className="w-4 h-4 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                                />
+                            </svg>
+                            Forward
+                        </button>
                         <button
                             onClick={onDelete}
                             className="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
