@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import UserAvatar from "../UserList/UserAvatar";
 
 const ForwardMessageModal = ({ message, onClose, onForward }) => {
     const [friends, setFriends] = useState([]);
@@ -187,20 +188,13 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
                                             className="mr-3"
                                         />
                                         <div className="flex items-center">
-                                            <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                                                {friend.avatar ? (
-                                                    <img
-                                                        src={friend.avatar}
-                                                        alt={friend.name}
-                                                        className="w-8 h-8 rounded-full"
-                                                    />
-                                                ) : (
-                                                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                                                        {friend.name
-                                                            .charAt(0)
-                                                            .toUpperCase()}
-                                                    </span>
-                                                )}
+                                            <div className="mr-3">
+                                                <UserAvatar
+                                                    name={friend.name}
+                                                    avatar={friend.avatar}
+                                                    size="w-8 h-8"
+                                                    textSize="text-sm"
+                                                />
                                             </div>
                                             <div>
                                                 <p className="text-sm font-medium text-gray-800 dark:text-gray-200">

@@ -313,7 +313,6 @@ class MessageController extends Controller
         $currentUserId = Auth::id();
         $otherUserId = $user->id;
 
-        // Get all messages between the two users
         $messages = Message::where(function ($query) use ($currentUserId, $otherUserId) {
             $query->where('sender_id', $currentUserId)
                 ->where('recipient_id', $otherUserId);
@@ -331,19 +330,16 @@ class MessageController extends Controller
             ]);
         }
 
-        // Calculate statistics
         $yourMessages = $messages->where('sender_id', $currentUserId)->count();
         $theirMessages = $messages->where('sender_id', $otherUserId)->count();
 
         $firstMessage = $messages->first();
         $latestMessage = $messages->last();
 
-        // Calculate unique days they've talked
         $uniqueDays = $messages->groupBy(function ($message) {
             return $message->created_at->format('Y-m-d');
         });
 
-        // Find the busiest day
         $busyDay = null;
         $maxCount = 0;
 

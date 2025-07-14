@@ -1,4 +1,5 @@
 import React from "react";
+import UserAvatar from "./UserAvatar";
 
 const UserListItem = ({ user, selectedUser, setSelectedUser, isOnline }) => {
     const handleUserClick = () => {
@@ -17,22 +18,13 @@ const UserListItem = ({ user, selectedUser, setSelectedUser, isOnline }) => {
                                : "hover:bg-gray-100 dark:hover:bg-gray-700 my-1"
                        }`}
         >
-            <div className="relative">
-                {user.avatar ? (
-                    <img
-                        src={`/storage/${user.avatar}`}
-                        alt={user.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                    />
-                ) : (
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 text-white text-lg font-semibold">
-                        {user.name.charAt(0).toUpperCase()}
-                    </div>
-                )}
-                {isOnline && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-800"></div>
-                )}
-            </div>
+            <UserAvatar
+                name={user.name}
+                avatar={user.avatar}
+                isOnline={isOnline}
+                size="w-12 h-12"
+                textSize="text-lg"
+            />
             <div className="ml-4 flex-1 flex justify-between items-center">
                 <div>
                     <div className="font-medium text-gray-900 dark:text-white">
