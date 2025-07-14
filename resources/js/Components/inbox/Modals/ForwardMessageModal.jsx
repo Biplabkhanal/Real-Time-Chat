@@ -4,13 +4,12 @@ import { toast } from "react-toastify";
 
 const ForwardMessageModal = ({ message, onClose, onForward }) => {
     const [friends, setFriends] = useState([]);
-    const [selectedFriend, setSelectedFriend] = useState(null);
+    const [selectedFriends, setSelectedFriends] = useState([]);
     const [additionalMessage, setAdditionalMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
 
     useEffect(() => {
-        // Fetch friends list
         const fetchFriends = async () => {
             try {
                 const response = await axios.get("/friends");
@@ -26,9 +25,28 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
         fetchFriends();
     }, []);
 
+    const handleSelectAll = () => {
+        if (selectedFriends.length === friends.length) {
+            setSelectedFriends([]);
+        } else {
+            setSelectedFriends([...friends]);
+        }
+    };
+
+    const handleFriendToggle = (friend) => {
+        setSelectedFriends((prev) => {
+            const isSelected = prev.find((f) => f.id === friend.id);
+            if (isSelected) {
+                return prev.filter((f) => f.id !== friend.id);
+            } else {
+                return [...prev, friend];
+            }
+        });
+    };
+
     const handleForward = async () => {
-        if (!selectedFriend) {
-            toast.error("Please select a friend to forward to");
+        if (selectedFriends.length === 0) {
+            toast.error("Please select at least one friend to forward to");
             return;
         }
 
@@ -37,12 +55,19 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
             const response = await axios.post(
                 `/message/${message.id}/forward`,
                 {
-                    recipient_id: selectedFriend.id,
+                    recipient_ids: selectedFriends.map((friend) => friend.id),
                     message: additionalMessage || message.message,
                 }
             );
 
-            toast.success(`Message forwarded to ${selectedFriend.name}`);
+            const friendNames = selectedFriends
+                .map((friend) => friend.name)
+                .join(", ");
+            const message =
+                selectedFriends.length === 1
+                    ? `Message forwarded to ${friendNames}`
+                    : `Message forwarded to ${selectedFriends.length} friends: ${friendNames}`;
+            toast.success(message);
             onForward(response.data);
             onClose();
         } catch (error) {
@@ -69,7 +94,7 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                        Forward Message
+                        Forward Message to Friends
                     </h3>
                     <button
                         onClick={onClose}
@@ -108,9 +133,22 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
 
                 {/* Friends List */}
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Send to:
-                    </label>
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Send to:
+                        </label>
+                        {friends.length > 0 && (
+                            <button
+                                type="button"
+                                onClick={handleSelectAll}
+                                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                                {selectedFriends.length === friends.length
+                                    ? "Deselect All"
+                                    : "Select All"}
+                            </button>
+                        )}
+                    </div>
                     {isFetching ? (
                         <div className="flex items-center justify-center py-4">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
@@ -125,23 +163,26 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
                                 friends.map((friend) => (
                                     <div
                                         key={friend.id}
-                                        className={`p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center ${
-                                            selectedFriend?.id === friend.id
-                                                ? "bg-blue-50 dark:bg-blue-900"
+                                        className={`p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center transition-colors ${
+                                            selectedFriends.find(
+                                                (f) => f.id === friend.id
+                                            )
+                                                ? "bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500"
                                                 : ""
                                         }`}
                                         onClick={() =>
-                                            setSelectedFriend(friend)
+                                            handleFriendToggle(friend)
                                         }
                                     >
                                         <input
-                                            type="radio"
-                                            name="friend"
+                                            type="checkbox"
                                             checked={
-                                                selectedFriend?.id === friend.id
+                                                selectedFriends.find(
+                                                    (f) => f.id === friend.id
+                                                ) !== undefined
                                             }
                                             onChange={() =>
-                                                setSelectedFriend(friend)
+                                                handleFriendToggle(friend)
                                             }
                                             className="mr-3"
                                         />
@@ -201,7 +242,11 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
                     </button>
                     <button
                         onClick={handleForward}
-                        disabled={isLoading || !selectedFriend || isFetching}
+                        disabled={
+                            isLoading ||
+                            selectedFriends.length === 0 ||
+                            isFetching
+                        }
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                         {isLoading ? (

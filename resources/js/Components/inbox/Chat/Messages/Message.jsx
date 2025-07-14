@@ -80,14 +80,13 @@ const Message = ({ message, isCurrentUser, onDelete, onForward }) => {
                         : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-r-lg rounded-bl-lg border border-gray-200 dark:border-gray-700"
                 } p-4 shadow`}
             >
-                {isCurrentUser && (
-                    <MessageOptions
-                        onDelete={handleDelete}
-                        onForward={handleForward}
-                        toggleDropdown={toggleDropdown}
-                        showOptions={showOptions}
-                    />
-                )}
+                <MessageOptions
+                    onDelete={isCurrentUser ? handleDelete : null}
+                    onForward={handleForward}
+                    toggleDropdown={toggleDropdown}
+                    showOptions={showOptions}
+                    isCurrentUser={isCurrentUser}
+                />
 
                 <MessageContent message={message} />
 

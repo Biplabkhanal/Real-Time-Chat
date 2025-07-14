@@ -43,7 +43,6 @@ class MessageController extends Controller
                 return response()->json(['error' => 'Cannot send message to this user'], 403);
             }
 
-            // Validate the request
             $validator = Validator::make($request->all(), [
                 'message' => 'nullable|string',
                 'attachments' => 'nullable|array',
@@ -76,7 +75,6 @@ class MessageController extends Controller
         $recipientId = $user->id;
         $messageText = $request->message ?? '';
 
-        // Create the first message with text and first attachment
         $firstMessage = $this->createMessage(
             $senderId,
             $recipientId,
@@ -87,7 +85,6 @@ class MessageController extends Controller
         $sentMessages[] = $firstMessage;
         $this->broadcastMessage($firstMessage);
 
-        // Create additional messages for remaining attachments
         if (count($request->attachments) > 1) {
             for ($i = 1; $i < count($request->attachments); $i++) {
                 $message = $this->createMessage($senderId, $recipientId, '', $request->attachments[$i]);
@@ -183,7 +180,6 @@ class MessageController extends Controller
     public function destroy(Message $message)
     {
         try {
-            // Check if the user is authorized to delete this message
             if ($message->sender_id !== Auth::id()) {
                 return response()->json(['error' => 'Unauthorized. You can only delete your own messages.'], 403);
             }
@@ -208,15 +204,12 @@ class MessageController extends Controller
             $currentUserId = Auth::id();
             $otherUserId = $user->id;
 
-            // Get all messages
             $messages = $this->getConversationMessages($currentUserId, $otherUserId);
 
-            // Delete attachments
             foreach ($messages as $message) {
                 $this->deleteAttachment($message);
             }
 
-            // Delete all messages in one query
             Message::where(function ($query) use ($currentUserId, $otherUserId) {
                 $query->where('sender_id', $currentUserId)
                     ->where('recipient_id', $otherUserId);
@@ -255,7 +248,6 @@ class MessageController extends Controller
     {
         $currentUserId = Auth::id();
 
-        // Fetch shared media files between current user and the selected user
         $messages = Message::where(function ($query) use ($currentUserId, $userId) {
             $query->where('sender_id', $currentUserId)
                 ->where('recipient_id', $userId);
@@ -293,7 +285,6 @@ class MessageController extends Controller
     {
         $currentUserId = Auth::id();
 
-        // Find users who have exchanged messages with the current user
         $userIds = Message::where(function ($query) use ($currentUserId) {
             $query->where('sender_id', $currentUserId)
                 ->orWhere('recipient_id', $currentUserId);
@@ -309,7 +300,6 @@ class MessageController extends Controller
                 return $id === $currentUserId;
             });
 
-        // Get user details for these IDs
         $users = User::whereIn('id', $userIds)->get();
 
         return response()->json($users);
@@ -391,14 +381,12 @@ class MessageController extends Controller
         $currentUserId = Auth::id();
         $otherUserId = $user->id;
 
-        // Get all messages between the users
         $messages = $this->getConversationMessages($currentUserId, $otherUserId);
 
         if ($messages->isEmpty()) {
             return response()->json(['error' => 'No messages to export'], 404);
         }
 
-        // Format user names
         $currentUser = Auth::user();
         $otherUser = $user;
 
@@ -427,7 +415,6 @@ class MessageController extends Controller
         $callback = function () use ($messages, $currentUser, $otherUser) {
             $file = fopen('php://output', 'w');
 
-            // Add CSV headers
             fputcsv($file, ['Timestamp', 'Sender', 'Message', 'Attachment']);
 
             foreach ($messages as $message) {
@@ -453,7 +440,6 @@ class MessageController extends Controller
      */
     public function exportToPdf($messages, $currentUser, $otherUser)
     {
-        // Process messages to encode image attachments
         foreach ($messages as $message) {
             if (!empty($message->attachment)) {
                 $attachmentPath = is_object($message->attachment)
@@ -493,7 +479,6 @@ class MessageController extends Controller
             $currentUserId = Auth::id();
             $otherUserId = $user->id;
 
-            // Get all messages in the conversation
             $messages = Message::where(function ($query) use ($currentUserId, $otherUserId) {
                 $query->where('sender_id', $currentUserId)
                     ->where('recipient_id', $otherUserId);
@@ -559,19 +544,19 @@ class MessageController extends Controller
     }
 
     /**
-     * Forward a message to another user
+     * Forward a message to multiple users
      */
     public function forward(Request $request, Message $message)
     {
         try {
-            // Check if user can access this message
             if ($message->sender_id !== Auth::id() && $message->recipient_id !== Auth::id()) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
-            // Validate request
             $validator = Validator::make($request->all(), [
-                'recipient_id' => 'required|exists:users,id',
+                'recipient_id' => 'nullable|exists:users,id',
+                'recipient_ids' => 'nullable|array',
+                'recipient_ids.*' => 'exists:users,id',
                 'message' => 'nullable|string'
             ]);
 
@@ -579,29 +564,43 @@ class MessageController extends Controller
                 return response()->json(['error' => $validator->errors()], 422);
             }
 
-            $recipientId = $request->recipient_id;
-
-            // Check if user can send message to recipient
-            if (!$this->canSendMessage($recipientId)) {
-                return response()->json(['error' => 'Cannot send message to this user'], 403);
+            $recipientIds = [];
+            if ($request->has('recipient_ids') && is_array($request->recipient_ids)) {
+                $recipientIds = $request->recipient_ids;
+            } elseif ($request->has('recipient_id')) {
+                $recipientIds = [$request->recipient_id];
+            } else {
+                return response()->json(['error' => 'No recipients specified'], 422);
             }
 
-            // Create forwarded message
-            $forwardedMessage = new Message;
-            $forwardedMessage->sender_id = Auth::id();
-            $forwardedMessage->recipient_id = $recipientId;
-            $forwardedMessage->message = $request->message ?? $message->message;
-            $forwardedMessage->attachment = $message->attachment;
-            $forwardedMessage->forwarded_from = $message->id;
-            $forwardedMessage->save();
+            $recipientIds = array_unique($recipientIds);
 
-            // Load relationships for response
-            $forwardedMessage->load(['sender', 'recipient', 'originalMessage.sender']);
+            foreach ($recipientIds as $recipientId) {
+                if (!$this->canSendMessage($recipientId)) {
+                    $recipient = User::find($recipientId);
+                    return response()->json(['error' => 'Cannot send message to ' . ($recipient ? $recipient->name : 'user')], 403);
+                }
+            }
 
-            // Broadcast the forwarded message
-            broadcast(new MessageSent($forwardedMessage, Auth::user()))->toOthers();
+            $forwardedMessages = [];
 
-            return response()->json($forwardedMessage);
+            foreach ($recipientIds as $recipientId) {
+                $forwardedMessage = new Message;
+                $forwardedMessage->sender_id = Auth::id();
+                $forwardedMessage->recipient_id = $recipientId;
+                $forwardedMessage->message = $request->message ?? $message->message;
+                $forwardedMessage->attachment = $message->attachment;
+                $forwardedMessage->forwarded_from = $message->id;
+                $forwardedMessage->save();
+
+                $forwardedMessage->load(['sender', 'recipient', 'originalMessage.sender']);
+
+                broadcast(new MessageSent($forwardedMessage, Auth::user()))->toOthers();
+
+                $forwardedMessages[] = $forwardedMessage;
+            }
+
+            return response()->json($forwardedMessages);
         } catch (\Exception $e) {
             Log::error('Error forwarding message: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
@@ -655,7 +654,6 @@ class MessageController extends Controller
     {
         $currentUser = Auth::user();
 
-        // Check if either user has blocked the other
         $isBlocked = \App\Models\BlockedUser::where(function ($query) use ($receiverId) {
             $query->where('user_id', Auth::id())
                 ->where('blocked_user_id', $receiverId);
@@ -664,7 +662,6 @@ class MessageController extends Controller
                 ->where('blocked_user_id', Auth::id());
         })->exists();
 
-        // Check if users are friends
         $areFriends = $currentUser->isFriendsWith($receiverId);
 
         return !$isBlocked && $areFriends;
