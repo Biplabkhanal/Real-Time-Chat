@@ -1,6 +1,7 @@
 import { useForm } from "@inertiajs/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
+import ValidationErrorModal from "./ValidationErrorModal";
 
 export default function ReviewForm({ auth }) {
     const { data, setData, post, processing, reset } = useForm({
@@ -9,13 +10,36 @@ export default function ReviewForm({ auth }) {
     });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [validationError, setValidationError] = useState({
+        show: false,
+        title: "",
+        message: "",
+    });
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Check if user is authenticated
         if (!auth.user) {
             setIsModalOpen(true);
+            return;
+        }
+
+        if (data.rating === 0) {
+            setValidationError({
+                show: true,
+                title: "Rating Required",
+                message:
+                    "Please select a star rating before submitting your review.",
+            });
+            return;
+        }
+
+        if (!data.content.trim()) {
+            setValidationError({
+                show: true,
+                title: "Review Required",
+                message: "Please write a review before submitting.",
+            });
             return;
         }
 
@@ -28,6 +52,28 @@ export default function ReviewForm({ auth }) {
 
     const redirectToLogin = () => {
         router.visit(route("login"));
+    };
+
+    const closeValidationError = () => {
+        setValidationError({ show: false, title: "", message: "" });
+    };
+
+    useEffect(() => {
+        if (isModalOpen || validationError.show) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "unset";
+        }
+
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [isModalOpen, validationError.show]);
+
+    const handleModalBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            setIsModalOpen(false);
+        }
     };
 
     return (
@@ -73,7 +119,10 @@ export default function ReviewForm({ auth }) {
 
             {/* Login Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
+                    onClick={handleModalBackdropClick}
+                >
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 relative">
                         <button
                             onClick={() => setIsModalOpen(false)}
@@ -107,6 +156,15 @@ export default function ReviewForm({ auth }) {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Validation Error Modal */}
+            {validationError.show && (
+                <ValidationErrorModal
+                    onClose={closeValidationError}
+                    title={validationError.title}
+                    message={validationError.message}
+                />
             )}
         </>
     );
