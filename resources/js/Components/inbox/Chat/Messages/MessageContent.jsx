@@ -3,7 +3,7 @@ import React from "react";
 const MessageContent = ({ message }) => (
     <div>
         {message.forwarded_from && (
-            <div className="mb-2 text-xs text-gray-500 dark:text-gray-400 flex items-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center mr-2">
                 <svg
                     className="w-3 h-3 mr-1"
                     fill="none"
@@ -20,7 +20,7 @@ const MessageContent = ({ message }) => (
                 Forwarded
             </div>
         )}
-        <p className="break-words">{message.message}</p>
+        <p className="break-words mr-2">{message.message}</p>
     </div>
 );
 
