@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, router } from "@inertiajs/react";
 import ReviewForm from "./ReviewForm";
+import ReviewDeleteModal from "./ReviewDeleteModal";
 
 export default function ReviewSection({ reviews, auth }) {
     return (
@@ -40,17 +41,33 @@ export default function ReviewSection({ reviews, auth }) {
 }
 
 function ReviewCard({ review, auth }) {
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
     const handleDelete = () => {
-        if (confirm("Are you sure you want to delete this review?")) {
-            router.delete(route("reviews.destroy", review.id), {
-                preserveScroll: true,
-                only: ["reviews"],
-            });
-        }
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        router.delete(route("reviews.destroy", review.id), {
+            preserveScroll: true,
+            only: ["reviews"],
+        });
+        setShowDeleteModal(false);
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteModal(false);
     };
 
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 flex flex-col h-64 relative">
+            {showDeleteModal && (
+                <ReviewDeleteModal
+                    onConfirm={confirmDelete}
+                    onCancel={cancelDelete}
+                    reviewId={review.id}
+                />
+            )}
             {auth?.user?.id === review.user.id && (
                 <button
                     onClick={handleDelete}
