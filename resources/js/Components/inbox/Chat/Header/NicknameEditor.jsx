@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { LoadingIcon } from "@/Components/FriendRequests";
 
 const NicknameEditor = ({ selectedUser, onNicknameSaved }) => {
     const [isMobile, setIsMobile] = useState(false);
@@ -48,11 +49,17 @@ const NicknameEditor = ({ selectedUser, onNicknameSaved }) => {
                 }
             );
 
+            setNickname(
+                response.data.display_name !== selectedUser.name
+                    ? response.data.display_name
+                    : ""
+            );
+
             toast.success(response.data.message);
             setIsEditing(false);
 
             if (onNicknameSaved) {
-                onNicknameSaved(response.data.display_name);
+                onNicknameSaved(response.data.display_name, false);
             }
         } catch (error) {
             toast.error(
@@ -138,9 +145,19 @@ const NicknameEditor = ({ selectedUser, onNicknameSaved }) => {
                             onClick={handleSaveNickname}
                             disabled={isLoading}
                             className="flex-1 px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700
-                                     dark:bg-blue-700 dark:hover:bg-blue-800 disabled:opacity-50"
+                                     dark:bg-blue-700 dark:hover:bg-blue-800 disabled:opacity-50 flex justify-center items-center"
                         >
-                            {isLoading ? "Saving..." : "Save"}
+                            {isLoading ? (
+                                <div className="flex items-center justify-center">
+                                    <LoadingIcon
+                                        size="md"
+                                        className="mr-2 text-white"
+                                    />
+                                    <span>Saving...</span>
+                                </div>
+                            ) : (
+                                "Save"
+                            )}
                         </button>
                         <button
                             onClick={handleCancelEdit}

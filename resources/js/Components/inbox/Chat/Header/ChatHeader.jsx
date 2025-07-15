@@ -116,11 +116,13 @@ const ChatHeader = ({
         }
     };
 
-    const handleNicknameUpdate = (newDisplayName) => {
-        // Update the local state with the new nickname
+    const handleNicknameUpdate = (newDisplayName, closeModal = true) => {
         selectedUser.display_name = newDisplayName;
-        setShowNicknameModal(false);
-        setShowDropdown(false);
+
+        if (closeModal) {
+            setShowNicknameModal(false);
+            setShowDropdown(false);
+        }
     };
 
     const openBlockConfirmation = () => {
