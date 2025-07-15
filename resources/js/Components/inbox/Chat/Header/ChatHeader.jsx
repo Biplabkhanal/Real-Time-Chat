@@ -9,6 +9,7 @@ import ConversationDeleteModal from "../../Modals/ConversationDeleteModal";
 import MoreOptionsButton from "../../Shared/Icons/MoreOptionsButton";
 import SearchButton from "../../Shared/Icons/SearchButton";
 import BlockUserModal from "../../Modals/BlockUserModal";
+import NicknameEditor from "./NicknameEditor";
 
 const ChatHeader = ({
     selectedUser,
@@ -22,6 +23,7 @@ const ChatHeader = ({
     const [showDropdown, setShowDropdown] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showBlockModal, setShowBlockModal] = useState(false);
+    const [showNicknameModal, setShowNicknameModal] = useState(false);
     const [isUserBlocked, setIsUserBlocked] = useState(false);
     const [isBlockedByUser, setIsBlockedByUser] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -112,6 +114,13 @@ const ChatHeader = ({
             console.error("Error blocking/unblocking user:", error);
             setShowBlockModal(false);
         }
+    };
+
+    const handleNicknameUpdate = (newDisplayName) => {
+        // Update the local state with the new nickname
+        selectedUser.display_name = newDisplayName;
+        setShowNicknameModal(false);
+        setShowDropdown(false);
     };
 
     const openBlockConfirmation = () => {
@@ -214,6 +223,15 @@ const ChatHeader = ({
                                         </button>
                                     )}
                                     <button
+                                        onClick={() => {
+                                            setShowNicknameModal(true);
+                                            setShowDropdown(false);
+                                        }}
+                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        Set Nickname
+                                    </button>
+                                    <button
                                         onClick={() => openBlockConfirmation()}
                                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
@@ -250,6 +268,33 @@ const ChatHeader = ({
                     isBlocked={isUserBlocked}
                     userName={selectedUser.name}
                 />
+            )}
+
+            {showNicknameModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                Set Nickname
+                            </h3>
+                        </div>
+                        <div className="p-4">
+                            <NicknameEditor
+                                selectedUser={selectedUser}
+                                onNicknameSaved={handleNicknameUpdate}
+                            />
+                        </div>
+                        <div className="p-4 border-t border-gray-200 dark:border-gray-700 text-right">
+                            <button
+                                onClick={() => setShowNicknameModal(false)}
+                                className="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200
+                                dark:text-gray-200 dark:bg-gray-600 dark:hover:bg-gray-700"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

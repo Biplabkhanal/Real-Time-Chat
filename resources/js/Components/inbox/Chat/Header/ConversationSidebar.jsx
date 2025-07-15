@@ -10,7 +10,6 @@ import LinksList from "./LinksList";
 import ExportConversationModal from "../../Modals/ExportConversationModal";
 import ConversationAnalytics from "./ConversationAnalytics";
 import ThemeSettings from "./ThemeSettings";
-import NicknameEditor from "./NicknameEditor";
 
 const ConversationSidebar = ({
     isOpen,
@@ -507,17 +506,6 @@ const ConversationSidebar = ({
                                             <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
                                                 Contact
                                             </h4>
-
-                                            {/* Nickname Editor */}
-                                            <NicknameEditor
-                                                selectedUser={selectedUser}
-                                                onNicknameSaved={(
-                                                    displayName
-                                                ) => {
-                                                    selectedUser.display_name =
-                                                        displayName;
-                                                }}
-                                            />
 
                                             <div className="space-y-2">
                                                 <button
