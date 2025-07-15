@@ -3,6 +3,24 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const NicknameEditor = ({ selectedUser, onNicknameSaved }) => {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+
+        return () => {
+            document.body.style.overflow = "unset";
+            window.removeEventListener("resize", checkMobile);
+        };
+    }, []);
+
     const [nickname, setNickname] = useState(
         selectedUser.display_name !== selectedUser.name
             ? selectedUser.display_name
@@ -56,9 +74,13 @@ const NicknameEditor = ({ selectedUser, onNicknameSaved }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg">
+        <div className="bg-white dark:bg-gray-800 rounded-lg w-full">
             {!isEditing ? (
-                <div className="flex items-center justify-between mb-2">
+                <div
+                    className={`flex ${
+                        isMobile ? "flex-col" : "items-center"
+                    } justify-between mb-2`}
+                >
                     <div className="flex-1">
                         <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                             Nickname
@@ -80,7 +102,9 @@ const NicknameEditor = ({ selectedUser, onNicknameSaved }) => {
                     </div>
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        className={`text-xs text-blue-600 dark:text-blue-400 hover:underline ${
+                            isMobile ? "mt-2 self-start" : ""
+                        }`}
                     >
                         {nickname ? "Edit" : "Add"}
                     </button>
@@ -113,7 +137,7 @@ const NicknameEditor = ({ selectedUser, onNicknameSaved }) => {
                         <button
                             onClick={handleSaveNickname}
                             disabled={isLoading}
-                            className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700
+                            className="flex-1 px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700
                                      dark:bg-blue-700 dark:hover:bg-blue-800 disabled:opacity-50"
                         >
                             {isLoading ? "Saving..." : "Save"}
@@ -121,7 +145,7 @@ const NicknameEditor = ({ selectedUser, onNicknameSaved }) => {
                         <button
                             onClick={handleCancelEdit}
                             disabled={isLoading}
-                            className="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200
+                            className="flex-1 px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200
                                      dark:text-gray-200 dark:bg-gray-600 dark:hover:bg-gray-700 disabled:opacity-50"
                         >
                             Cancel
