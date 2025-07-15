@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const ReviewDeleteModal = ({ onConfirm, onCancel, reviewId }) => {
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, []);
+
     const handleDelete = (e) => {
         e.preventDefault();
         onConfirm(reviewId);
