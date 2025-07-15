@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import ReviewForm from "./ReviewForm";
 
 export default function ReviewSection({ reviews, auth }) {
@@ -15,18 +15,19 @@ export default function ReviewSection({ reviews, auth }) {
                     </p>
                 </div>
 
-                {/* Review Cards */}
                 <div className="grid gap-8 lg:grid-cols-3">
                     {reviews?.data &&
                         reviews.data.map((review) => (
-                            <ReviewCard key={review.id} review={review} />
+                            <ReviewCard
+                                key={review.id}
+                                review={review}
+                                auth={auth}
+                            />
                         ))}
                 </div>
 
-                {/* Pagination */}
                 <PaginationLinks reviews={reviews} />
 
-                {/* Review Form */}
                 <div className="mt-12 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                     <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                         Share Your Experience
@@ -38,10 +39,38 @@ export default function ReviewSection({ reviews, auth }) {
     );
 }
 
-// Review Card Component
-function ReviewCard({ review }) {
+function ReviewCard({ review, auth }) {
+    const handleDelete = () => {
+        if (confirm("Are you sure you want to delete this review?")) {
+            router.delete(route("reviews.destroy", review.id), {
+                preserveScroll: true,
+                only: ["reviews"],
+            });
+        }
+    };
+
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 flex flex-col h-64">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 flex flex-col h-64 relative">
+            {auth?.user?.id === review.user.id && (
+                <button
+                    onClick={handleDelete}
+                    className="absolute top-3 right-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
+                    title="Delete review"
+                >
+                    <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            fillRule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                        />
+                    </svg>
+                </button>
+            )}
+
             <div className="flex items-center mb-3">
                 <div className="h-12 w-12 rounded-full bg-blue-500 dark:bg-blue-700 flex items-center justify-center text-white font-semibold text-xl">
                     <div className="flex-shrink-0">
@@ -86,7 +115,6 @@ function ReviewCard({ review }) {
     );
 }
 
-// Pagination Component
 function PaginationLinks({ reviews }) {
     if (!reviews?.links || reviews.links.length <= 3) {
         return null;

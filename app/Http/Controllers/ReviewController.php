@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ReviewController extends Controller
@@ -29,5 +30,16 @@ class ReviewController extends Controller
         return inertia('Welcome', [
             'reviews' => $reviews
         ]);
+    }
+
+    public function destroy(Review $review)
+    {
+        if ($review->user_id !== Auth::id()) {
+            return back()->with('error', 'You can only delete your own reviews.');
+        }
+
+        $review->delete();
+
+        return back()->with('success', 'Review deleted successfully!');
     }
 }

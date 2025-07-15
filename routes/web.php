@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     Route::post('/block-user', [BlockUserController::class, 'blockUser']);
     Route::delete('/unblock-user/{user}', [BlockUserController::class, 'unblockUser']);
