@@ -520,6 +520,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
                                     onDeleteMessage={handleDeleteClick}
                                     onForwardMessage={handleForwardMessage}
                                     targetScrollRef={targetScrollRef}
+                                    selectedUser={selectedUser}
                                 />
 
                                 {/* Message Input */}

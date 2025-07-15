@@ -24,6 +24,11 @@ class MessageController extends Controller
     {
         $currentUser = Auth::user();
         $users = $currentUser->friends()->get();
+
+        $users->each(function ($user) {
+            $user->display_name = $user->pivot->nickname ?: $user->name;
+        });
+
         $selectedUserId = $request->query('user');
 
         return Inertia::render('Inbox', [
@@ -301,6 +306,12 @@ class MessageController extends Controller
             });
 
         $users = User::whereIn('id', $userIds)->get();
+
+        $currentUser = Auth::user();
+        $users->each(function ($user) use ($currentUser) {
+            $displayName = $currentUser->getDisplayNameForFriend($user->id);
+            $user->display_name = $displayName ?: $user->name;
+        });
 
         return response()->json($users);
     }

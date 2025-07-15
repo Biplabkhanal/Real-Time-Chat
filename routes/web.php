@@ -4,6 +4,7 @@ use App\Http\Controllers\BlockUserController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\FriendRequestController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NicknameController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
@@ -83,6 +84,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/friends', [FriendRequestController::class, 'friends'])->name('friends.index');
     Route::delete('/friend/remove/{friend}', [FriendRequestController::class, 'removeFriend'])->name('friend.remove');
     Route::get('/users/search', [FriendRequestController::class, 'searchUsers'])->name('users.search');
+
+    // Nickname Routes
+    Route::post('/nickname/set/{friend}', [NicknameController::class, 'setNickname'])->name('nickname.set');
+    Route::get('/nickname/get/{friend}', [NicknameController::class, 'getNickname'])->name('nickname.get');
 
     // CSRF token refresh route
     Route::get('/csrf-token', function () {

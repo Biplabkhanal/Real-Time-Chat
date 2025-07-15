@@ -135,7 +135,9 @@ const ChatHeader = ({
                 <div className="flex items-center flex-1">
                     <div>
                         <UserAvatar
-                            name={selectedUser.name}
+                            name={
+                                selectedUser.display_name || selectedUser.name
+                            }
                             isOnline={onlineUsers[selectedUser.id]}
                             avatar={selectedUser.avatar}
                         />
@@ -144,7 +146,8 @@ const ChatHeader = ({
                         {isMobile ? (
                             <div>
                                 <div className="font-bold text-gray-900 dark:text-white mb-1">
-                                    {selectedUser.name}
+                                    {selectedUser.display_name ||
+                                        selectedUser.name}
                                 </div>
                                 <UserStatus
                                     isOnline={onlineUsers[selectedUser.id]}
@@ -156,7 +159,8 @@ const ChatHeader = ({
                         ) : (
                             <div>
                                 <div className="font-bold text-gray-900 dark:text-white">
-                                    {selectedUser.name}
+                                    {selectedUser.display_name ||
+                                        selectedUser.name}
                                 </div>
                                 <UserStatus
                                     isOnline={onlineUsers[selectedUser.id]}
