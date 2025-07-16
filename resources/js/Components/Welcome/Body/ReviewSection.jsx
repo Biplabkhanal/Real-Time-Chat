@@ -140,14 +140,14 @@ function PaginationLinks({ reviews }) {
     return (
         <div className="mt-8 flex justify-center">
             <nav
-                className="inline-flex rounded-md shadow-sm -space-x-px"
+                className="inline-flex rounded-md shadow-sm -space-x-px flex-wrap sm:flex-nowrap max-w-full overflow-x-auto"
                 aria-label="Pagination"
             >
                 {reviews.links.map((link, index) => (
                     <Link
                         key={index}
                         href={link.url || "#"}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium
+                        className={`relative inline-flex items-center px-3 py-2 sm:px-4 border text-xs sm:text-sm font-medium
                             ${link.url ? "" : "opacity-50 cursor-not-allowed"}
                             ${
                                 link.active
