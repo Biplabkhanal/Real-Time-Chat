@@ -2,29 +2,27 @@ import React from "react";
 
 export default function AppDemo() {
     return (
-        <div className="mt-20">
-            <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="mt-10 sm:mt-20">
+            <div className="text-center mb-8 sm:mb-12">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                     Experience ChatSync in Action
                 </h2>
-                <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
+                <p className="mt-2 sm:mt-3 max-w-xl sm:max-w-2xl mx-auto text-base sm:text-xl text-gray-500 dark:text-gray-400">
                     Modern interface designed for productivity and ease of use
                 </p>
             </div>
 
-            <div className="relative mx-auto max-w-5xl rounded-lg shadow-xl overflow-hidden">
+            <div className="relative mx-auto w-full sm:max-w-5xl rounded-lg shadow-xl overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-1">
                     <div className="flex items-center space-x-1.5 px-3 py-1.5">
                         <div className="h-3 w-3 rounded-full bg-red-500"></div>
                         <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
                         <div className="h-3 w-3 rounded-full bg-green-500"></div>
                     </div>
-                    <div className="bg-white dark:bg-gray-900 h-96 w-full overflow-hidden">
-                        <div className="h-full w-full flex items-center justify-center">
-                            <div className="flex h-full w-full">
-                                <ChatSidebar />
-                                <ChatArea />
-                            </div>
+                    <div className="bg-white dark:bg-gray-900 h-[32rem] sm:h-96 w-full overflow-hidden">
+                        <div className="h-full w-full flex flex-col sm:flex-row items-stretch justify-center">
+                            <ChatSidebar />
+                            <ChatArea />
                         </div>
                     </div>
                 </div>
@@ -35,8 +33,8 @@ export default function AppDemo() {
 
 function ChatSidebar() {
     return (
-        <div className="w-1/4 bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-6">
+        <div className="w-full sm:w-1/4 bg-gray-100 dark:bg-gray-800 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex-shrink-0">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <h3 className="font-bold text-gray-800 dark:text-white">
                     Chats
                 </h3>
@@ -58,14 +56,14 @@ function ChatSidebar() {
             {[1, 2, 3, 4].map((item) => (
                 <div
                     key={item}
-                    className={`flex items-center p-3 mb-2 rounded-lg ${
+                    className={`flex items-center p-2 sm:p-3 mb-2 rounded-lg ${
                         item === 1 ? "bg-blue-50 dark:bg-blue-900/30" : ""
                     }`}
                 >
-                    <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 mr-3"></div>
+                    <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-gray-300 dark:bg-gray-600 mr-2 sm:mr-3"></div>
                     <div className="flex-1">
                         <div className="flex justify-between">
-                            <p className="font-medium text-gray-900 dark:text-white text-sm">
+                            <p className="font-medium text-gray-900 dark:text-white text-xs sm:text-sm">
                                 User {item}
                             </p>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -84,12 +82,12 @@ function ChatSidebar() {
 
 function ChatArea() {
     return (
-        <div className="w-3/4 flex flex-col">
+        <div className="w-full sm:w-3/4 flex flex-col">
             {/* Chat header */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 mr-3"></div>
+            <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-gray-300 dark:bg-gray-600 mr-2 sm:mr-3"></div>
                 <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">
                         User 1
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -99,25 +97,25 @@ function ChatArea() {
             </div>
 
             {/* Chat messages */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-4">
+            <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3 sm:space-y-4">
                 <div className="flex justify-end">
-                    <div className="bg-blue-600 text-white rounded-lg py-2 px-4 max-w-xs">
-                        <p className="text-sm">
+                    <div className="bg-blue-600 text-white rounded-lg py-2 px-3 sm:px-4 max-w-[80%] sm:max-w-xs">
+                        <p className="text-xs sm:text-sm">
                             Hey there! How are you doing today?
                         </p>
                     </div>
                 </div>
                 <div className="flex justify-start">
-                    <div className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg py-2 px-4 max-w-xs">
-                        <p className="text-sm">
+                    <div className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg py-2 px-3 sm:px-4 max-w-[80%] sm:max-w-xs">
+                        <p className="text-xs sm:text-sm">
                             I'm doing great! Just checking out this new chat
                             app.
                         </p>
                     </div>
                 </div>
                 <div className="flex justify-end">
-                    <div className="bg-blue-600 text-white rounded-lg py-2 px-4 max-w-xs">
-                        <p className="text-sm">
+                    <div className="bg-blue-600 text-white rounded-lg py-2 px-3 sm:px-4 max-w-[80%] sm:max-w-xs">
+                        <p className="text-xs sm:text-sm">
                             It's pretty awesome, right? Super fast and easy to
                             use!
                         </p>
@@ -126,12 +124,12 @@ function ChatArea() {
             </div>
 
             {/* Message input */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2">
+            <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-full px-3 sm:px-4 py-2">
                     <input
                         type="text"
                         placeholder="Type a message..."
-                        className="bg-transparent flex-1 focus:outline-none text-gray-700 dark:text-gray-300"
+                        className="bg-transparent flex-1 focus:outline-none text-gray-700 dark:text-gray-300 text-sm sm:text-base"
                         readOnly
                     />
                     <button className="ml-2 text-blue-600 dark:text-blue-400">
