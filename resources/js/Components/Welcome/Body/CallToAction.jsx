@@ -10,11 +10,11 @@ export default function CallToAction({ auth }) {
                 <div className="absolute top-1/4 right-1/4 w-32 h-32 rounded-full bg-blue-500 opacity-10"></div>
             </div>
 
-            <div className="max-w-4xl mx-auto px-6 py-20 sm:py-24 lg:px-8 text-center relative z-10">
-                <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <div className="max-w-4xl mx-auto px-6 py-12 lg:px-8 text-center relative z-10">
+                <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-5xl">
                     Elevate Your Communication Experience
                 </h2>
-                <p className="mt-6 text-xl leading-7 text-blue-100 max-w-3xl mx-auto">
+                <p className="mt-6 text-base sm:text-xl leading-7 text-blue-100 max-w-3xl mx-auto">
                     Join thousands of users already enjoying seamless, secure
                     messaging with ChatSync. Start connecting in real-time today
                     — no credit card required.
