@@ -60,15 +60,6 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
                     message: additionalMessage || message.message,
                 }
             );
-
-            const friendNames = selectedFriends
-                .map((friend) => friend.name)
-                .join(", ");
-            const successMessage =
-                selectedFriends.length === 1
-                    ? `Message forwarded to ${friendNames}`
-                    : `Message forwarded to ${selectedFriends.length} friends: ${friendNames}`;
-            toast.success(successMessage);
             onForward(response.data);
             onClose();
         } catch (error) {
