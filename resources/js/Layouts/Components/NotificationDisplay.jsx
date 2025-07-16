@@ -64,7 +64,7 @@ export default function NotificationDisplay({
     }
 
     return (
-        <div className="notification-container absolute mt-2 w-[22rem] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
+        <div className="notification-container absolute mt-2 w-[22rem] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto right-0 sm:right-4 md:right-8 lg:right-3  transition-all duration-200">
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Notifications
