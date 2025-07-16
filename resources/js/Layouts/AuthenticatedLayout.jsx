@@ -7,6 +7,8 @@ import MobileMenu from "@/Layouts/Components/MobileMenu";
 import Notifications from "@/Layouts/Components/Notifications";
 import NotificationButton from "@/Layouts/Components/NotificationButton";
 import NotificationDisplay from "@/Layouts/Components/NotificationDisplay";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -208,6 +210,23 @@ export default function AuthenticatedLayout({ header, children }) {
             </nav>
 
             <main>{children}</main>
+
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                toastClassName="toast-custom"
+                bodyClassName="toast-body-custom"
+                progressClassName="toast-progress-custom"
+                style={{ zIndex: 9999 }}
+            />
         </div>
     );
 }
