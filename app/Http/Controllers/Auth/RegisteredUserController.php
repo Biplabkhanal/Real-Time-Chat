@@ -46,16 +46,14 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        // Send welcome email with error handling
         try {
             $user->notify(new WelcomeEmail());
             Log::info('Welcome email notification dispatched for user: ' . $user->email);
         } catch (\Exception $e) {
             Log::error('Failed to send welcome email: ' . $e->getMessage());
         }
+        // Auth::login($user);
 
-        Auth::login($user);
-
-        return redirect(route('inbox', absolute: false));
+        return redirect()->route('login');
     }
 }
