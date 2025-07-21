@@ -2,8 +2,9 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
-import { Transition } from "@headlessui/react";
+import { LoadingIcon } from "@/Components/FriendRequests/icons";
 import { Link, useForm, usePage } from "@inertiajs/react";
+import { toast } from "react-hot-toast";
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -12,16 +13,35 @@ export default function UpdateProfileInformation({
 }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email,
-        });
+    const { data, setData, patch, errors, processing } = useForm({
+        name: user.name,
+        email: user.email,
+    });
+
+    const prevName = user.name;
+    const prevEmail = user.email;
+
+    const isChanged = data.name !== prevName || data.email !== prevEmail;
 
     const submit = (e) => {
         e.preventDefault();
-
-        patch(route("profile.update"));
+        const nameChanged = data.name !== prevName;
+        const emailChanged = data.email !== prevEmail;
+        let message = "";
+        if (nameChanged && emailChanged) {
+            message = "Profile information updated successfully!";
+        } else if (nameChanged) {
+            message = "Name updated successfully!";
+        } else if (emailChanged) {
+            message = "Email updated successfully!";
+        }
+        patch(route("profile.update"), {
+            onSuccess: () => {
+                if (message) {
+                    toast.success(message, { position: "top-right" });
+                }
+            },
+        });
     };
 
     return (
@@ -103,23 +123,20 @@ export default function UpdateProfileInformation({
 
                 <div className="flex items-center gap-4">
                     <PrimaryButton
-                        disabled={processing}
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-200"
+                        disabled={processing || !isChanged}
+                        className={`bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 ${
+                            isChanged ? "cursor-pointer" : "cursor-not-allowed"
+                        }`}
                     >
-                        Save
+                        {processing ? (
+                            <span className="flex items-center gap-2">
+                                <LoadingIcon size="sm" className="text-white" />
+                                Saving...
+                            </span>
+                        ) : (
+                            "Save"
+                        )}
                     </PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out duration-300"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out duration-300"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Saved.
-                        </p>
-                    </Transition>
                 </div>
             </form>
         </section>

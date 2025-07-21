@@ -24,7 +24,7 @@ export default function UpdateAvatarForm({ className = "" }) {
             onSuccess: () => {
                 photoInput.current.value = "";
                 setPhotoPreview(null);
-                toast.success("Avatar updated successfully.", {
+                toast.success("Avatar updated successfully!", {
                     position: "top-right",
                 });
             },
