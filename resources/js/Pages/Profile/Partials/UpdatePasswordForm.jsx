@@ -2,34 +2,41 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
-import { Transition } from "@headlessui/react";
+import { LoadingIcon } from "@/Components/FriendRequests/icons";
 import { useForm } from "@inertiajs/react";
 import { useRef } from "react";
+import { toast } from "react-hot-toast";
 
 export default function UpdatePasswordForm({ className = "" }) {
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
-
-    const {
-        data,
-        setData,
-        errors,
-        put,
-        reset,
-        processing,
-        recentlySuccessful,
-    } = useForm({
+    const prevData = useRef({
         current_password: "",
         password: "",
         password_confirmation: "",
     });
+    const { data, setData, errors, put, reset, processing } = useForm({
+        current_password: "",
+        password: "",
+        password_confirmation: "",
+    });
+
+    const isChanged =
+        data.current_password !== prevData.current.current_password ||
+        data.password !== prevData.current.password ||
+        data.password_confirmation !== prevData.current.password_confirmation;
 
     const updatePassword = (e) => {
         e.preventDefault();
 
         put(route("password.update"), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                toast.success("Password updated successfully!", {
+                    position: "top-right",
+                });
+            },
             onError: (errors) => {
                 if (errors.password) {
                     reset("password", "password_confirmation");
@@ -131,23 +138,20 @@ export default function UpdatePasswordForm({ className = "" }) {
 
                 <div className="flex items-center gap-4">
                     <PrimaryButton
-                        disabled={processing}
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-200"
+                        disabled={processing || !isChanged}
+                        className={`bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 ${
+                            isChanged ? "cursor-pointer" : "cursor-not-allowed"
+                        }`}
                     >
-                        Save
+                        {processing ? (
+                            <span className="flex items-center gap-2">
+                                <LoadingIcon size="sm" className="text-white" />
+                                Saving...
+                            </span>
+                        ) : (
+                            "Save"
+                        )}
                     </PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out duration-300"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out duration-300"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Saved.
-                        </p>
-                    </Transition>
                 </div>
             </form>
         </section>
