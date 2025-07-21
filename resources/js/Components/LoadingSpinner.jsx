@@ -1,5 +1,6 @@
 export default function LoadingSpinner({ size = "md", text = "Loading..." }) {
     const sizeClasses = {
+        ssm: "h-1 w-1",
         sm: "h-4 w-4",
         md: "h-8 w-8",
         lg: "h-12 w-12",
@@ -7,6 +8,7 @@ export default function LoadingSpinner({ size = "md", text = "Loading..." }) {
     };
 
     const textSizeClasses = {
+        ssm: "text-xs",
         sm: "text-sm",
         md: "text-base",
         lg: "text-lg",

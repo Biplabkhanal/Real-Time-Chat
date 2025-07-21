@@ -1,9 +1,10 @@
 import { useForm, usePage } from "@inertiajs/react";
-import { Transition } from "@headlessui/react";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { useState, useRef, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import LoadingSpinner from "@/Components/LoadingSpinner";
 
 export default function UpdateAvatarForm({ className = "" }) {
     const user = usePage().props.auth.user;
@@ -23,6 +24,9 @@ export default function UpdateAvatarForm({ className = "" }) {
             onSuccess: () => {
                 photoInput.current.value = "";
                 setPhotoPreview(null);
+                toast.success("Avatar updated successfully.", {
+                    position: "top-right",
+                });
             },
         });
     };
@@ -108,7 +112,21 @@ export default function UpdateAvatarForm({ className = "" }) {
                                         : "from-gray-400 to-gray-500 cursor-not-allowed"
                                 } transition-all duration-200`}
                             >
-                                {isNewAvatar ? "Save" : "Saved"}
+                                {isNewAvatar ? (
+                                    processing ? (
+                                        <span className="flex items-center gap-2">
+                                            <LoadingSpinner
+                                                size="ssm"
+                                                text=""
+                                            />
+                                            Saving...
+                                        </span>
+                                    ) : (
+                                        "Save"
+                                    )
+                                ) : (
+                                    "Saved"
+                                )}
                             </PrimaryButton>
                         )}
                     </div>
@@ -131,18 +149,6 @@ export default function UpdateAvatarForm({ className = "" }) {
                     />
                     <InputError message={errors.avatar} className="mt-2" />
                 </div>
-
-                <Transition
-                    show={recentlySuccessful}
-                    enter="transition ease-in-out"
-                    enterFrom="opacity-0"
-                    leave="transition ease-in-out"
-                    leaveTo="opacity-0"
-                >
-                    <p className="text-sm text-green-600 dark:text-green-400">
-                        Avatar updated successfully.
-                    </p>
-                </Transition>
             </form>
         </section>
     );
