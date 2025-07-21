@@ -9,6 +9,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserStatusController;
+use App\Http\Controllers\TypingIndicatorController;
 use App\Mail\TestMail;
 use App\Models\Review;
 use Illuminate\Foundation\Application;
@@ -88,6 +89,9 @@ Route::middleware('auth')->group(function () {
     // Nickname Routes
     Route::post('/nickname/set/{friend}', [NicknameController::class, 'setNickname'])->name('nickname.set');
     Route::get('/nickname/get/{friend}', [NicknameController::class, 'getNickname'])->name('nickname.get');
+
+    // Typing indicator route
+    Route::post('/typing', [TypingIndicatorController::class, 'typing'])->name('typing');
 
     // CSRF token refresh route
     Route::get('/csrf-token', function () {
