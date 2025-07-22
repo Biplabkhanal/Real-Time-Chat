@@ -1,5 +1,6 @@
 import Dropdown from "@/Components/Dropdown";
 import { usePage } from "@inertiajs/react";
+import ChevronDownIcon from "./ChevronDownIcon";
 
 export default function UserDropdown({ closeMobileMenu }) {
     const user = usePage().props.auth.user;
@@ -21,18 +22,7 @@ export default function UserDropdown({ closeMobileMenu }) {
                                 className="inline-flex items-center justify-between w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-700 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
                                 <span className="truncate">{user.name}</span>
-                                <svg
-                                    className="-me-0.5 ms-2 h-4 w-4 flex-shrink-0"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
+                                <ChevronDownIcon className="-me-0.5 ms-2 h-4 w-4 flex-shrink-0" />
                             </button>
                         </span>
                     </Dropdown.Trigger>
