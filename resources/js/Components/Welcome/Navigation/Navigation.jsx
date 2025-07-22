@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import ThemeDropdown from "./ThemeDropdown";
 import UserDropdown from "./UserDropdown";
 import GuestNavigation from "./GuestNavigation";
+import MenuIcon from "../Icons/MenuIcon";
+import CloseIcon from "../Icons/CloseIcon";
 
 export default function Navigation({ auth }) {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -58,37 +60,9 @@ export default function Navigation({ auth }) {
                                 : "Open main menu"}
                         </span>
                         {!showMobileMenu ? (
-                            <svg
-                                className="block h-6 w-6"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                            </svg>
+                            <MenuIcon className="block h-6 w-6" />
                         ) : (
-                            <svg
-                                className="block h-6 w-6"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
+                            <CloseIcon className="block h-6 w-6" />
                         )}
                     </button>
                 </div>
