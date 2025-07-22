@@ -1,13 +1,6 @@
-import ChatHeader from "@/Components/inbox/Chat/Header/ChatHeader";
 import ConversationSidebar from "@/Components/inbox/Chat/Header/ConversationSidebar";
 import { useMessageHandler } from "@/Components/inbox/hooks/customHooks";
-import EmptyChatState from "@/Components/inbox/Shared/States/EmptyChatState";
 import NoFriendsState from "@/Components/inbox/Shared/States/NoFriendsState";
-import AddButton from "@/Components/inbox/Shared/Icons/AddButton";
-import AttachmentPreview from "@/Components/inbox/Chat/Input/AttachmentPreview";
-import ChatMessages from "@/Components/inbox/Chat/Messages/ChatMessages";
-import MessageInput from "@/Components/inbox/Chat/Input/MessageInput";
-import UserList from "@/Components/inbox/UserList/UserList";
 import UserModal from "@/Components/inbox/UserList/UserModal";
 import MobileToggleButton from "@/Components/inbox/Shared/MobileToggleButton";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
@@ -15,6 +8,8 @@ import { Head } from "@inertiajs/react";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import InboxSidebar from "./Inbox/InboxSidebar";
+import ChatArea from "./Inbox/ChatArea";
 
 export default function Inbox({ auth, users, selectedUserId }) {
     const webSocketChannel = `message.${auth.user.id}`;
@@ -33,8 +28,8 @@ export default function Inbox({ auth, users, selectedUserId }) {
     });
     const [showInfoSidebar, setShowInfoSidebar] = useState(false);
     const [isUserSelectionLoading, setIsUserSelectionLoading] = useState(false);
-    const [showSidebar, setShowSidebar] = useState(false); // Default to hiding sidebar on mobile
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // Track if current view is mobile
+    const [showSidebar, setShowSidebar] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -437,7 +432,6 @@ export default function Inbox({ auth, users, selectedUserId }) {
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="ChatSync - Inbox" />
-
             {users.length === 0 ? (
                 <NoFriendsState />
             ) : (
@@ -446,124 +440,41 @@ export default function Inbox({ auth, users, selectedUserId }) {
                         showSidebar={showSidebar}
                         toggleSidebar={toggleSidebar}
                     />
-
-                    {/* Sidebar */}
-                    <div
-                        className={`${
-                            showSidebar ? "translate-x-0" : "-translate-x-full"
-                        } md:translate-x-0 md:w-1/4 w-full md:static fixed inset-y-0 left-0 z-40
-                        bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
-                        flex flex-col transition-transform duration-300 ease-in-out shadow-lg md:shadow-none`}
-                    >
-                        <div className="px-4 py-[1.64rem] bg-gray-50 dark:bg-gray-900 font-bold text-lg border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-gray-800 dark:text-white">
-                                    Chats
-                                </h2>
-                                {isUsersLoading ? (
-                                    <div className="w-6 h-4 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse"></div>
-                                ) : (
-                                    <span className="bg-blue-500 text-white text-xs px-1 py-0 rounded-full">
-                                        {usersWithConversations.length}
-                                    </span>
-                                )}
-                            </div>
-                            <AddButton onClick={() => setIsModalOpen(true)} />
-                        </div>
-
-                        {/* Contact List */}
-                        <UserList
-                            filteredUsers={usersWithConversations}
-                            selectedUser={selectedUser}
-                            setSelectedUser={handleUserSelect}
-                            onlineUsers={onlineUsers}
-                            isLoading={isUsersLoading}
-                        />
-                    </div>
-
-                    {/* Chat Area */}
-                    <div
-                        className={`flex flex-col ${
-                            showInfoSidebar ? "w-[50%]" : "flex-1"
-                        } bg-gray-50 dark:bg-gray-900`}
-                    >
-                        {!selectedUser ? (
-                            <EmptyChatState />
-                        ) : (
-                            <>
-                                <div className="relative">
-                                    <ChatHeader
-                                        selectedUser={selectedUser}
-                                        onlineUsers={onlineUsers}
-                                        lastSeen={lastSeen}
-                                        auth={auth}
-                                        onConversationDeleted={
-                                            handleConversationDeleted
-                                        }
-                                        showInfoSidebar={showInfoSidebar}
-                                        setShowInfoSidebar={setShowInfoSidebar}
-                                    />
-                                </div>
-
-                                {/* Chat Messages */}
-                                <ChatMessages
-                                    isLoading={
-                                        isLoading || isUserSelectionLoading
-                                    }
-                                    isUserSelectionLoading={
-                                        isUserSelectionLoading
-                                    }
-                                    error={error}
-                                    currentMessages={currentMessages}
-                                    auth={auth}
-                                    getMessages={getMessages}
-                                    onDeleteMessage={handleDeleteClick}
-                                    onForwardMessage={handleForwardMessage}
-                                    targetScrollRef={targetScrollRef}
-                                    selectedUser={selectedUser}
-                                />
-
-                                {/* Message Input */}
-                                <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                                    {error && error.includes("send") && (
-                                        <div className="mb-2 text-sm text-red-500 dark:text-red-400">
-                                            {error}
-                                        </div>
-                                    )}
-
-                                    {/* Attachments preview */}
-                                    <AttachmentPreview
-                                        attachments={attachments}
-                                        onRemove={(index) => {
-                                            const newAttachments = [
-                                                ...attachments,
-                                            ];
-                                            newAttachments.splice(index, 1);
-                                            setAttachments(newAttachments);
-                                        }}
-                                    />
-
-                                    <MessageInput
-                                        inputRef={inputRef}
-                                        messageInput={messageInput}
-                                        setMessageInput={setMessageInput}
-                                        handleKeyDown={handleKeyDown}
-                                        isLoading={isSending}
-                                        attachments={attachments}
-                                        setAttachments={setAttachments}
-                                        sendMessage={handleSendMessage}
-                                        selectedUser={selectedUser}
-                                    />
-                                    {!isBlocked && (
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">
-                                            Press Enter to send, Shift+Enter for
-                                            new line
-                                        </p>
-                                    )}
-                                </div>
-                            </>
-                        )}
-                    </div>
+                    <InboxSidebar
+                        showSidebar={showSidebar}
+                        isUsersLoading={isUsersLoading}
+                        usersWithConversations={usersWithConversations}
+                        selectedUser={selectedUser}
+                        handleUserSelect={handleUserSelect}
+                        onlineUsers={onlineUsers}
+                        setIsModalOpen={setIsModalOpen}
+                    />
+                    <ChatArea
+                        selectedUser={selectedUser}
+                        showInfoSidebar={showInfoSidebar}
+                        setShowInfoSidebar={setShowInfoSidebar}
+                        isLoading={isLoading}
+                        isUserSelectionLoading={isUserSelectionLoading}
+                        error={error}
+                        currentMessages={currentMessages}
+                        auth={auth}
+                        getMessages={getMessages}
+                        handleDeleteClick={handleDeleteClick}
+                        handleForwardMessage={handleForwardMessage}
+                        targetScrollRef={targetScrollRef}
+                        setMessageInput={setMessageInput}
+                        setAttachments={setAttachments}
+                        attachments={attachments}
+                        messageInput={messageInput}
+                        handleKeyDown={handleKeyDown}
+                        isSending={isSending}
+                        handleSendMessage={handleSendMessage}
+                        inputRef={inputRef}
+                        lastSeen={lastSeen}
+                        onlineUsers={onlineUsers}
+                        handleConversationDeleted={handleConversationDeleted}
+                        isBlocked={isBlocked}
+                    />
                     {selectedUser && (
                         <ConversationSidebar
                             isOpen={showInfoSidebar}
@@ -574,7 +485,6 @@ export default function Inbox({ auth, users, selectedUserId }) {
                     )}
                 </div>
             )}
-
             <UserModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
