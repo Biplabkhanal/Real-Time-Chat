@@ -10,6 +10,7 @@ import MobileMenu from "./Components/MobileMenu";
 import { ToastContainer } from "react-toastify";
 import UserDropdown from "./Components/UserDropdown";
 import Logo from "@/Components/Welcome/Header/Logo";
+import MenuToggleIcon from "./Components/MenuToggleIcon";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -95,35 +96,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                 }
                                 className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 dark:text-gray-200 transition duration-150 ease-in-out hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 dark:hover:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-gray-500 dark:focus:text-gray-100 focus:outline-none cursor-pointer"
                             >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? "inline-flex"
-                                                : "hidden"
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? "inline-flex"
-                                                : "hidden"
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
+                                <MenuToggleIcon
+                                    showingNavigationDropdown={
+                                        showingNavigationDropdown
+                                    }
+                                />
                             </button>
                         </div>
                     </div>
