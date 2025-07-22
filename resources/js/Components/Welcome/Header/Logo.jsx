@@ -1,6 +1,8 @@
-export default function Logo() {
+export default function Logo({ className = "text-3xl" }) {
     return (
-        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 flex items-center">
+        <div
+            className={`${className} font-bold text-blue-600 dark:text-blue-400 flex items-center`}
+        >
             <svg
                 className="h-8 w-8 mr-2"
                 fill="currentColor"
