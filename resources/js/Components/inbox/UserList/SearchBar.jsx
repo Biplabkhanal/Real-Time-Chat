@@ -1,17 +1,17 @@
 import React from "react";
 
-const SearchBar = ({ searchInput, setSearchInput }) => {
+const SearchBar = ({ value, onChange, placeholder }) => {
     return (
         <div className=" border-gray-200 dark:border-gray-700">
             <div className="relative">
                 <input
                     type="text"
-                    placeholder="Search ..."
+                    placeholder={placeholder || "Search ..."}
                     className="w-full p-2 pl-8 border border-gray-300 dark:border-gray-600 rounded-lg
                                bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white
                                focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
+                    value={value}
+                    onChange={onChange}
                 />
                 <svg
                     className="absolute left-2 top-[0.85rem] h-4 w-4 text-gray-500 dark:text-gray-400"
