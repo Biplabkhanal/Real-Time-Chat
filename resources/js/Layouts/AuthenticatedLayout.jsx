@@ -3,14 +3,14 @@ import { useState } from "react";
 import { Link } from "@inertiajs/react";
 import NavLink from "@/Components/NavLink";
 import Notifications from "@/Layouts/Components/Notifications";
-import NotificationButton from "@/Layouts/Components/NotificationButton";
+import NotificationButton from "@/Layouts/Components/NavIcons/NotificationButton";
 import NotificationDisplay from "@/Layouts/Components/NotificationDisplay";
 import "react-toastify/dist/ReactToastify.css";
 import MobileMenu from "./Components/MobileMenu";
 import { ToastContainer } from "react-toastify";
 import UserDropdown from "./Components/UserDropdown";
 import Logo from "@/Components/Welcome/Header/Logo";
-import MenuToggleIcon from "./Components/MenuToggleIcon";
+import MenuToggleIcon from "./Components/NavIcons/MenuToggleIcon";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
