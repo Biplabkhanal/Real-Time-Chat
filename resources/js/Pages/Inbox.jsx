@@ -1,4 +1,4 @@
-import ConversationSidebar from "@/Components/inbox/Chat/Header/ConversationSidebar";
+import ConversationSidebar from "@/Components/inbox/Chat/Header/Sidebar/ConversationSidebar";
 import { useMessageHandler } from "@/Components/inbox/hooks/customHooks";
 import NoFriendsState from "@/Components/inbox/Shared/States/NoFriendsState";
 import UserModal from "@/Components/inbox/UserList/UserModal";
