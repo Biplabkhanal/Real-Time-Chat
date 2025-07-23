@@ -172,7 +172,6 @@ export default function Inbox({ auth, users, selectedUserId }) {
     };
 
     const handleForwardMessage = (forwardedMessage) => {
-        // Optional: Show a toast notification
         toast.info(`Message forwarded successfully`);
     };
     useEffect(() => {
@@ -448,6 +447,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
                         handleUserSelect={handleUserSelect}
                         onlineUsers={onlineUsers}
                         setIsModalOpen={setIsModalOpen}
+                        users={users}
                     />
                     <ChatArea
                         selectedUser={selectedUser}

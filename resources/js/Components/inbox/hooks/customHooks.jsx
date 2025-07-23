@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { usePage } from "@inertiajs/react";
@@ -24,51 +24,43 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
     const [messageInput, setMessageInput] = useState("");
     const [attachments, setAttachments] = useState([]);
     const [currentMessages, setCurrentMessages] = useState([]);
+    const messagesFetchedRef = useRef(null);
 
-    const getMessages = useCallback(
-        async (onComplete, showLoading = true) => {
-            if (!selectedUserRef.current) return;
+    const getMessages = useCallback(async (onComplete, showLoading = true) => {
+        if (!selectedUserRef.current) return;
+        const userId = selectedUserRef.current.id;
+        if (messagesFetchedRef.current === userId) return;
 
+        if (showLoading) {
+            setIsLoading(true);
+        }
+        setError(null);
+
+        try {
+            const response = await axios.get(`/message/${userId}`);
+
+            setCurrentMessages(response.data);
+            messagesFetchedRef.current = userId;
+
+            setTimeout(() => {
+                if (typeof window.scrollToBottom === "function") {
+                    window.scrollToBottom();
+                }
+            }, 100);
+        } catch (err) {
             if (showLoading) {
-                setIsLoading(true);
+                setError("Failed to load messages. Please refresh the page.");
+                console.error("Error fetching messages:", err);
             }
-            setError(null);
-
-            try {
-                const response = await axios.get(
-                    `/message/${selectedUserRef.current.id}`
-                );
-
-                if (
-                    JSON.stringify(response.data) !==
-                    JSON.stringify(currentMessages)
-                ) {
-                    setCurrentMessages(response.data);
-
-                    setTimeout(() => {
-                        if (typeof window.scrollToBottom === "function") {
-                            window.scrollToBottom();
-                        }
-                    }, 100);
-                }
-            } catch (err) {
-                if (showLoading) {
-                    setError(
-                        "Failed to load messages. Please refresh the page."
-                    );
-                    console.error("Error fetching messages:", err);
-                }
-            } finally {
-                if (showLoading) {
-                    setIsLoading(false);
-                }
-                if (typeof onComplete === "function") {
-                    onComplete();
-                }
+        } finally {
+            if (showLoading) {
+                setIsLoading(false);
             }
-        },
-        [currentMessages]
-    );
+            if (typeof onComplete === "function") {
+                onComplete();
+            }
+        }
+    }, []);
 
     const handleSendMessage = useCallback(async () => {
         if (messageInput.trim() === "" && attachments.length === 0) return;
