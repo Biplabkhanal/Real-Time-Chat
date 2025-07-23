@@ -9,10 +9,10 @@ import LinksList from "../LinksList";
 import ExportConversationModal from "../../../Modals/ExportConversationModal";
 import ConversationAnalytics from "./ConversationAnalytics";
 import ThemeSettings from "../ThemeSettings";
-import ConversationUsers from "./ConversationUsers";
-import ConversationStats from "./ConversationStats";
-import ConversationTimeline from "./ConversationTimeline";
-import ConversationContact from "./ConversationContact";
+import ConversationUsers from "./ConversationInfo/ConversationUsers";
+import ConversationStats from "./ConversationInfo/ConversationStats";
+import ConversationTimeline from "./ConversationInfo/ConversationTimeline";
+import ConversationContact from "./ConversationInfo/ConversationContact";
 import ConversationHeader from "./ConversationHeader";
 
 const ConversationSidebar = ({

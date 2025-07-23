@@ -1,5 +1,5 @@
 import React from "react";
-import { EmailIcon, ExportIcon } from "./icons/Icons";
+import { EmailIcon, ExportIcon } from "../icons/Icons";
 
 const ConversationContact = ({ selectedUser, setShowExportModal }) => (
     <div className="mt-6">

@@ -4,7 +4,7 @@ import {
     BusyDayIcon,
     FirstMessageIcon,
     LatestMessageIcon,
-} from "./icons/Icons";
+} from "../icons/Icons";
 
 const ConversationTimeline = ({ stats, currentUser, selectedUser }) => (
     <div>
