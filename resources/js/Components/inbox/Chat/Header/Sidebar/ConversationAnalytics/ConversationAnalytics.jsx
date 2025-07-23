@@ -10,7 +10,6 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import { Bar, Pie } from "react-chartjs-2";
 import MessagePerDayChart from "./MessagePerDayChart";
 import MessageDistributionChart from "./MessageDistributionChart";
 import ActivityHeatmap from "./ActivityHeatmap";

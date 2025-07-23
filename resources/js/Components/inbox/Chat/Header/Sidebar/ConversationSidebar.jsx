@@ -14,6 +14,7 @@ import ConversationStats from "./ConversationInfo/ConversationStats";
 import ConversationTimeline from "./ConversationInfo/ConversationTimeline";
 import ConversationContact from "./ConversationInfo/ConversationContact";
 import ConversationHeader from "./ConversationHeader";
+import { fetchConversationStats, fetchSharedMedia } from "./sidebarApi";
 
 const ConversationSidebar = ({
     isOpen,
@@ -69,46 +70,29 @@ const ConversationSidebar = ({
     useEffect(() => {
         if (isOpen && selectedUser?.id) {
             if (activeTab === "info") {
-                fetchConversationStats();
+                handleFetchConversationStats();
             } else if (["images", "documents", "links"].includes(activeTab)) {
-                fetchSharedMedia();
+                handleFetchSharedMedia();
             }
         }
     }, [isOpen, selectedUser?.id, activeTab]);
 
-    const fetchConversationStats = async () => {
-        try {
-            setLoading(true);
-            const response = await axios.get(
-                `/conversation-stats/${selectedUser.id}`
-            );
-            setStats(response.data);
-            setLoading(false);
-        } catch (err) {
-            console.error("Error fetching conversation stats:", err);
-            setError("Failed to load conversation information");
-            setLoading(false);
-        }
+    const handleFetchConversationStats = async () => {
+        setLoading(true);
+        setError(null);
+        const result = await fetchConversationStats(selectedUser.id);
+        setStats(result.data);
+        if (result.error) setError(result.error);
+        setLoading(false);
     };
 
-    const fetchSharedMedia = async () => {
+    const handleFetchSharedMedia = async () => {
         setMediaLoading(true);
         setMediaError(null);
-        try {
-            const response = await axios.get(
-                route("messages.media", {
-                    userId: selectedUser.id,
-                })
-            );
-            setMediaFiles(response.data);
-            setMediaLoading(false);
-        } catch (error) {
-            console.error("Error fetching shared media:", error);
-            setMediaError(
-                error.response?.data?.message || "Failed to load shared media"
-            );
-            setMediaLoading(false);
-        }
+        const result = await fetchSharedMedia(selectedUser.id, route);
+        setMediaFiles(result.data);
+        if (result.error) setMediaError(result.error);
+        setMediaLoading(false);
     };
 
     const filterByType = (type) => {
