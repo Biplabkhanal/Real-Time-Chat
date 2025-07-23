@@ -7,7 +7,7 @@ import MediaGrid from "../MediaGrid";
 import DocumentsList from "../DocumentsList";
 import LinksList from "../LinksList";
 import ExportConversationModal from "../../../Modals/ExportConversationModal";
-import ConversationAnalytics from "./ConversationAnalytics";
+import ConversationAnalytics from "./ConversationAnalytics/ConversationAnalytics";
 import ThemeSettings from "../ThemeSettings";
 import ConversationUsers from "./ConversationInfo/ConversationUsers";
 import ConversationStats from "./ConversationInfo/ConversationStats";
