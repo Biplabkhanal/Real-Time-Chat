@@ -2,14 +2,46 @@ import { WelcomeLayout } from "@/Components/Welcome";
 import { Head } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 
-export default function Welcome({ auth, reviews, laravelVersion, phpVersion }) {
+export default function Welcome({ auth, reviews }) {
     const [reviewData, setReviewData] = useState(reviews || []);
+    const [loading, setLoading] = useState(true);
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         if (reviews) {
             setReviewData(reviews);
         }
     }, [reviews]);
+
+    useEffect(() => {
+        let current = 0;
+        const interval = setInterval(() => {
+            current += 10;
+            setProgress(current);
+            if (current >= 100) {
+                clearInterval(interval);
+                setLoading(false);
+            }
+        }, 150);
+        return () => clearInterval(interval);
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-black dark:text-white/50">
+                <span className="mb-6 text-xl font-semibold text-blue-600">
+                    Loading ChatSync...
+                </span>
+                <div className="w-64 h-4 bg-gray-200 rounded-full overflow-hidden mb-4">
+                    <div
+                        className="h-full bg-blue-500 transition-all duration-100"
+                        style={{ width: `${progress}%` }}
+                    ></div>
+                </div>
+                <span className="text-sm text-gray-500">{progress}%</span>
+            </div>
+        );
+    }
 
     return (
         <>
