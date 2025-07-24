@@ -9,14 +9,13 @@ use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $notifications = Notification::where('user_id', Auth::id())
             ->orderBy('is_read', 'asc')
             ->with('sender')
             ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get();
+            ->paginate(5);
 
         $unreadCount = Notification::where('user_id', Auth::id())
             ->where('is_read', false)

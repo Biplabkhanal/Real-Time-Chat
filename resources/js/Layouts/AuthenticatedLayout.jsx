@@ -1,5 +1,5 @@
 import { usePage } from "@inertiajs/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
 import NavLink from "@/Components/NavLink";
 import Notifications from "@/Layouts/Components/Notifications";
@@ -12,7 +12,7 @@ import UserDropdown from "./Components/UserDropdown";
 import Logo from "@/Components/Welcome/Header/Logo";
 import MenuToggleIcon from "./Components/NavIcons/MenuToggleIcon";
 
-export default function AuthenticatedLayout({ header, children }) {
+export default function AuthenticatedLayout({ children }) {
     const user = usePage().props.auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -26,6 +26,20 @@ export default function AuthenticatedLayout({ header, children }) {
         toggleNotifications,
         handleNotificationClick,
     } = Notifications({ user });
+
+    const isMobileView =
+        typeof window !== "undefined" && window.innerWidth <= 640;
+
+    useEffect(() => {
+        if ((showNotifications || showingNavigationDropdown) && isMobileView) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [showNotifications, showingNavigationDropdown, isMobileView]);
 
     return (
         <div className="min-h-screen bg-gray-100">

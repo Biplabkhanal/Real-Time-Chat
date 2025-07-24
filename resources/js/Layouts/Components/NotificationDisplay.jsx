@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import PaginationControls from "./PaginationControls";
 
 export default function NotificationDisplay({
     showNotifications,
-    notifications,
     unreadCount,
     markAllAsRead,
     markAsRead,
@@ -10,6 +10,27 @@ export default function NotificationDisplay({
     isMobile,
     onClose,
 }) {
+    const [page, setPage] = useState(1);
+    const [notifications, setNotifications] = useState([]);
+    const [pagination, setPagination] = useState({
+        current_page: 1,
+        last_page: 1,
+    });
+
+    useEffect(() => {
+        if (showNotifications) {
+            fetch(`/notifications?page=${page}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setNotifications(data.notifications.data);
+                    setPagination({
+                        current_page: data.notifications.current_page,
+                        last_page: data.notifications.last_page,
+                    });
+                });
+        }
+    }, [showNotifications, page]);
+
     if (!showNotifications) return null;
 
     if (isMobile) {
@@ -58,13 +79,18 @@ export default function NotificationDisplay({
                             true
                         )}
                     </div>
+                    <PaginationControls
+                        currentPage={pagination.current_page}
+                        lastPage={pagination.last_page}
+                        setPage={setPage}
+                    />
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="notification-container absolute mt-2 w-[22rem] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto right-0 sm:right-4 md:right-8 lg:right-3  transition-all duration-200">
+        <div className="notification-container absolute mt-2 w-[23rem] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 overflow-y-auto right-0 sm:right-4 md:right-8 lg:right-3  transition-all duration-200">
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Notifications
@@ -84,6 +110,11 @@ export default function NotificationDisplay({
                 handleNotificationClick,
                 false
             )}
+            <PaginationControls
+                currentPage={pagination.current_page}
+                lastPage={pagination.last_page}
+                setPage={setPage}
+            />
         </div>
     );
 }
