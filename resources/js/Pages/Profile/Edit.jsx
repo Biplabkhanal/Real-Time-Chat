@@ -6,6 +6,7 @@ import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
 import UpdateAvatarForm from "./Partials/UpdateAvatarForm";
 import BlockedUsersForm from "./Partials/BlockedUsersForm";
+import LoadingSpinner from "@/Components/LoadingSpinner";
 
 export default function Edit({ mustVerifyEmail, status }) {
     const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +21,7 @@ export default function Edit({ mustVerifyEmail, status }) {
             <AuthenticatedLayout>
                 <Head title="ChatSync - Profile" />
                 <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-gray-100 dark:bg-gray-900">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                    <LoadingSpinner size="xl" text="Loading profile..." />
                 </div>
             </AuthenticatedLayout>
         );

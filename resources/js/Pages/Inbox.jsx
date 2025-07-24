@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import InboxSidebar from "./Inbox/InboxSidebar";
 import ChatArea from "./Inbox/ChatArea";
+import LoadingSpinner from "@/Components/LoadingSpinner";
 
 export default function Inbox({ auth, users, selectedUserId }) {
     const webSocketChannel = `message.${auth.user.id}`;
@@ -433,7 +434,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
             <Head title="ChatSync - Inbox" />
             {isUsersLoading ? (
                 <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-gray-100 dark:bg-gray-900">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                    <LoadingSpinner size="xl" text="Loading inbox..." />
                 </div>
             ) : users.length === 0 ? (
                 <NoFriendsState />
