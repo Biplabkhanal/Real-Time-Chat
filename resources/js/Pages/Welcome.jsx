@@ -1,4 +1,5 @@
 import { WelcomeLayout } from "@/Components/Welcome";
+import Logo from "@/Components/Welcome/Header/Logo";
 import { Head } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 
@@ -29,12 +30,12 @@ export default function Welcome({ auth, reviews }) {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-black dark:text-white/50">
-                <span className="mb-6 text-xl font-semibold text-blue-600">
-                    Loading ChatSync...
-                </span>
+                <div className="flex flex-col items-center mb-6">
+                    <Logo className="h-20 w-auto text-4xl" />
+                </div>
                 <div className="w-64 h-4 bg-gray-200 rounded-full overflow-hidden mb-4">
                     <div
-                        className="h-full bg-blue-500 transition-all duration-100"
+                        className="h-full bg-blue-600 dark:bg-blue-400 transition-all duration-100"
                         style={{ width: `${progress}%` }}
                     ></div>
                 </div>
