@@ -431,7 +431,11 @@ export default function Inbox({ auth, users, selectedUserId }) {
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="ChatSync - Inbox" />
-            {users.length === 0 ? (
+            {isUsersLoading ? (
+                <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-gray-100 dark:bg-gray-900">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                </div>
+            ) : users.length === 0 ? (
                 <NoFriendsState />
             ) : (
                 <div className="h-[calc(100vh-64px)] flex bg-gray-100 dark:bg-gray-900 overflow-hidden">
