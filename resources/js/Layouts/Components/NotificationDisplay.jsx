@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PaginationControls from "./PaginationControls";
+import NotificationDeleteModal from "./NotificationDeleteModal";
+import { DeleteIcon, CloseIcon, CheckIcon } from "./NavIcons/Icons";
 
 export default function NotificationDisplay({
     showNotifications,
@@ -16,9 +18,16 @@ export default function NotificationDisplay({
         current_page: 1,
         last_page: 1,
     });
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [notificationToDelete, setNotificationToDelete] = useState(null);
 
-    const deleteNotification = async (id, e) => {
+    const handleDeleteClick = (id, e) => {
         e.stopPropagation();
+        setNotificationToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    const handleConfirmDelete = async (id) => {
         const token = document
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute("content");
@@ -38,7 +47,15 @@ export default function NotificationDisplay({
             }
         } catch (err) {
             alert("Error deleting notification");
+        } finally {
+            setShowDeleteModal(false);
+            setNotificationToDelete(null);
         }
+    };
+
+    const handleCancelDelete = () => {
+        setShowDeleteModal(false);
+        setNotificationToDelete(null);
     };
 
     useEffect(() => {
@@ -79,19 +96,7 @@ export default function NotificationDisplay({
                                 className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700 transition-colors duration-150"
                                 aria-label="Close"
                             >
-                                <svg
-                                    className="h-5 w-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
+                                <CloseIcon className="h-5 w-5" />
                             </button>
                         </div>
                     </div>
@@ -101,7 +106,7 @@ export default function NotificationDisplay({
                             markAsRead,
                             handleNotificationClick,
                             true,
-                            deleteNotification
+                            handleDeleteClick
                         )}
                     </div>
                     <PaginationControls
@@ -110,6 +115,12 @@ export default function NotificationDisplay({
                         setPage={setPage}
                     />
                 </div>
+                <NotificationDeleteModal
+                    show={showDeleteModal}
+                    onConfirm={handleConfirmDelete}
+                    onCancel={handleCancelDelete}
+                    notificationId={notificationToDelete}
+                />
             </div>
         );
     }
@@ -134,12 +145,18 @@ export default function NotificationDisplay({
                 markAsRead,
                 handleNotificationClick,
                 false,
-                deleteNotification
+                handleDeleteClick
             )}
             <PaginationControls
                 currentPage={pagination.current_page}
                 lastPage={pagination.last_page}
                 setPage={setPage}
+            />
+            <NotificationDeleteModal
+                show={showDeleteModal}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                notificationId={notificationToDelete}
             />
         </div>
     );
@@ -248,20 +265,11 @@ function renderNotificationList(
                                     } rounded text-center transition-colors duration-150 ml-2 flex-shrink-0`}
                                     title="Mark as read"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
+                                    <CheckIcon
                                         className={
                                             isMobile ? "h-4 w-4" : "h-3 w-3"
                                         }
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
+                                    />
                                 </button>
                             )}
                         {/* Delete button */}
@@ -276,22 +284,11 @@ function renderNotificationList(
                                     } rounded text-center transition-colors duration-150 ml-2 flex-shrink-0`}
                                     title="Delete notification"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
+                                    <DeleteIcon
                                         className={
                                             isMobile ? "h-4 w-4" : "h-3 w-3"
                                         }
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M6 18L18 6M6 6l12 12"
-                                        />
-                                    </svg>
+                                    />
                                 </button>
                             )}
                     </div>
