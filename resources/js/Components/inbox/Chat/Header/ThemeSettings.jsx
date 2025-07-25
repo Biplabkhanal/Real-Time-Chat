@@ -16,8 +16,8 @@ const ThemeSettings = () => {
     ];
 
     return (
-        <div className="p-4">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+        <div className="p-4 ">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4 ">
                 Change Theme
             </h3>
 
@@ -27,10 +27,10 @@ const ThemeSettings = () => {
                         <button
                             key={themeOption.id}
                             onClick={() => setTheme(themeOption.id)}
-                            className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
+                            className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all  ${
                                 theme === themeOption.id
                                     ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                                    : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                    : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200"
                             }`}
                         >
                             {themeOption.icon === "sun" && (
@@ -42,7 +42,9 @@ const ThemeSettings = () => {
                             {themeOption.icon === "computer" && (
                                 <ComputerIcon className="w-6 h-6 mb-2" />
                             )}
-                            <span className="text-sm">{themeOption.name}</span>
+                            <span className="text-sm font-medium">
+                                {themeOption.name}
+                            </span>
                         </button>
                     ))}
                 </div>
