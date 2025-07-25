@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import TabNavigation from "../TabNavigation ";
-import LoadingSpinner from "../../../Shared/Icons/LoadingSpinner";
 import ErrorDisplay from "../ErrorDisplay";
 import MediaGrid from "../MediaGrid";
 import DocumentsList from "../DocumentsList";
@@ -15,6 +14,7 @@ import ConversationTimeline from "./ConversationInfo/ConversationTimeline";
 import ConversationContact from "./ConversationInfo/ConversationContact";
 import ConversationHeader from "./ConversationHeader";
 import { fetchConversationStats, fetchSharedMedia } from "./sidebarApi";
+import LoadingSpinner from "@/Components/LoadingSpinner";
 
 const ConversationSidebar = ({
     isOpen,
@@ -69,6 +69,7 @@ const ConversationSidebar = ({
 
     useEffect(() => {
         if (isOpen && selectedUser?.id) {
+            setLoading(true);
             if (activeTab === "info") {
                 handleFetchConversationStats();
             } else if (["images", "documents", "links"].includes(activeTab)) {
@@ -80,19 +81,29 @@ const ConversationSidebar = ({
     const handleFetchConversationStats = async () => {
         setLoading(true);
         setError(null);
-        const result = await fetchConversationStats(selectedUser.id);
-        setStats(result.data);
-        if (result.error) setError(result.error);
-        setLoading(false);
+        try {
+            const result = await fetchConversationStats(selectedUser.id);
+            setStats(result.data);
+            if (result.error) setError(result.error);
+        } catch (err) {
+            setError("Failed to fetch conversation stats.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleFetchSharedMedia = async () => {
         setMediaLoading(true);
         setMediaError(null);
-        const result = await fetchSharedMedia(selectedUser.id, route);
-        setMediaFiles(result.data);
-        if (result.error) setMediaError(result.error);
-        setMediaLoading(false);
+        try {
+            const result = await fetchSharedMedia(selectedUser.id, route);
+            setMediaFiles(result.data);
+            if (result.error) setMediaError(result.error);
+        } catch (err) {
+            setMediaError("Failed to fetch media.");
+        } finally {
+            setMediaLoading(false);
+        }
     };
 
     const filterByType = (type) => {
@@ -152,7 +163,7 @@ const ConversationSidebar = ({
 
     const renderMediaContent = () => {
         if (mediaLoading) {
-            return <LoadingSpinner />;
+            return <LoadingSpinner size="md" />;
         }
 
         if (mediaError) {
@@ -222,7 +233,7 @@ const ConversationSidebar = ({
                 {activeTab === "info" && (
                     <div className="space-y-6">
                         {loading ? (
-                            <LoadingSpinner />
+                            <LoadingSpinner size="md" />
                         ) : error ? (
                             <ErrorDisplay
                                 error={error}

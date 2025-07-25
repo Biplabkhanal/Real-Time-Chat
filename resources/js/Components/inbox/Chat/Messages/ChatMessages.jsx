@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/Components/LoadingSpinner";
 import EmptyState from "../../Shared/States/EmptyState";
 import ErrorState from "../../Shared/States/ErrorState";
 import LoadingState from "../../Shared/States/LoadingState";
@@ -17,11 +18,13 @@ const ChatMessages = ({
 }) => (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
         {isUserSelectionLoading ? (
-            <LoadingState message="Loading conversation..." />
+            <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+                <LoadingSpinner size="lg" text="Loading conversation..." />
+            </div>
         ) : (
             <>
                 {isLoading && currentMessages.length === 0 && (
-                    <LoadingState message="Loading messages..." />
+                    <LoadingSpinner size="lg" message="Loading messages..." />
                 )}
 
                 {error && (
