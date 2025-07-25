@@ -27,6 +27,7 @@ const ConversationSidebar = ({
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState("info");
     const [isMobile, setIsMobile] = useState(false);
+    const [themeLoading, setThemeLoading] = useState(false);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -198,6 +199,16 @@ const ConversationSidebar = ({
         return null;
     };
 
+    const handleTabChange = (tab) => {
+        if (tab === "theme") {
+            setThemeLoading(true);
+            setActiveTab(tab);
+            setTimeout(() => setThemeLoading(false), 400);
+        } else {
+            setActiveTab(tab);
+        }
+    };
+
     if (isMobile) {
         return null;
     }
@@ -217,7 +228,7 @@ const ConversationSidebar = ({
             <div className="border-b border-gray-200 dark:border-gray-700">
                 <TabNavigation
                     activeTab={activeTab}
-                    setActiveTab={setActiveTab}
+                    setActiveTab={handleTabChange}
                     tabs={[
                         { id: "info", label: "Info" },
                         { id: "images", label: "Images" },
@@ -280,7 +291,13 @@ const ConversationSidebar = ({
                     activeTab === "links" ||
                     activeTab === "analytics" ||
                     activeTab === "theme") && (
-                    <div className="h-full">{renderMediaContent()}</div>
+                    <div className="h-full">
+                        {themeLoading && activeTab === "theme" ? (
+                            <LoadingSpinner size="md" text="Loading..." />
+                        ) : (
+                            renderMediaContent()
+                        )}
+                    </div>
                 )}
 
                 {showExportModal && (
