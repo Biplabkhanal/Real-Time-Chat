@@ -17,6 +17,30 @@ export default function NotificationDisplay({
         last_page: 1,
     });
 
+    const deleteNotification = async (id, e) => {
+        e.stopPropagation();
+        const token = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
+        try {
+            const res = await fetch(`/notifications/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                    ...(token ? { "X-CSRF-TOKEN": token } : {}),
+                },
+            });
+            if (res.ok) {
+                setNotifications((prev) => prev.filter((n) => n.id !== id));
+            } else {
+                alert("Failed to delete notification");
+            }
+        } catch (err) {
+            alert("Error deleting notification");
+        }
+    };
+
     useEffect(() => {
         if (showNotifications) {
             fetch(`/notifications?page=${page}`)
@@ -76,7 +100,8 @@ export default function NotificationDisplay({
                             notifications,
                             markAsRead,
                             handleNotificationClick,
-                            true
+                            true,
+                            deleteNotification
                         )}
                     </div>
                     <PaginationControls
@@ -108,7 +133,8 @@ export default function NotificationDisplay({
                 notifications,
                 markAsRead,
                 handleNotificationClick,
-                false
+                false,
+                deleteNotification
             )}
             <PaginationControls
                 currentPage={pagination.current_page}
@@ -123,7 +149,8 @@ function renderNotificationList(
     notifications,
     markAsRead,
     handleNotificationClick,
-    isMobile
+    isMobile,
+    deleteNotification
 ) {
     if (notifications.length === 0) {
         return (
@@ -233,6 +260,36 @@ function renderNotificationList(
                                             fillRule="evenodd"
                                             d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                             clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </button>
+                            )}
+                        {/* Delete button */}
+                        {notification.id &&
+                            !notification.id.toString().startsWith("temp-") && (
+                                <button
+                                    onClick={(e) =>
+                                        deleteNotification(notification.id, e)
+                                    }
+                                    className={`text-xs bg-red-600 hover:bg-red-700 text-white ${
+                                        isMobile ? "py-1 px-2" : "py-1 px-1"
+                                    } rounded text-center transition-colors duration-150 ml-2 flex-shrink-0`}
+                                    title="Delete notification"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className={
+                                            isMobile ? "h-4 w-4" : "h-3 w-3"
+                                        }
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M6 18L18 6M6 6l12 12"
                                         />
                                     </svg>
                                 </button>
