@@ -3,7 +3,7 @@ import React from "react";
 export default function PaginationControls({ currentPage, lastPage, setPage }) {
     if (lastPage <= 1) return null;
     return (
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 p-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <div className="flex flex-row justify-between items-center gap-2 p-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <button
                 onClick={() => setPage((p) => Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}

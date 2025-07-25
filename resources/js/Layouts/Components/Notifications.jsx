@@ -71,11 +71,13 @@ export default function Notifications({ user }) {
                 route("notifications.markAsRead", { id: notificationId })
             );
             setNotifications(
-                notifications.map((notification) =>
-                    notification.id === notificationId
-                        ? { ...notification, is_read: true }
-                        : notification
-                )
+                Array.isArray(notifications)
+                    ? notifications.map((notification) =>
+                          notification.id === notificationId
+                              ? { ...notification, is_read: true }
+                              : notification
+                      )
+                    : []
             );
             setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
         } catch (error) {
@@ -87,10 +89,12 @@ export default function Notifications({ user }) {
         try {
             await axios.post(route("notifications.markAllAsRead"));
             setNotifications(
-                notifications.map((notification) => ({
-                    ...notification,
-                    is_read: true,
-                }))
+                Array.isArray(notifications)
+                    ? notifications.map((notification) => ({
+                          ...notification,
+                          is_read: true,
+                      }))
+                    : []
             );
             setUnreadCount(0);
         } catch (error) {
