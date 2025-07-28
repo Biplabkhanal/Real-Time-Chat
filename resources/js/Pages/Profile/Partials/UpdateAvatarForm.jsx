@@ -3,8 +3,8 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { useState, useRef, useEffect } from "react";
-import { toast } from "react-hot-toast";
 import LoadingSpinner from "@/Components/LoadingSpinner";
+import { toast } from "react-toastify";
 
 export default function UpdateAvatarForm({ className = "" }) {
     const user = usePage().props.auth.user;

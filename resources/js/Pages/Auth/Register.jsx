@@ -4,7 +4,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -28,8 +28,6 @@ export default function Register() {
     return (
         <GuestLayout>
             <Head title="Register" />
-            <Toaster position="top-right" />
-
             <div className="flex flex-col sm:justify-center items-center  bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 bg-dots-darker dark:bg-dots-lighter">
                 <div className="w-full sm:max-w-md px-6 py-4 bg-white/50 dark:bg-gray-800/50 shadow-md overflow-hidden rounded-xl backdrop-blur-lg border border-gray-200/50 transition-all duration-300 hover:shadow-lg">
                     <form onSubmit={submit} className="space-y-6">

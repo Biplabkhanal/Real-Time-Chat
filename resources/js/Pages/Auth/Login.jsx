@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -30,7 +30,6 @@ export default function Login({ status, canResetPassword }) {
     return (
         <GuestLayout>
             <Head title="Log in" />
-            <Toaster position="top-right" />
 
             <div className="px-6 py-8 bg-white/50 dark:bg-gray-800/50 shadow-md overflow-hidden rounded-xl backdrop-blur-lg border border-gray-200/50 transition-all duration-300 hover:shadow-lg">
                 {status && (

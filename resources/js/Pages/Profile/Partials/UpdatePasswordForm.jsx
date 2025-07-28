@@ -5,7 +5,7 @@ import TextInput from "@/Components/TextInput";
 import { LoadingIcon } from "@/Components/FriendRequests/icons";
 import { useForm } from "@inertiajs/react";
 import { useRef } from "react";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export default function UpdatePasswordForm({ className = "" }) {
     const passwordInput = useRef();

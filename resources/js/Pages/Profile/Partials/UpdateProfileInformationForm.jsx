@@ -4,7 +4,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { LoadingIcon } from "@/Components/FriendRequests/icons";
 import { Link, useForm, usePage } from "@inertiajs/react";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -38,7 +38,7 @@ export default function UpdateProfileInformation({
         patch(route("profile.update"), {
             onSuccess: () => {
                 if (message) {
-                    toast.success(message, { position: "top-right" });
+                    toast.success(message);
                 }
             },
         });
