@@ -24,8 +24,7 @@ export default function NotificationDisplay({
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [notificationToDelete, setNotificationToDelete] = useState(null);
 
-    const handleDeleteClick = (id, e) => {
-        e.stopPropagation();
+    const handleDeleteClick = (id) => {
         setNotificationToDelete(id);
         setShowDeleteModal(true);
     };
@@ -107,6 +106,12 @@ export default function NotificationDisplay({
 
     if (!showNotifications) return null;
 
+    const handleClose = () => {
+        if (typeof onClose === "function") onClose();
+        setShowDeleteModal(false);
+        setNotificationToDelete(null);
+    };
+
     if (isMobile) {
         return (
             <div className="sm:hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center pt-16 px-4">
@@ -125,7 +130,7 @@ export default function NotificationDisplay({
                                 </button>
                             )}
                             <button
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700 transition-colors duration-150"
                                 aria-label="Close"
                             >
@@ -139,7 +144,10 @@ export default function NotificationDisplay({
                             markAsRead={handleMarkAsRead}
                             handleNotificationClick={handleNotificationClick}
                             isMobile={true}
-                            deleteNotification={handleDeleteClick}
+                            deleteNotification={(id, e) => {
+                                if (e) e.stopPropagation();
+                                handleDeleteClick(id);
+                            }}
                         />
                     </div>
                     <PaginationControls
@@ -147,13 +155,19 @@ export default function NotificationDisplay({
                         lastPage={pagination.last_page}
                         setPage={setPage}
                     />
+                    <NotificationDeleteModal
+                        show={showDeleteModal}
+                        onConfirm={(id, e) => {
+                            if (e) e.stopPropagation();
+                            handleConfirmDelete(id);
+                        }}
+                        onCancel={(e) => {
+                            if (e) e.stopPropagation();
+                            handleCancelDelete();
+                        }}
+                        notificationId={notificationToDelete}
+                    />
                 </div>
-                <NotificationDeleteModal
-                    show={showDeleteModal}
-                    onConfirm={handleConfirmDelete}
-                    onCancel={handleCancelDelete}
-                    notificationId={notificationToDelete}
-                />
             </div>
         );
     }
@@ -178,17 +192,27 @@ export default function NotificationDisplay({
                 markAsRead={handleMarkAsRead}
                 handleNotificationClick={handleNotificationClick}
                 isMobile={false}
-                deleteNotification={handleDeleteClick}
+                deleteNotification={(id, e) => {
+                    if (e) e.stopPropagation();
+                    handleDeleteClick(id);
+                }}
             />
             <PaginationControls
                 currentPage={pagination.current_page}
                 lastPage={pagination.last_page}
                 setPage={setPage}
             />
+            {/* Render modal INSIDE notification container */}
             <NotificationDeleteModal
                 show={showDeleteModal}
-                onConfirm={handleConfirmDelete}
-                onCancel={handleCancelDelete}
+                onConfirm={(id, e) => {
+                    if (e) e.stopPropagation();
+                    handleConfirmDelete(id);
+                }}
+                onCancel={(e) => {
+                    if (e) e.stopPropagation();
+                    handleCancelDelete();
+                }}
                 notificationId={notificationToDelete}
             />
         </div>

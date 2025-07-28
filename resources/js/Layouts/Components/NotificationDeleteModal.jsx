@@ -20,7 +20,8 @@ function NotificationDeleteModal({
 
     const handleDelete = (e) => {
         e.preventDefault();
-        onConfirm(notificationId);
+        e.stopPropagation();
+        onConfirm(notificationId, e);
     };
     if (!show) return null;
     return (
@@ -42,7 +43,8 @@ function NotificationDeleteModal({
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            onCancel();
+                            e.stopPropagation();
+                            onCancel(e);
                         }}
                         className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-md transition-colors"
                     >
