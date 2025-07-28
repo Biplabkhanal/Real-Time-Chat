@@ -3,6 +3,7 @@ import PaginationControls from "./PaginationControls";
 import NotificationDeleteModal from "./NotificationDeleteModal";
 import { CloseIcon } from "./NavIcons/Icons";
 import NotificationList from "./NotificationList";
+import { toast } from "react-toastify";
 
 export default function NotificationDisplay({
     showNotifications,
@@ -43,11 +44,12 @@ export default function NotificationDisplay({
             });
             if (res.ok) {
                 setNotifications((prev) => prev.filter((n) => n.id !== id));
+                toast.success("Notification deleted");
             } else {
-                alert("Failed to delete notification");
+                toast.error("Failed to delete notification");
             }
         } catch (err) {
-            alert("Error deleting notification");
+            toast.error("Error deleting notification");
         } finally {
             setShowDeleteModal(false);
             setNotificationToDelete(null);

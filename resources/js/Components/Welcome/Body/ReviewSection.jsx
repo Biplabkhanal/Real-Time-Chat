@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, router } from "@inertiajs/react";
+import { toast } from "react-toastify";
 import ReviewForm from "./ReviewForm";
 import ReviewDeleteModal from "./ReviewDeleteModal";
 import TrashIcon from "../Icons/TrashIcon";
@@ -68,6 +69,12 @@ function ReviewCard({ review, auth }) {
         router.delete(route("reviews.destroy", review.id), {
             preserveScroll: true,
             only: ["reviews"],
+            onSuccess: () => {
+                toast.success("Review deleted successfully!");
+            },
+            onError: () => {
+                toast.error("Failed to delete review");
+            },
         });
         setShowDeleteModal(false);
     };

@@ -74,7 +74,7 @@ class FriendRequestController extends Controller
         $requestId = $existingRequest ? $existingRequest->id : $friendRequest->id;
 
         return response()->json([
-            'message' => 'Friend request sent successfully',
+            'message' => 'Friend request sent successfully!',
             'request_id' => $requestId
         ]);
     }
@@ -171,7 +171,7 @@ class FriendRequestController extends Controller
             return redirect()->back()->with('success', 'Friend request declined');
         }
 
-        return response()->json(['message' => 'Friend request declined']);
+        return response()->json(['message' => 'Friend request declined!']);
     }
 
     /**
@@ -191,7 +191,7 @@ class FriendRequestController extends Controller
 
         $friendRequest->delete();
 
-        return response()->json(['message' => 'Friend request cancelled']);
+        return response()->json(['message' => 'Friend request cancelled!']);
     }
 
     /**
@@ -235,10 +235,10 @@ class FriendRequestController extends Controller
         $friend->friendships()->where('friend_id', $currentUser->id)->delete();
 
         if (request()->header('X-Inertia')) {
-            return redirect()->back()->with('success', 'Friend removed successfully');
+            return redirect()->back()->with('success', 'Friend removed successfully!');
         }
 
-        return response()->json(['message' => 'Friend removed successfully']);
+        return response()->json(['message' => 'Friend removed successfully!']);
     }
 
     /**

@@ -1,6 +1,8 @@
 import Header from "../Header/Header";
 import MainContent from "./MainContent";
 import Footer from "./Footer";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function WelcomeLayout({ auth, reviews, children }) {
     return (
@@ -10,6 +12,22 @@ export default function WelcomeLayout({ auth, reviews, children }) {
                     <Header auth={auth} />
                     <MainContent auth={auth} reviews={reviews} />
                     <Footer />
+                    <ToastContainer
+                        position="top-right"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="light"
+                        toastClassName="toast-custom"
+                        bodyClassName="toast-body-custom"
+                        progressClassName="toast-progress-custom"
+                        style={{ zIndex: 9999 }}
+                    />
                 </div>
             </div>
         </div>

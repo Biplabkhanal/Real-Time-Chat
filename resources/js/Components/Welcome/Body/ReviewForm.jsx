@@ -1,6 +1,7 @@
 import { useForm } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
+import { toast } from "react-toastify";
 import ValidationErrorModal from "./ValidationErrorModal";
 
 export default function ReviewForm({ auth }) {
@@ -44,7 +45,10 @@ export default function ReviewForm({ auth }) {
         }
 
         post(route("reviews.store"), {
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                toast.success("Review submitted successfully!");
+            },
             preserveScroll: true,
             only: ["reviews"],
         });

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { router } from "@inertiajs/react";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export const useFriendRequestsLogic = (
     initialPendingRequests,
@@ -396,7 +396,7 @@ export const useFriendRequestsLogic = (
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        toast.success("Friend request declined");
+                        toast.success("Friend request declined!");
                         setPendingRequests((prev) =>
                             prev.filter((req) => req.id !== requestId)
                         );
@@ -437,7 +437,7 @@ export const useFriendRequestsLogic = (
             router.delete(`/friend/remove/${friendId}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success("Friend removed successfully");
+                    toast.success("Friend removed successfully!");
                     setFriends((prev) =>
                         prev.filter((friend) => friend.id !== friendId)
                     );
