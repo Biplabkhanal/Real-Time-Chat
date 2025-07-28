@@ -11,8 +11,8 @@ const FriendRequestCard = memo(
         isDeclining = false,
     }) => {
         return (
-            <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-                <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg flex-col sm:flex-row">
+                <div className="flex items-center space-x-4 w-full sm:w-auto">
                     <UserAvatar user={request.sender} size="md" />
                     <div>
                         <h4 className="font-medium text-white">
@@ -26,7 +26,7 @@ const FriendRequestCard = memo(
                         </p>
                     </div>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex flex-row w-full sm:w-auto space-x-2 mt-4 sm:mt-0 justify-end">
                     <ActionButton
                         type="primary"
                         onClick={() => onAcceptRequest(request.id)}

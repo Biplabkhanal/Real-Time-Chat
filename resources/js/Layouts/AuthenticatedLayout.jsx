@@ -144,7 +144,7 @@ export default function AuthenticatedLayout({ children }) {
             <main>{children}</main>
 
             <ToastContainer
-                position={isMobileView ? "bottom-center" : "top-right"}
+                position={isMobileView ? "top-center" : "top-right"}
                 autoClose={isMobileView ? 3000 : 5000}
                 hideProgressBar={false}
                 newestOnTop={false}
@@ -174,6 +174,7 @@ export default function AuthenticatedLayout({ children }) {
                               width: "90%",
                               left: "5%",
                               right: "5%",
+                              top: "4%",
                               fontSize: "1rem",
                           }
                         : { zIndex: 9999 }

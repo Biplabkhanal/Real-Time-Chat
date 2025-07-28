@@ -118,9 +118,9 @@ export default function NotificationDisplay({
     if (isMobile) {
         return (
             <div className="sm:hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center pt-16 px-4">
-                <div className="notification-container bg-gray-800 border border-gray-700 rounded-md shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
-                    <div className="sticky top-0 bg-gray-800 flex items-center justify-between p-4 border-b border-gray-700 shadow-md z-10">
-                        <h3 className="text-lg font-semibold text-white">
+                <div className="notification-container  bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+                    <div className="sticky top-0 flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 ">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                             Notifications
                         </h3>
                         <div className="flex space-x-3 items-center">
@@ -207,7 +207,7 @@ export default function NotificationDisplay({
                 lastPage={pagination.last_page}
                 setPage={setPage}
             />
-            {/* Render modal INSIDE notification container */}
+
             <NotificationDeleteModal
                 show={showDeleteModal}
                 onConfirm={(id, e) => {
