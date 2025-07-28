@@ -67,7 +67,7 @@ export default function Notifications({ user }) {
         }
 
         try {
-            await axios.post(
+            const response = await axios.post(
                 route("notifications.markAsRead", { id: notificationId })
             );
             setNotifications(
@@ -79,7 +79,9 @@ export default function Notifications({ user }) {
                       )
                     : []
             );
-            setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
+            if (response.data.unreadCount !== undefined) {
+                setUnreadCount(response.data.unreadCount);
+            }
         } catch (error) {
             console.error("Error marking notification as read:", error);
         }
@@ -87,7 +89,9 @@ export default function Notifications({ user }) {
 
     const markAllAsRead = async () => {
         try {
-            await axios.post(route("notifications.markAllAsRead"));
+            const response = await axios.post(
+                route("notifications.markAllAsRead")
+            );
             setNotifications(
                 Array.isArray(notifications)
                     ? notifications.map((notification) => ({
@@ -96,7 +100,9 @@ export default function Notifications({ user }) {
                       }))
                     : []
             );
-            setUnreadCount(0);
+            if (response.data.unreadCount !== undefined) {
+                setUnreadCount(response.data.unreadCount);
+            }
         } catch (error) {
             console.error("Error marking all notifications as read:", error);
         }

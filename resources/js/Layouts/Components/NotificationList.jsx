@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { CheckIcon, DeleteIcon } from "./NavIcons/Icons";
 
 function NotificationList({
@@ -8,11 +8,8 @@ function NotificationList({
     isMobile,
     deleteNotification,
 }) {
-    const [locallyReadIds, setLocallyReadIds] = useState([]);
-
     const handleMarkAsRead = (id, e) => {
         e.stopPropagation();
-        setLocallyReadIds((prev) => [...prev, id]);
         markAsRead(id, e);
     };
 
@@ -33,9 +30,7 @@ function NotificationList({
     return (
         <div>
             {notifications.map((notification, index) => {
-                const isRead =
-                    notification.is_read ||
-                    locallyReadIds.includes(notification.id);
+                const isRead = notification.is_read;
 
                 return (
                     <div

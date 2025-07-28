@@ -35,7 +35,11 @@ class NotificationController extends Controller
 
         $notification->update(['is_read' => true]);
 
-        return response()->json(['success' => true]);
+        $unreadCount = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json(['success' => true, 'unreadCount' => $unreadCount]);
     }
 
     public function markAllAsRead()
@@ -44,7 +48,11 @@ class NotificationController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
-        return response()->json(['success' => true]);
+        $unreadCount = Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json(['success' => true, 'unreadCount' => $unreadCount]);
     }
 
     public function destroy($id)

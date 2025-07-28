@@ -34,7 +34,6 @@ export default function NotificationDisplay({
         const token = document
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute("content");
-        const notification = notifications.find((n) => n.id === id);
         try {
             const res = await fetch(`/notifications/${id}`, {
                 method: "DELETE",
