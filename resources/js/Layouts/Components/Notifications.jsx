@@ -135,5 +135,6 @@ export default function Notifications({ user }) {
         markAllAsRead,
         toggleNotifications,
         handleNotificationClick,
+        setUnreadCount,
     };
 }

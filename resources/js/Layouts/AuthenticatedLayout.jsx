@@ -25,6 +25,7 @@ export default function AuthenticatedLayout({ children }) {
         markAllAsRead,
         toggleNotifications,
         handleNotificationClick,
+        setUnreadCount,
     } = Notifications({ user });
 
     const isMobileView =
@@ -91,6 +92,7 @@ export default function AuthenticatedLayout({ children }) {
                                         handleNotificationClick
                                     }
                                     isMobile={false}
+                                    setUnreadCount={setUnreadCount}
                                 />
                             </div>
                         </div>
@@ -129,6 +131,7 @@ export default function AuthenticatedLayout({ children }) {
                     handleNotificationClick={handleNotificationClick}
                     isMobile={true}
                     onClose={() => toggleNotifications()}
+                    setUnreadCount={setUnreadCount}
                 />
 
                 <MobileMenu

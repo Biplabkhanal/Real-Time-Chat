@@ -13,6 +13,7 @@ export default function NotificationDisplay({
     handleNotificationClick,
     isMobile,
     onClose,
+    setUnreadCount,
 }) {
     const [page, setPage] = useState(1);
     const [notifications, setNotifications] = useState([]);
@@ -33,6 +34,7 @@ export default function NotificationDisplay({
         const token = document
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute("content");
+        const notification = notifications.find((n) => n.id === id);
         try {
             const res = await fetch(`/notifications/${id}`, {
                 method: "DELETE",
@@ -43,13 +45,20 @@ export default function NotificationDisplay({
                 },
             });
             if (res.ok) {
+                const data = await res.json();
                 setNotifications((prev) => prev.filter((n) => n.id !== id));
-                toast.success("Notification deleted");
+                if (
+                    typeof setUnreadCount === "function" &&
+                    data.unreadCount !== undefined
+                ) {
+                    setUnreadCount(data.unreadCount);
+                }
+                toast.success("Notification deleted successfully!");
             } else {
-                toast.error("Failed to delete notification");
+                toast.error("Failed to delete notification!");
             }
         } catch (err) {
-            toast.error("Error deleting notification");
+            toast.error("Error deleting notification!");
         } finally {
             setShowDeleteModal(false);
             setNotificationToDelete(null);
