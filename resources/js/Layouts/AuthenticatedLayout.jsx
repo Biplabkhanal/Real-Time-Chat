@@ -144,8 +144,8 @@ export default function AuthenticatedLayout({ children }) {
             <main>{children}</main>
 
             <ToastContainer
-                position="top-right"
-                autoClose={5000}
+                position={isMobileView ? "bottom-center" : "top-right"}
+                autoClose={isMobileView ? 3000 : 5000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick
@@ -154,10 +154,30 @@ export default function AuthenticatedLayout({ children }) {
                 draggable
                 pauseOnHover
                 theme="light"
-                toastClassName="toast-custom"
-                bodyClassName="toast-body-custom"
-                progressClassName="toast-progress-custom"
-                style={{ zIndex: 9999 }}
+                toastClassName={
+                    isMobileView ? "toast-custom toast-mobile" : "toast-custom"
+                }
+                bodyClassName={
+                    isMobileView
+                        ? "toast-body-custom toast-body-mobile"
+                        : "toast-body-custom"
+                }
+                progressClassName={
+                    isMobileView
+                        ? "toast-progress-custom toast-progress-mobile"
+                        : "toast-progress-custom"
+                }
+                style={
+                    isMobileView
+                        ? {
+                              zIndex: 9999,
+                              width: "90%",
+                              left: "5%",
+                              right: "5%",
+                              fontSize: "1rem",
+                          }
+                        : { zIndex: 9999 }
+                }
             />
         </div>
     );
