@@ -69,6 +69,28 @@ export default function NotificationDisplay({
         setNotificationToDelete(null);
     };
 
+    const handleMarkAsRead = async (notificationId, event) => {
+        setNotifications((prev) =>
+            prev.map((notification) =>
+                notification.id === notificationId
+                    ? { ...notification, is_read: true }
+                    : notification
+            )
+        );
+        if (typeof markAsRead === "function") {
+            await markAsRead(notificationId, event);
+        }
+    };
+
+    const handleMarkAllAsRead = async () => {
+        setNotifications((prev) =>
+            prev.map((notification) => ({ ...notification, is_read: true }))
+        );
+        if (typeof markAllAsRead === "function") {
+            await markAllAsRead();
+        }
+    };
+
     useEffect(() => {
         if (showNotifications) {
             fetch(`/notifications?page=${page}`)
@@ -96,7 +118,7 @@ export default function NotificationDisplay({
                         <div className="flex space-x-3 items-center">
                             {unreadCount > 0 && (
                                 <button
-                                    onClick={markAllAsRead}
+                                    onClick={handleMarkAllAsRead}
                                     className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md transition-colors duration-150"
                                 >
                                     Mark all as read
@@ -114,7 +136,7 @@ export default function NotificationDisplay({
                     <div className="max-h-[calc(80vh-4rem)] overflow-y-auto">
                         <NotificationList
                             notifications={notifications}
-                            markAsRead={markAsRead}
+                            markAsRead={handleMarkAsRead}
                             handleNotificationClick={handleNotificationClick}
                             isMobile={true}
                             deleteNotification={handleDeleteClick}
@@ -144,7 +166,7 @@ export default function NotificationDisplay({
                 </h3>
                 {unreadCount > 0 && (
                     <button
-                        onClick={markAllAsRead}
+                        onClick={handleMarkAllAsRead}
                         className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                     >
                         Mark all as read
@@ -153,7 +175,7 @@ export default function NotificationDisplay({
             </div>
             <NotificationList
                 notifications={notifications}
-                markAsRead={markAsRead}
+                markAsRead={handleMarkAsRead}
                 handleNotificationClick={handleNotificationClick}
                 isMobile={false}
                 deleteNotification={handleDeleteClick}
