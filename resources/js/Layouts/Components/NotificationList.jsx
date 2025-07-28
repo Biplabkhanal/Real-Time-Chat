@@ -1,5 +1,6 @@
 import React from "react";
 import { CheckIcon, DeleteIcon } from "./NavIcons/Icons";
+import LoadingSpinner from "../../Components/LoadingSpinner";
 
 function NotificationList({
     notifications,
@@ -7,11 +8,16 @@ function NotificationList({
     handleNotificationClick,
     isMobile,
     deleteNotification,
+    loading = false,
 }) {
     const handleMarkAsRead = (id, e) => {
         e.stopPropagation();
         markAsRead(id, e);
     };
+
+    if (loading) {
+        return <LoadingSpinner size="md" text="Loading notifications..." />;
+    }
 
     if (notifications.length === 0) {
         return (

@@ -23,6 +23,7 @@ export default function NotificationDisplay({
     });
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [notificationToDelete, setNotificationToDelete] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const handleDeleteClick = (id) => {
         setNotificationToDelete(id);
@@ -92,6 +93,7 @@ export default function NotificationDisplay({
 
     useEffect(() => {
         if (showNotifications) {
+            setLoading(true);
             fetch(`/notifications?page=${page}`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -100,7 +102,8 @@ export default function NotificationDisplay({
                         current_page: data.notifications.current_page,
                         last_page: data.notifications.last_page,
                     });
-                });
+                })
+                .finally(() => setLoading(false));
         }
     }, [showNotifications, page]);
 
@@ -148,6 +151,7 @@ export default function NotificationDisplay({
                                 if (e) e.stopPropagation();
                                 handleDeleteClick(id);
                             }}
+                            loading={loading}
                         />
                     </div>
                     <PaginationControls
@@ -196,6 +200,7 @@ export default function NotificationDisplay({
                     if (e) e.stopPropagation();
                     handleDeleteClick(id);
                 }}
+                loading={loading}
             />
             <PaginationControls
                 currentPage={pagination.current_page}
