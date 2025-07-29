@@ -193,7 +193,7 @@ class MessageController extends Controller
             $message->delete();
 
             broadcast(new MessageDeleted($message->id, $message->recipient_id))->toOthers();
-            return response()->json(['success' => 'Message deleted successfully']);
+            return response()->json(['success' => 'Message deleted successfully!']);
         } catch (\Exception $e) {
             Log::error('Error deleting message: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);

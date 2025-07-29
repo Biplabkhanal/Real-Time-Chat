@@ -162,12 +162,17 @@ export default function Inbox({ auth, users, selectedUserId }) {
 
     const handleDeleteClick = async (messageId) => {
         try {
-            await axios.delete(`/message/${messageId}`);
-            toast.success("Message deleted successfully");
+            const response = await axios.delete(`/message/${messageId}`);
+            const successMsg =
+                response.data?.success || "Message deleted successfully";
+            setCurrentMessages((prevMessages) =>
+                prevMessages.filter((msg) => msg.id !== messageId)
+            );
+            toast.success(successMsg);
         } catch (error) {
             console.error("Error deleting message:", error);
             toast.error(
-                error.response?.data?.message || "Failed to delete message"
+                error.response?.data?.error || "Failed to delete message"
             );
         }
     };

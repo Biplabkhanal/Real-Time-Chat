@@ -7,7 +7,7 @@ const AttachmentImage = ({ url, name }) => (
             alt={name}
             className="h-10 w-10 object-cover rounded mr-2"
         />
-        <span className="text-sm truncate max-w-[140px] text-white">
+        <span className="text-sm truncate max-w-[140px] text-gray-500 dark:text-white">
             {name}
         </span>
     </div>
