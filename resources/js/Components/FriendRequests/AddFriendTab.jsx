@@ -36,8 +36,8 @@ const AddFriendTab = memo(
                 )}
 
                 {!isSearching && !loading && (
-                    <div className="bg-gray-900 rounded-lg p-6">
-                        <h3 className="text-lg font-medium text-white mb-4">
+                    <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                             {searchQuery.trim() === ""
                                 ? "All Users"
                                 : "Search Results"}

@@ -433,7 +433,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
         <AuthenticatedLayout user={auth.user}>
             <Head title="ChatSync - Inbox" />
             {isUsersLoading ? (
-                <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-gray-100 dark:bg-gray-900">
+                <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-white/80 dark:bg-gray-900">
                     <LoadingSpinner size="xl" text="Loading inbox..." />
                 </div>
             ) : users.length === 0 ? (

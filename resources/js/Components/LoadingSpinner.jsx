@@ -16,7 +16,7 @@ export default function LoadingSpinner({ size = "md", text = "Loading..." }) {
     };
 
     return (
-        <div className="flex items-center justify-center transition-opacity duration-300">
+        <div className="flex items-center justify-center transition-opacity duration-300 my-2">
             <div className="text-center">
                 <div
                     className={`animate-spin rounded-full border-b-2 border-blue-600 mx-auto mb-4 ${sizeClasses[size]}`}

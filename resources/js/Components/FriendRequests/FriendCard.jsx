@@ -30,7 +30,7 @@ const FriendCard = memo(({ friend, onRemoveFriend, isLoading = false }) => {
 
     return (
         <>
-            <div className="p-4 bg-gray-800 rounded-lg">
+            <div className="p-4 bg-white/80 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 shadow-md rounded-xl transition-colors">
                 <div className="flex items-center space-x-4 mb-3">
                     <UserAvatar
                         user={friend}
@@ -38,10 +38,10 @@ const FriendCard = memo(({ friend, onRemoveFriend, isLoading = false }) => {
                         showOnlineStatus={true}
                     />
                     <div>
-                        <h4 className="font-medium text-white">
+                        <h4 className="font-semibold text-gray-800 dark:text-white text-base">
                             {friend.name}
                         </h4>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                             {friend.is_online ? "Online" : "Offline"}
                         </p>
                     </div>

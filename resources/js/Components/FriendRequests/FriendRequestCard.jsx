@@ -11,17 +11,17 @@ const FriendRequestCard = memo(
         isDeclining = false,
     }) => {
         return (
-            <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg flex-col sm:flex-row">
+            <div className="flex items-center justify-between p-4 bg-white/80 dark:bg-gray-800 border-gray-200 dark:border-gray-800 shadow-md rounded-xl transition-colors flex-col sm:flex-row">
                 <div className="flex items-center space-x-4 w-full sm:w-auto">
                     <UserAvatar user={request.sender} size="md" />
                     <div>
-                        <h4 className="font-medium text-white">
+                        <h4 className="font-medium text-gray-800 dark:text-white text-base">
                             {request.sender.name}
                         </h4>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                             {request.sender.email}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(request.created_at).toLocaleDateString()}
                         </p>
                     </div>

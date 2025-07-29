@@ -16,7 +16,7 @@ const FriendRequestsTab = memo(
         if (loading) {
             return (
                 <div className="space-y-6">
-                    <div className="bg-gray-900 rounded-lg p-6">
+                    <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6">
                         <div className="py-12">
                             <LoadingSpinner
                                 size="md"
@@ -30,8 +30,8 @@ const FriendRequestsTab = memo(
 
         return (
             <div className="space-y-6">
-                <div className="bg-gray-900 rounded-lg p-6">
-                    <h2 className="text-lg font-medium text-white mb-6">
+                <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
                         Pending Friend Requests ({pendingRequests.length})
                     </h2>
 

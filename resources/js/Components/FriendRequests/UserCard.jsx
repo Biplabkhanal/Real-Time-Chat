@@ -69,15 +69,21 @@ const UserCard = memo(
         };
 
         return (
-            <div className="p-4 bg-gray-800 rounded-lg">
+            <div className="p-4 bg-white/80 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 shadow-md rounded-xl transition-colors">
                 <div className="flex items-center space-x-4 mb-3">
                     <UserAvatar user={user} size="md" />
                     <div>
-                        <h4 className="font-medium text-white">{user.name}</h4>
-                        <p className="text-sm text-gray-400">{user.email}</p>
+                        <h4 className="font-semibold text-gray-800 dark:text-white text-base">
+                            {user.name}
+                        </h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {user.email}
+                        </p>
                     </div>
                 </div>
-                <div className="flex justify-end">{renderActionButtons()}</div>
+                <div className="flex justify-end mt-2">
+                    {renderActionButtons()}
+                </div>
             </div>
         );
     }

@@ -154,11 +154,13 @@ export default function NotificationDisplay({
                             loading={loading}
                         />
                     </div>
-                    <PaginationControls
-                        currentPage={pagination.current_page}
-                        lastPage={pagination.last_page}
-                        setPage={setPage}
-                    />
+                    {!loading && (
+                        <PaginationControls
+                            currentPage={pagination.current_page}
+                            lastPage={pagination.last_page}
+                            setPage={setPage}
+                        />
+                    )}
                     <NotificationDeleteModal
                         show={showDeleteModal}
                         onConfirm={(id, e) => {
@@ -202,11 +204,13 @@ export default function NotificationDisplay({
                 }}
                 loading={loading}
             />
-            <PaginationControls
-                currentPage={pagination.current_page}
-                lastPage={pagination.last_page}
-                setPage={setPage}
-            />
+            {!loading && (
+                <PaginationControls
+                    currentPage={pagination.current_page}
+                    lastPage={pagination.last_page}
+                    setPage={setPage}
+                />
+            )}
 
             <NotificationDeleteModal
                 show={showDeleteModal}
