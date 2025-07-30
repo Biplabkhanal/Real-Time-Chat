@@ -67,4 +67,14 @@ class BlockUserController extends Controller
 
         return response()->json($blockedUsers);
     }
+
+    public function getBlockedByUsers()
+    {
+        $blockedByUserIds = BlockedUser::where('blocked_user_id', Auth::id())
+            ->pluck('user_id');
+
+        $blockedByUsers = User::whereIn('id', $blockedByUserIds)->get();
+
+        return response()->json($blockedByUsers);
+    }
 }

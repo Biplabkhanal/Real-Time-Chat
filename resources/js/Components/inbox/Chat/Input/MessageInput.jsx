@@ -83,7 +83,7 @@ const MessageInput = ({
 
     if (isBlocked) {
         return (
-            <div className="flex flex-col items-center p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
+            <div className="flex flex-col items-center p-2 bg-white dark:bg-gray-800 rounded-md">
                 <p className="text-red-500 dark:text-red-400 font-medium text-center">
                     {blockStatus.isBlocked
                         ? "You have blocked this user. Unblock them to send messages."

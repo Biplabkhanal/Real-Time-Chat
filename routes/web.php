@@ -70,6 +70,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/unblock-user/{user}', [BlockUserController::class, 'unblockUser']);
     Route::get('/block-status/{user}', [BlockUserController::class, 'checkBlockStatus']);
     Route::get('/blocked-users', [BlockUserController::class, 'getBlockedUsers']);
+    Route::get('/blocked-by-users', [BlockUserController::class, 'getBlockedByUsers']);
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
