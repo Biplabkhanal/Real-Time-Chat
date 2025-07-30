@@ -62,6 +62,7 @@ const ChatArea = ({
                     onForwardMessage={handleForwardMessage}
                     targetScrollRef={targetScrollRef}
                     selectedUser={selectedUser}
+                    onlineUsers={onlineUsers}
                 />
                 <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                     {error && error.includes("send") && (

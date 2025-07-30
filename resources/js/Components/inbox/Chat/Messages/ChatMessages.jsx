@@ -1,7 +1,6 @@
 import LoadingSpinner from "@/Components/LoadingSpinner";
 import EmptyState from "../../Shared/States/EmptyState";
 import ErrorState from "../../Shared/States/ErrorState";
-import LoadingState from "../../Shared/States/LoadingState";
 import Message from "./Message";
 
 const ChatMessages = ({
@@ -15,6 +14,7 @@ const ChatMessages = ({
     onForwardMessage,
     targetScrollRef,
     selectedUser,
+    onlineUsers,
 }) => (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100 dark:bg-gray-900">
         {isUserSelectionLoading ? (
@@ -44,6 +44,7 @@ const ChatMessages = ({
                         onForward={onForwardMessage}
                         auth={auth}
                         selectedUser={selectedUser}
+                        onlineUsers={onlineUsers} // <-- pass onlineUsers to Message
                     />
                 ))}
             </>

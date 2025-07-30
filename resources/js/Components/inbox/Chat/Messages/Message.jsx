@@ -6,7 +6,13 @@ import MessageTimestamp from "./MessageTimestamp";
 import MessageDeleteModal from "../../Modals/MessageDeleteModal";
 import ForwardMessageModal from "../../Modals/ForwardMessageModal";
 
-const Message = ({ message, isCurrentUser, onDelete, onForward }) => {
+const Message = ({
+    message,
+    isCurrentUser,
+    onDelete,
+    onForward,
+    onlineUsers,
+}) => {
     const [showOptions, setShowOptions] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [forwardModalOpen, setForwardModalOpen] = useState(false);
@@ -113,6 +119,7 @@ const Message = ({ message, isCurrentUser, onDelete, onForward }) => {
                         message={message}
                         onClose={() => setForwardModalOpen(false)}
                         onForward={handleForwardConfirm}
+                        onlineUsers={onlineUsers}
                     />
                 )}
             </div>

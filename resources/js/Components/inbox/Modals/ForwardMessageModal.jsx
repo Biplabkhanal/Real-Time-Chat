@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import UserAvatar from "../UserList/UserAvatar";
 import { filterBlockedUsers } from "@/utils/filterBlockedUsers";
 
-const ForwardMessageModal = ({ message, onClose, onForward }) => {
+const ForwardMessageModal = ({ message, onClose, onForward, onlineUsers }) => {
     const [friends, setFriends] = useState([]);
     const [selectedFriends, setSelectedFriends] = useState([]);
     const [additionalMessage, setAdditionalMessage] = useState("");
@@ -164,52 +164,80 @@ const ForwardMessageModal = ({ message, onClose, onForward }) => {
                                     No friends available
                                 </p>
                             ) : (
-                                friends.map((friend) => (
-                                    <div
-                                        key={friend.id}
-                                        className={`p-2 sm:p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center transition-colors ${
-                                            selectedFriends.find(
-                                                (f) => f.id === friend.id
-                                            )
-                                                ? "bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500"
-                                                : ""
-                                        }`}
-                                        onClick={() =>
-                                            handleFriendToggle(friend)
-                                        }
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={
-                                                selectedFriends.find(
-                                                    (f) => f.id === friend.id
-                                                ) !== undefined
-                                            }
-                                            onChange={() =>
-                                                handleFriendToggle(friend)
-                                            }
-                                            className="mr-2 sm:mr-3"
-                                        />
-                                        <div className="flex items-center">
-                                            <div className="mr-2 sm:mr-3">
-                                                <UserAvatar
-                                                    name={friend.name}
-                                                    avatar={friend.avatar}
-                                                    size="w-7 h-7 sm:w-8 sm:h-8"
-                                                    textSize="text-xs sm:text-sm"
+                                friends.map(
+                                    (friend) => (
+                                        console.log(
+                                            "Rendering friend:",
+                                            friend,
+                                            "isOnline:",
+                                            typeof onlineUsers === "object"
+                                                ? onlineUsers[friend.id]
+                                                : false
+                                        ),
+                                        (
+                                            <div
+                                                key={friend.id}
+                                                className={`p-2 sm:p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center transition-colors ${
+                                                    selectedFriends.find(
+                                                        (f) =>
+                                                            f.id === friend.id
+                                                    )
+                                                        ? "bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500"
+                                                        : ""
+                                                }`}
+                                                onClick={() =>
+                                                    handleFriendToggle(friend)
+                                                }
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={
+                                                        selectedFriends.find(
+                                                            (f) =>
+                                                                f.id ===
+                                                                friend.id
+                                                        ) !== undefined
+                                                    }
+                                                    onChange={() =>
+                                                        handleFriendToggle(
+                                                            friend
+                                                        )
+                                                    }
+                                                    className="mr-2 sm:mr-3"
                                                 />
+                                                <div className="flex items-center">
+                                                    <div className="mr-2 sm:mr-3">
+                                                        <UserAvatar
+                                                            name={friend.name}
+                                                            avatar={
+                                                                friend.avatar
+                                                            }
+                                                            isOnline={
+                                                                typeof onlineUsers ===
+                                                                "object"
+                                                                    ? onlineUsers[
+                                                                          friend
+                                                                              .id
+                                                                      ]
+                                                                    : false
+                                                            }
+                                                            size="w-7 h-7 sm:w-8 sm:h-8"
+                                                            textSize="text-xs sm:text-sm"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200">
+                                                            {friend.name}
+                                                        </p>
+                                                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                                                            {friend.email}
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200">
-                                                    {friend.name}
-                                                </p>
-                                                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                                                    {friend.email}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
+                                        )
+                                    )
+                                )
                             )}
                         </div>
                     )}
