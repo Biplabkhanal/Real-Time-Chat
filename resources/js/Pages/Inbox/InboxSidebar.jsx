@@ -23,7 +23,7 @@ const InboxSidebar = ({
                 showSidebar ? "translate-x-0" : "-translate-x-full"
             } md:translate-x-0 md:w-1/4 w-full md:static fixed inset-y-0 left-0 z-40 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-transform duration-300 ease-in-out shadow-lg md:shadow-none`}
         >
-            <div className="px-4 py-[1.64rem] bg-gray-50 dark:bg-gray-900 font-bold text-lg border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div className="px-4 py-[1.64rem] bg-white dark:bg-gray-800 font-bold text-lg border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <h2 className="text-gray-800 dark:text-white">Chats</h2>
                     {isUsersLoading ? (
