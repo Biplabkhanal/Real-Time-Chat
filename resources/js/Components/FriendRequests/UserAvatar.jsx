@@ -30,7 +30,7 @@ const UserAvatar = memo(({ user, size = "md", showOnlineStatus = false }) => {
             )}
             {showOnlineStatus && user.is_online && (
                 <div
-                    className={`absolute bottom-0 right-0 ${onlineIndicatorClasses[size]} bg-green-500 border-2 border-gray-800 rounded-full`}
+                    className={`absolute bottom-0 right-0 ${onlineIndicatorClasses[size]} bg-green-500 border-2 border-none rounded-full`}
                 />
             )}
         </div>
