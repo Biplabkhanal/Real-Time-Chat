@@ -140,7 +140,8 @@ class MessageController extends Controller
      */
     private function broadcastMessage(Message $message)
     {
-        broadcast(new MessageSent($message, Auth::user()))->toOthers();
+
+        broadcast(new MessageSent($message, Auth::user()));
     }
 
     /**

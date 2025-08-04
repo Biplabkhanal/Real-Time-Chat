@@ -194,13 +194,11 @@ export default function Inbox({ auth, users, selectedUserId }) {
             channel.listen("MessageSent", (e) => {
                 const isMessageForCurrentChat =
                     selectedUserRef.current &&
-                    ((e.user.id === selectedUserRef.current.id &&
-                        e.message.recipient_id === auth.user.id) ||
-                        (e.message.sender_id === selectedUserRef.current.id &&
-                            e.message.recipient_id === auth.user.id));
+                    (e.message.sender_id === selectedUserRef.current.id ||
+                        e.message.recipient_id === selectedUserRef.current.id);
 
                 if (isMessageForCurrentChat) {
-                    if (e.message && e.message.sender_id !== auth.user.id) {
+                    if (e.message) {
                         setCurrentMessages((prevMessages) => {
                             const messageExists = prevMessages.some(
                                 (msg) => msg.id === e.message.id
@@ -208,6 +206,24 @@ export default function Inbox({ auth, users, selectedUserId }) {
                             if (messageExists) {
                                 return prevMessages;
                             }
+
+                            const optimisticIndex = prevMessages.findIndex(
+                                (msg) =>
+                                    msg._isOptimistic &&
+                                    msg.message === e.message.message &&
+                                    msg.sender_id === e.message.sender_id &&
+                                    Math.abs(
+                                        new Date(msg.created_at) -
+                                            new Date(e.message.created_at)
+                                    ) < 5000
+                            );
+
+                            if (optimisticIndex !== -1) {
+                                const newMessages = [...prevMessages];
+                                newMessages[optimisticIndex] = e.message;
+                                return newMessages;
+                            }
+
                             return [...prevMessages, e.message];
                         });
 

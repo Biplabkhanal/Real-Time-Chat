@@ -100,17 +100,9 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
                 }
             );
 
-            if (response.data) {
-                setCurrentMessages((prev) =>
-                    prev
-                        .filter((msg) => !msg._isOptimistic)
-                        .concat(
-                            Array.isArray(response.data)
-                                ? response.data
-                                : [response.data]
-                        )
-                );
-            }
+            setCurrentMessages((prev) =>
+                prev.filter((msg) => msg.id !== tempMessageId)
+            );
         } catch (err) {
             setCurrentMessages((prev) =>
                 prev.filter((msg) => msg.id !== tempMessageId)

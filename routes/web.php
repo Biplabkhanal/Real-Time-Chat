@@ -77,7 +77,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
-    // Friend Request Routes
     Route::get('/friend-requests', [FriendRequestController::class, 'index'])->name('friend-requests.index');
     Route::post('/friend-request/send/{user}', [FriendRequestController::class, 'send'])->name('friend-request.send');
     Route::post('/friend-request/accept/{friendRequest}', [FriendRequestController::class, 'accept'])->name('friend-request.accept');
@@ -88,14 +87,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/friend/remove/{friend}', [FriendRequestController::class, 'removeFriend'])->name('friend.remove');
     Route::get('/users/search', [FriendRequestController::class, 'searchUsers'])->name('users.search');
 
-    // Nickname Routes
     Route::post('/nickname/set/{friend}', [NicknameController::class, 'setNickname'])->name('nickname.set');
     Route::get('/nickname/get/{friend}', [NicknameController::class, 'getNickname'])->name('nickname.get');
 
-    // Typing indicator route
     Route::post('/typing', [TypingIndicatorController::class, 'typing'])->name('typing');
 
-    // CSRF token refresh route
     Route::get('/csrf-token', function () {
         return response()->json(['csrf_token' => csrf_token()]);
     })->name('csrf-token');

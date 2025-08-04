@@ -35,6 +35,18 @@ class MessageSent implements ShouldBroadcastNow
     {
         return [
             new PrivateChannel("message.{$this->message->recipient_id}"),
+            new PrivateChannel("message.{$this->message->sender_id}"),
+        ];
+    }
+
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'message' => $this->message,
+            'user' => $this->user,
         ];
     }
 }
