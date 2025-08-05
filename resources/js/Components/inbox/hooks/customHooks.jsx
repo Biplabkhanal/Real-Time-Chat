@@ -16,7 +16,7 @@ export const useFilterUsers = (searchInput, users, setFilteredUsers) => {
     }, [searchInput, users]);
 };
 
-export const useMessageHandler = (selectedUserRef, inputRef) => {
+export const useMessageHandler = (selectedUserRef, inputRef, onMessageSent) => {
     const { auth } = usePage().props;
     const [isLoading, setIsLoading] = useState(false);
     const [isSending, setIsSending] = useState(false);
@@ -102,6 +102,10 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
             setCurrentMessages((prev) =>
                 prev.filter((msg) => msg.id !== tempMessageId)
             );
+
+            if (onMessageSent && selectedUserRef.current) {
+                onMessageSent(selectedUserRef.current.id);
+            }
         } catch (err) {
             setCurrentMessages((prev) =>
                 prev.filter((msg) => msg.id !== tempMessageId)
@@ -115,7 +119,7 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
         } finally {
             setIsSending(false);
         }
-    }, [messageInput, attachments, auth]);
+    }, [messageInput, attachments, auth, onMessageSent]);
 
     const handleKeyDown = useCallback(
         (e) => {

@@ -35,6 +35,10 @@ export default function Inbox({ auth, users, selectedUserId }) {
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
     const inputRef = useRef(null);
+    const onMessageSent = (recipientId) => {
+        moveUserToTop(recipientId);
+    };
+
     const {
         isLoading,
         isSending,
@@ -48,7 +52,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
         handleKeyDown,
         getMessages,
         setCurrentMessages,
-    } = useMessageHandler(selectedUserRef, inputRef);
+    } = useMessageHandler(selectedUserRef, inputRef, onMessageSent);
 
     const scrollToBottom = () => {
         if (targetScrollRef.current) {
@@ -273,6 +277,12 @@ export default function Inbox({ auth, users, selectedUserId }) {
                         setTimeout(scrollToBottom, 100);
                     }
                 } else {
+                    const otherUserId =
+                        e.message.sender_id === auth.user.id
+                            ? e.message.recipient_id
+                            : e.message.sender_id;
+
+                    moveUserToTop(otherUserId);
                     fetchUsersWithConversations(false);
                 }
             });
@@ -312,6 +322,18 @@ export default function Inbox({ auth, users, selectedUserId }) {
 
     const toggleSidebar = () => {
         setShowSidebar(!showSidebar);
+    };
+
+    const moveUserToTop = (userId) => {
+        setUsersWithConversations((prevUsers) => {
+            const userIndex = prevUsers.findIndex((user) => user.id === userId);
+            if (userIndex > 0) {
+                const updatedUsers = [...prevUsers];
+                const [user] = updatedUsers.splice(userIndex, 1);
+                return [user, ...updatedUsers];
+            }
+            return prevUsers;
+        });
     };
 
     const fetchUsersWithConversations = async (showLoading = false) => {
