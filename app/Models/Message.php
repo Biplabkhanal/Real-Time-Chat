@@ -18,7 +18,8 @@ class Message extends Model
 
     protected $casts = [
         'is_read' => 'boolean',
-        'read_at' => 'datetime'
+        'read_at' => 'datetime',
+        'attachment' => 'array'
     ];
 
     public function markAsRead()

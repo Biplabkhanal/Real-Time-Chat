@@ -171,13 +171,7 @@ class MessageController extends Controller
             })
             ->with(['originalMessage.sender'])
             ->orderBy('created_at', 'asc')
-            ->get()
-            ->map(function ($message) {
-                if ($message->attachment) {
-                    $message->attachment = json_decode($message->attachment);
-                }
-                return $message;
-            });
+            ->get();
     }
 
     /**
@@ -238,11 +232,22 @@ class MessageController extends Controller
     private function deleteAttachment($message)
     {
         if ($message->attachment) {
-            $attachment = json_decode($message->attachment);
-            if (isset($attachment->path) && $attachment->path) {
-                if (Storage::disk('public')->exists($attachment->path)) {
-                    Storage::disk('public')->delete($attachment->path);
-                }
+            $attachment = $message->attachment;
+
+            // Handle both JSON string and already decoded array/object
+            if (is_string($attachment)) {
+                $attachment = json_decode($attachment, true); // Decode as array
+            }
+
+            $path = null;
+            if (is_array($attachment)) {
+                $path = $attachment['path'] ?? null;
+            } elseif (is_object($attachment)) {
+                $path = $attachment->path ?? null;
+            }
+
+            if ($path && Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
             }
         }
     }
@@ -267,12 +272,12 @@ class MessageController extends Controller
             ->get();
 
         $media = $messages->map(function ($message) {
-            $attachment = json_decode($message->attachment);
+            $attachment = $message->attachment;
             return [
                 'id' => $message->id,
-                'path' => $attachment->path ?? null,
-                'type' => $attachment->type ?? $this->getFileType($attachment->path ?? ''),
-                'name' => $attachment->name ?? $this->getFileName($attachment->path ?? ''),
+                'path' => $attachment['path'] ?? null,
+                'type' => $attachment['type'] ?? $this->getFileType($attachment['path'] ?? ''),
+                'name' => $attachment['name'] ?? $this->getFileName($attachment['path'] ?? ''),
                 'is_link' => $this->isLink($message->message),
                 'url' => $this->extractUrl($message->message),
                 'title' => $message->message,
@@ -450,9 +455,14 @@ class MessageController extends Controller
     {
         foreach ($messages as $message) {
             if (!empty($message->attachment)) {
-                $attachmentPath = is_object($message->attachment)
-                    ? $message->attachment->path ?? ''
-                    : $message->attachment;
+                $attachmentPath = '';
+                if (is_array($message->attachment)) {
+                    $attachmentPath = $message->attachment['path'] ?? '';
+                } elseif (is_object($message->attachment)) {
+                    $attachmentPath = $message->attachment->path ?? '';
+                } else {
+                    $attachmentPath = $message->attachment;
+                }
 
                 if (!empty($attachmentPath)) {
                     $fileExtension = pathinfo($attachmentPath, PATHINFO_EXTENSION);

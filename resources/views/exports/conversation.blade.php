@@ -151,9 +151,14 @@
 
                     @if (!empty($message->attachment))
                         @php
-                            $attachmentPath = is_object($message->attachment)
-                                ? $message->attachment->path ?? ''
-                                : $message->attachment;
+                            $attachmentPath = '';
+                            if (is_array($message->attachment)) {
+                                $attachmentPath = $message->attachment['path'] ?? '';
+                            } elseif (is_object($message->attachment)) {
+                                $attachmentPath = $message->attachment->path ?? '';
+                            } else {
+                                $attachmentPath = $message->attachment;
+                            }
 
                             $isImage = false;
                             $fileName = '';
