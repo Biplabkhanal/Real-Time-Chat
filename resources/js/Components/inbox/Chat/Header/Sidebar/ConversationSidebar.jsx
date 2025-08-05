@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import TabNavigation from "../TabNavigation ";
-import ErrorDisplay from "../ErrorDisplay";
-import MediaGrid from "../MediaGrid";
-import DocumentsList from "../DocumentsList";
-import LinksList from "../LinksList";
 import ExportConversationModal from "../../../Modals/ExportConversationModal";
 import ConversationAnalytics from "./ConversationAnalytics/ConversationAnalytics";
 import ThemeSettings from "../ThemeSettings";
@@ -13,8 +8,11 @@ import ConversationStats from "./ConversationInfo/ConversationStats";
 import ConversationTimeline from "./ConversationInfo/ConversationTimeline";
 import ConversationContact from "./ConversationInfo/ConversationContact";
 import ConversationHeader from "./ConversationHeader";
-import { fetchConversationStats, fetchSharedMedia } from "./sidebarApi";
+import SharedMediaRenderer from "../SharedMediaRenderer";
+import { fetchConversationStats } from "./sidebarApi";
+import { useSharedMedia } from "../../../hooks/useSharedMedia";
 import LoadingSpinner from "@/Components/LoadingSpinner";
+import ErrorDisplay from "../ErrorDisplay";
 
 const ConversationSidebar = ({
     isOpen,
@@ -28,6 +26,15 @@ const ConversationSidebar = ({
     const [activeTab, setActiveTab] = useState("info");
     const [isMobile, setIsMobile] = useState(false);
     const [themeLoading, setThemeLoading] = useState(false);
+    const [showExportModal, setShowExportModal] = useState(false);
+    const exportModalRef = useRef(null);
+
+    // Use shared media hook
+    const { mediaFiles, mediaLoading, mediaError, filterByType, refetchMedia } =
+        useSharedMedia(
+            selectedUser?.id,
+            ["images", "documents", "links"].includes(activeTab)
+        );
 
     useEffect(() => {
         const checkMobile = () => {
@@ -41,13 +48,6 @@ const ConversationSidebar = ({
             window.removeEventListener("resize", checkMobile);
         };
     }, []);
-
-    const [mediaFiles, setMediaFiles] = useState([]);
-    const [mediaLoading, setMediaLoading] = useState(true);
-    const [mediaError, setMediaError] = useState(null);
-
-    const [showExportModal, setShowExportModal] = useState(false);
-    const exportModalRef = useRef(null);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -73,8 +73,6 @@ const ConversationSidebar = ({
             setLoading(true);
             if (activeTab === "info") {
                 handleFetchConversationStats();
-            } else if (["images", "documents", "links"].includes(activeTab)) {
-                handleFetchSharedMedia();
             }
         }
     }, [isOpen, selectedUser?.id, activeTab]);
@@ -93,107 +91,25 @@ const ConversationSidebar = ({
         }
     };
 
-    const handleFetchSharedMedia = async () => {
-        setMediaLoading(true);
-        setMediaError(null);
-        try {
-            const result = await fetchSharedMedia(selectedUser.id, route);
-            setMediaFiles(result.data);
-            if (result.error) setMediaError(result.error);
-        } catch (err) {
-            setMediaError("Failed to fetch media.");
-        } finally {
-            setMediaLoading(false);
-        }
-    };
-
-    const filterByType = (type) => {
-        if (!mediaFiles || mediaFiles.length === 0) {
-            return [];
-        }
-
-        if (type === "images") {
-            return mediaFiles.filter((file) => {
-                try {
-                    if (
-                        file.path &&
-                        typeof file.path === "string" &&
-                        file.path.includes('type":"image')
-                    ) {
-                        const parsedPath = JSON.parse(file.path);
-                        return (
-                            parsedPath.type &&
-                            parsedPath.type.startsWith("image/")
-                        );
-                    }
-                    return file.type && file.type.startsWith("image/");
-                } catch (e) {
-                    console.error("Error parsing path:", e);
-                    return false;
-                }
-            });
-        } else if (type === "documents") {
-            return mediaFiles.filter((file) => {
-                try {
-                    if (
-                        file.path &&
-                        typeof file.path === "string" &&
-                        (file.path.includes("pdf") ||
-                            file.path.includes("doc") ||
-                            file.path.includes("xlsx") ||
-                            file.path.includes("text"))
-                    ) {
-                        return true;
-                    }
-                    return (
-                        file.type &&
-                        (file.type.includes("pdf") ||
-                            file.type.includes("doc") ||
-                            file.type.includes("xlsx") ||
-                            file.type.includes("text"))
-                    );
-                } catch (e) {
-                    return false;
-                }
-            });
-        } else if (type === "links") {
-            return mediaFiles.filter((file) => file.is_link);
-        }
-        return [];
-    };
-
     const renderMediaContent = () => {
-        if (mediaLoading) {
-            return <LoadingSpinner size="md" />;
-        }
-
-        if (mediaError) {
-            return (
-                <ErrorDisplay
-                    error={mediaError}
-                    retryAction={fetchSharedMedia}
-                />
-            );
-        }
-
-        if (activeTab === "images") {
-            return <MediaGrid files={filterByType("images")} />;
-        }
-
-        if (activeTab === "documents") {
-            return <DocumentsList files={filterByType("documents")} />;
-        }
-
-        if (activeTab === "links") {
-            return <LinksList files={filterByType("links")} />;
-        }
-
         if (activeTab === "analytics") {
             return <ConversationAnalytics userId={selectedUser.id} />;
         }
 
         if (activeTab === "theme") {
             return <ThemeSettings />;
+        }
+
+        if (["images", "documents", "links"].includes(activeTab)) {
+            return (
+                <SharedMediaRenderer
+                    activeTab={activeTab}
+                    mediaLoading={mediaLoading}
+                    mediaError={mediaError}
+                    filterByType={filterByType}
+                    refetchMedia={refetchMedia}
+                />
+            );
         }
 
         return null;
@@ -248,7 +164,7 @@ const ConversationSidebar = ({
                         ) : error ? (
                             <ErrorDisplay
                                 error={error}
-                                retryAction={fetchConversationStats}
+                                retryAction={handleFetchConversationStats}
                             />
                         ) : stats ? (
                             <>

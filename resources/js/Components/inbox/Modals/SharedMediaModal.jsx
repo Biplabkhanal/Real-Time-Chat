@@ -1,127 +1,29 @@
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import axios from "axios";
 import TabNavigation from "../Chat/Header/TabNavigation ";
-import LoadingSpinner from "../Shared/Icons/LoadingSpinner";
-import ErrorDisplay from "../Chat/Header/ErrorDisplay";
-import MediaGrid from "../Chat/Header/MediaGrid";
-import DocumentsList from "../Chat/Header/DocumentsList";
-import LinksList from "../Chat/Header/LinksList";
+import SharedMediaRenderer from "../Chat/Header/SharedMediaRenderer";
+import { useSharedMedia } from "../hooks/useSharedMedia";
 
-const SharedMediaModal = ({ isOpen, onClose, currentUserId, otherUserId }) => {
-    const [mediaFiles, setMediaFiles] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const SharedMediaModal = ({ isOpen, onClose, otherUserId }) => {
     const [activeTab, setActiveTab] = useState("images");
 
-    useEffect(() => {
-        if (isOpen && currentUserId && otherUserId) {
-            fetchSharedMedia();
-        }
-    }, [isOpen, currentUserId, otherUserId]);
-
-    const fetchSharedMedia = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.get(
-                route("messages.media", {
-                    userId: otherUserId,
-                })
-            );
-            setMediaFiles(response.data);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching shared media:", error);
-            setError(
-                error.response?.data?.message || "Failed to load shared media"
-            );
-            setLoading(false);
-        }
-    };
-
-    const filterByType = (type) => {
-        if (!mediaFiles || mediaFiles.length === 0) {
-            return [];
-        }
-
-        if (type === "images") {
-            const images = mediaFiles.filter((file) => {
-                try {
-                    if (
-                        file.path &&
-                        typeof file.path === "string" &&
-                        file.path.includes('type":"image')
-                    ) {
-                        const parsedPath = JSON.parse(file.path);
-                        return (
-                            parsedPath.type &&
-                            parsedPath.type.startsWith("image/")
-                        );
-                    }
-                    return file.type && file.type.startsWith("image/");
-                } catch (e) {
-                    console.error("Error parsing path:", e);
-                    return false;
-                }
-            });
-
-            return images;
-        } else if (type === "documents") {
-            // Similar approach for documents
-            return mediaFiles.filter((file) => {
-                try {
-                    if (
-                        file.path &&
-                        typeof file.path === "string" &&
-                        (file.path.includes("pdf") ||
-                            file.path.includes("doc") ||
-                            file.path.includes("xlsx") ||
-                            file.path.includes("text"))
-                    ) {
-                        return true;
-                    }
-                    return (
-                        file.type &&
-                        (file.type.includes("pdf") ||
-                            file.type.includes("doc") ||
-                            file.type.includes("xlsx") ||
-                            file.type.includes("text"))
-                    );
-                } catch (e) {
-                    return false;
-                }
-            });
-        } else if (type === "links") {
-            return mediaFiles.filter((file) => file.is_link);
-        }
-        return [];
-    };
+    const {
+        mediaLoading: loading,
+        mediaError: error,
+        filterByType,
+        refetchMedia,
+    } = useSharedMedia(otherUserId, isOpen);
 
     const renderContent = () => {
-        if (loading) {
-            return <LoadingSpinner />;
-        }
-
-        if (error) {
-            return (
-                <ErrorDisplay error={error} retryAction={fetchSharedMedia} />
-            );
-        }
-
-        if (activeTab === "images") {
-            return <MediaGrid files={filterByType("images")} />;
-        }
-
-        if (activeTab === "documents") {
-            return <DocumentsList files={filterByType("documents")} />;
-        }
-
-        if (activeTab === "links") {
-            return <LinksList files={filterByType("links")} />;
-        }
-
-        return null;
+        return (
+            <SharedMediaRenderer
+                activeTab={activeTab}
+                mediaLoading={loading}
+                mediaError={error}
+                filterByType={filterByType}
+                refetchMedia={refetchMedia}
+            />
+        );
     };
 
     return (

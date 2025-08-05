@@ -39,6 +39,10 @@ export { default as ExportConversationModal } from "./Modals/ExportConversationM
 export { default as MessageDeleteModal } from "./Modals/MessageDeleteModal";
 export { default as SharedMediaModal } from "./Modals/SharedMediaModal";
 
+// Shared Components
+export { default as SharedMediaRenderer } from "./Chat/Header/SharedMediaRenderer";
+
 // Hooks
 export { default as useFileUpload } from "./hooks/useFileUpload";
 export { useMessageHandler, useFilterUsers } from "./hooks/customHooks";
+export { useSharedMedia } from "./hooks/useSharedMedia";

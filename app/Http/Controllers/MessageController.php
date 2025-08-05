@@ -234,9 +234,8 @@ class MessageController extends Controller
         if ($message->attachment) {
             $attachment = $message->attachment;
 
-            // Handle both JSON string and already decoded array/object
             if (is_string($attachment)) {
-                $attachment = json_decode($attachment, true); // Decode as array
+                $attachment = json_decode($attachment, true);
             }
 
             $path = null;
@@ -259,20 +258,17 @@ class MessageController extends Controller
     {
         $currentUserId = Auth::id();
 
-        $messages = Message::where(function ($query) use ($currentUserId, $userId) {
-            $query->where('sender_id', $currentUserId)
-                ->where('recipient_id', $userId);
-        })
-            ->orWhere(function ($query) use ($currentUserId, $userId) {
-                $query->where('sender_id', $userId)
-                    ->where('recipient_id', $currentUserId);
-            })
-            ->whereNotNull('attachment')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $messages = $this->getConversationMessages($currentUserId, $userId)
+            ->whereNotNull('attachment');
 
         $media = $messages->map(function ($message) {
             $attachment = $message->attachment;
+
+            // Handle JSON string attachment data
+            if (is_string($attachment)) {
+                $attachment = json_decode($attachment, true) ?? [];
+            }
+
             return [
                 'id' => $message->id,
                 'path' => $attachment['path'] ?? null,
@@ -285,7 +281,7 @@ class MessageController extends Controller
             ];
         });
 
-        return response()->json($media);
+        return response()->json($media->values()->toArray());
     }
 
 
@@ -330,13 +326,7 @@ class MessageController extends Controller
         $currentUserId = Auth::id();
         $otherUserId = $user->id;
 
-        $messages = Message::where(function ($query) use ($currentUserId, $otherUserId) {
-            $query->where('sender_id', $currentUserId)
-                ->where('recipient_id', $otherUserId);
-        })->orWhere(function ($query) use ($currentUserId, $otherUserId) {
-            $query->where('sender_id', $otherUserId)
-                ->where('recipient_id', $currentUserId);
-        })->orderBy('created_at', 'asc')->get();
+        $messages = $this->getConversationMessages($currentUserId, $otherUserId);
 
         if ($messages->isEmpty()) {
             return response()->json([
@@ -497,13 +487,7 @@ class MessageController extends Controller
             $currentUserId = Auth::id();
             $otherUserId = $user->id;
 
-            $messages = Message::where(function ($query) use ($currentUserId, $otherUserId) {
-                $query->where('sender_id', $currentUserId)
-                    ->where('recipient_id', $otherUserId);
-            })->orWhere(function ($query) use ($currentUserId, $otherUserId) {
-                $query->where('sender_id', $otherUserId)
-                    ->where('recipient_id', $currentUserId);
-            })->orderBy('created_at', 'asc')->get();
+            $messages = $this->getConversationMessages($currentUserId, $otherUserId);
 
             $last7Days = [];
             $today = Carbon::now();
