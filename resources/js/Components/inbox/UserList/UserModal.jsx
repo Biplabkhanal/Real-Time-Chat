@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import { useFilterUsers } from "../hooks/customHooks";
 import UserListItemModal from "./UserListItemModal";
+import LoadingSpinner from "@/Components/LoadingSpinner";
 
 const UserModal = ({
     isOpen,
@@ -14,8 +15,35 @@ const UserModal = ({
     const [searchInput, setSearchInput] = useState("");
     const [filteredUsers, setFilteredUsers] = useState(users);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useFilterUsers(searchInput, users, setFilteredUsers);
+
+    useEffect(() => {
+        if (isOpen) {
+            const originalOverflow = document.body.style.overflow;
+            document.body.style.overflow = "hidden";
+            return () => {
+                document.body.style.overflow = originalOverflow;
+            };
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsLoading(true);
+            setSelectedUser(null);
+            setSearchInput("");
+
+            const timer = setTimeout(() => {
+                setIsLoading(false);
+            }, 150);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen]);
+
+    const currentSelectedUser = isOpen ? selectedUser : null;
 
     const handleUserSelect = (user) => {
         setSelectedUser(user);
@@ -30,11 +58,11 @@ const UserModal = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 md:p-0">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md md:w-96 max-h-[500px] shadow-xl mx-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 md:p-0 touch-none">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md md:w-96 max-h-[500px] min-h-[500px] shadow-xl mx-auto touch-auto">
                 {/* Header */}
                 <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-                    <h3 className="text-xl dark:text-white">New Message</h3>
+                    <h3 className="text-md dark:text-white">New Message</h3>
                     <button
                         onClick={onClose}
                         className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -65,13 +93,17 @@ const UserModal = ({
                 </div>
 
                 {/* User List */}
-                <div className="overflow-y-auto max-h-[300px] p-2">
-                    {filteredUsers.length > 0 ? (
+                <div className="overflow-y-auto max-h-[350px] p-2">
+                    {isLoading ? (
+                        <div className="flex justify-center items-center py-8">
+                            <LoadingSpinner size="md" text="Loading users..." />
+                        </div>
+                    ) : filteredUsers.length > 0 ? (
                         filteredUsers.map((user) => (
                             <UserListItemModal
                                 key={user.id}
                                 user={user}
-                                selectedUser={selectedUser}
+                                selectedUser={currentSelectedUser}
                                 isOnline={onlineUsers?.[user.id] || false}
                                 onUserSelect={handleUserSelect}
                                 addToUsersList={addToUsersList}
