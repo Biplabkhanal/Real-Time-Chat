@@ -177,8 +177,18 @@ export default function Inbox({ auth, users, selectedUserId }) {
         }
     };
 
-    const handleForwardMessage = (forwardedMessage) => {
-        toast.info(`Message forwarded successfully`);
+    const handleForwardMessage = (forwardData) => {
+        if (forwardData && forwardData.message) {
+            toast.success(forwardData.message);
+        } else {
+            toast.success("Message forwarded successfully");
+        }
+
+        if (forwardData && forwardData.updated_conversations) {
+            fetchUsersWithConversations(false);
+        } else {
+            fetchUsersWithConversations(false);
+        }
     };
     useEffect(() => {
         if (!window.Echo) {
@@ -263,7 +273,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
                         setTimeout(scrollToBottom, 100);
                     }
                 } else {
-                    fetchUsersWithConversations();
+                    fetchUsersWithConversations(false);
                 }
             });
 
@@ -304,8 +314,10 @@ export default function Inbox({ auth, users, selectedUserId }) {
         setShowSidebar(!showSidebar);
     };
 
-    const fetchUsersWithConversations = async () => {
-        setIsUsersLoading(true);
+    const fetchUsersWithConversations = async (showLoading = false) => {
+        if (showLoading) {
+            setIsUsersLoading(true);
+        }
         try {
             const response = await axios.get("/users-with-conversations");
             setUsersWithConversations(response.data);
@@ -313,12 +325,14 @@ export default function Inbox({ auth, users, selectedUserId }) {
             console.error("Error fetching users with conversations:", error);
             setUsersWithConversations(users);
         } finally {
-            setIsUsersLoading(false);
+            if (showLoading) {
+                setIsUsersLoading(false);
+            }
         }
     };
 
     useEffect(() => {
-        fetchUsersWithConversations();
+        fetchUsersWithConversations(true);
     }, []);
 
     useEffect(() => {
@@ -360,7 +374,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
         );
 
         setSelectedUser(null);
-        fetchUsersWithConversations();
+        fetchUsersWithConversations(false);
     };
 
     const addToUsersList = (user) => {
