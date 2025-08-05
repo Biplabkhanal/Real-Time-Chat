@@ -44,7 +44,7 @@ const ChatMessages = ({
                         onForward={onForwardMessage}
                         auth={auth}
                         selectedUser={selectedUser}
-                        onlineUsers={onlineUsers} // <-- pass onlineUsers to Message
+                        onlineUsers={onlineUsers}
                     />
                 ))}
             </>

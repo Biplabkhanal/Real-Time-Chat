@@ -75,8 +75,7 @@ export const useMessageHandler = (selectedUserRef, inputRef) => {
             recipient_id: selectedUserRef.current.id,
             created_at: new Date().toISOString(),
             is_read: false,
-            attachment:
-                attachments.length > 0 ? JSON.stringify(attachments[0]) : null,
+            attachment: attachments.length > 0 ? attachments[0] : null,
             _isOptimistic: true,
         };
 

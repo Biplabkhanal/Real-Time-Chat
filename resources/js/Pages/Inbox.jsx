@@ -208,14 +208,47 @@ export default function Inbox({ auth, users, selectedUserId }) {
                             }
 
                             const optimisticIndex = prevMessages.findIndex(
-                                (msg) =>
-                                    msg._isOptimistic &&
-                                    msg.message === e.message.message &&
-                                    msg.sender_id === e.message.sender_id &&
-                                    Math.abs(
+                                (msg) => {
+                                    if (
+                                        !msg._isOptimistic ||
+                                        msg.sender_id !== e.message.sender_id
+                                    ) {
+                                        return false;
+                                    }
+
+                                    const timeDiff = Math.abs(
                                         new Date(msg.created_at) -
                                             new Date(e.message.created_at)
-                                    ) < 5000
+                                    );
+                                    if (timeDiff >= 5000) {
+                                        return false;
+                                    }
+
+                                    if (
+                                        msg.attachment &&
+                                        e.message.attachment
+                                    ) {
+                                        const msgAttachment =
+                                            typeof msg.attachment === "string"
+                                                ? JSON.parse(msg.attachment)
+                                                : msg.attachment;
+                                        const newMsgAttachment =
+                                            typeof e.message.attachment ===
+                                            "string"
+                                                ? JSON.parse(
+                                                      e.message.attachment
+                                                  )
+                                                : e.message.attachment;
+
+                                        return (
+                                            msg.message === e.message.message &&
+                                            msgAttachment.name ===
+                                                newMsgAttachment.name
+                                        );
+                                    }
+
+                                    return msg.message === e.message.message;
+                                }
                             );
 
                             if (optimisticIndex !== -1) {
