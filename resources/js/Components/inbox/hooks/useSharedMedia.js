@@ -1,35 +1,66 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 export const useSharedMedia = (selectedUserId, isActive = false) => {
     const [mediaFiles, setMediaFiles] = useState([]);
-    const [mediaLoading, setMediaLoading] = useState(true);
+    const [mediaLoading, setMediaLoading] = useState(false);
     const [mediaError, setMediaError] = useState(null);
+    const cancelTokenRef = useRef(null);
 
     useEffect(() => {
-        if (isActive && selectedUserId) {
-            handleFetchSharedMedia();
+        if (cancelTokenRef.current) {
+            cancelTokenRef.current.cancel("User changed");
         }
+
+        if (!isActive || !selectedUserId) {
+            setMediaFiles([]);
+            setMediaError(null);
+            setMediaLoading(false);
+            return;
+        }
+
+        setMediaFiles([]);
+        setMediaError(null);
+        handleFetchSharedMedia();
+
+        return () => {
+            if (cancelTokenRef.current) {
+                cancelTokenRef.current.cancel(
+                    "Component unmounted or user changed"
+                );
+            }
+        };
     }, [isActive, selectedUserId]);
 
     const handleFetchSharedMedia = async () => {
         setMediaLoading(true);
         setMediaError(null);
+
+        const cancelToken = axios.CancelToken.source();
+        cancelTokenRef.current = cancelToken;
+
         try {
             const response = await axios.get(
-                `/messages/media/${selectedUserId}`
+                `/messages/media/${selectedUserId}`,
+                { cancelToken: cancelToken.token }
             );
 
             const data = Array.isArray(response.data) ? response.data : [];
 
-            setMediaFiles(data);
-            setMediaError(null);
+            if (!cancelToken.token.reason) {
+                setMediaFiles(data);
+                setMediaError(null);
+            }
         } catch (err) {
-            console.error("Error fetching shared media:", err);
-            setMediaError("Failed to fetch media.");
-            setMediaFiles([]);
+            if (!axios.isCancel(err)) {
+                console.error("Error fetching shared media:", err);
+                setMediaError("Failed to fetch media.");
+                setMediaFiles([]);
+            }
         } finally {
-            setMediaLoading(false);
+            if (!cancelToken.token.reason) {
+                setMediaLoading(false);
+            }
         }
     };
 

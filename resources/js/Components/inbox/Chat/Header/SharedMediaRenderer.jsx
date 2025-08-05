@@ -28,13 +28,15 @@ const SharedMediaRenderer = ({
         );
     }
 
+    const filteredFiles = filterByType(activeTab);
+
     switch (activeTab) {
         case "images":
-            return <MediaGrid files={filterByType("images")} />;
+            return <MediaGrid files={filteredFiles} />;
         case "documents":
-            return <DocumentsList files={filterByType("documents")} />;
+            return <DocumentsList files={filteredFiles} />;
         case "links":
-            return <LinksList files={filterByType("links")} />;
+            return <LinksList files={filteredFiles} />;
         default:
             return null;
     }

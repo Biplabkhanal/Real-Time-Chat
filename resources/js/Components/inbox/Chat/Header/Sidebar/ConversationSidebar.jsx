@@ -10,9 +10,9 @@ import ConversationContact from "./ConversationInfo/ConversationContact";
 import ConversationHeader from "./ConversationHeader";
 import SharedMediaRenderer from "../SharedMediaRenderer";
 import { fetchConversationStats } from "./sidebarApi";
-import { useSharedMedia } from "../../../hooks/useSharedMedia";
 import LoadingSpinner from "@/Components/LoadingSpinner";
 import ErrorDisplay from "../ErrorDisplay";
+import { useSharedMedia } from "@/Components/inbox/hooks/useSharedMedia";
 
 const ConversationSidebar = ({
     isOpen,
@@ -29,8 +29,7 @@ const ConversationSidebar = ({
     const [showExportModal, setShowExportModal] = useState(false);
     const exportModalRef = useRef(null);
 
-    // Use shared media hook
-    const { mediaFiles, mediaLoading, mediaError, filterByType, refetchMedia } =
+    const { mediaLoading, mediaError, filterByType, refetchMedia } =
         useSharedMedia(
             selectedUser?.id,
             ["images", "documents", "links"].includes(activeTab)
@@ -77,6 +76,15 @@ const ConversationSidebar = ({
         }
     }, [isOpen, selectedUser?.id, activeTab]);
 
+    useEffect(() => {
+        if (selectedUser?.id) {
+            setActiveTab("info");
+            setError(null);
+            setStats(null);
+            setLoading(true);
+        }
+    }, [selectedUser?.id]);
+
     const handleFetchConversationStats = async () => {
         setLoading(true);
         setError(null);
@@ -103,6 +111,7 @@ const ConversationSidebar = ({
         if (["images", "documents", "links"].includes(activeTab)) {
             return (
                 <SharedMediaRenderer
+                    key={selectedUser?.id} // Force re-render when user changes
                     activeTab={activeTab}
                     mediaLoading={mediaLoading}
                     mediaError={mediaError}
@@ -207,7 +216,7 @@ const ConversationSidebar = ({
                     activeTab === "links" ||
                     activeTab === "analytics" ||
                     activeTab === "theme") && (
-                    <div className="h-full">
+                    <div key={selectedUser?.id} className="h-full">
                         {themeLoading && activeTab === "theme" ? (
                             <LoadingSpinner size="md" text="Loading..." />
                         ) : (
