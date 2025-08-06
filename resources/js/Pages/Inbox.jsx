@@ -356,7 +356,12 @@ export default function Inbox({ auth, users, selectedUserId }) {
             if (userIndex > 0) {
                 const updatedUsers = [...prevUsers];
                 const [user] = updatedUsers.splice(userIndex, 1);
+                user.latest_message_at = new Date().toISOString();
                 return [user, ...updatedUsers];
+            } else if (userIndex === 0) {
+                const updatedUsers = [...prevUsers];
+                updatedUsers[0].latest_message_at = new Date().toISOString();
+                return updatedUsers;
             }
             return prevUsers;
         });

@@ -264,7 +264,6 @@ class MessageController extends Controller
         $media = $messages->map(function ($message) {
             $attachment = $message->attachment;
 
-            // Handle JSON string attachment data
             if (is_string($attachment)) {
                 $attachment = json_decode($attachment, true) ?? [];
             }
@@ -310,10 +309,28 @@ class MessageController extends Controller
         $users = User::whereIn('id', $userIds)->get();
 
         $currentUser = Auth::user();
-        $users->each(function ($user) use ($currentUser) {
+
+        $users->each(function ($user) use ($currentUser, $currentUserId) {
             $displayName = $currentUser->getDisplayNameForFriend($user->id);
             $user->display_name = $displayName ?: $user->name;
+
+            $latestMessage = Message::where(function ($query) use ($currentUserId, $user) {
+                $query->where('sender_id', $currentUserId)
+                    ->where('recipient_id', $user->id);
+            })
+                ->orWhere(function ($query) use ($currentUserId, $user) {
+                    $query->where('sender_id', $user->id)
+                        ->where('recipient_id', $currentUserId);
+                })
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            $user->latest_message_at = $latestMessage ? $latestMessage->created_at : null;
         });
+
+        $users = $users->sortByDesc(function ($user) {
+            return $user->latest_message_at;
+        })->values();
 
         return response()->json($users);
     }
