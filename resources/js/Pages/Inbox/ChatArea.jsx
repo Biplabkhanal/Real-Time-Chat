@@ -67,6 +67,7 @@ const ChatArea = ({
                     onlineUsers={onlineUsers}
                     typingUsers={typingUsers}
                 />
+
                 <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                     {error && error.includes("send") && (
                         <div className="mb-2 text-sm text-red-500 dark:text-red-400">
