@@ -2,6 +2,7 @@ import LoadingSpinner from "@/Components/LoadingSpinner";
 import EmptyState from "../../Shared/States/EmptyState";
 import ErrorState from "../../Shared/States/ErrorState";
 import Message from "./Message";
+import TypingIndicator from "./TypingIndicator";
 
 const ChatMessages = ({
     isLoading,
@@ -15,6 +16,7 @@ const ChatMessages = ({
     targetScrollRef,
     selectedUser,
     onlineUsers,
+    typingUsers = {},
 }) => (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100 dark:bg-gray-900">
         {isUserSelectionLoading ? (
@@ -47,6 +49,21 @@ const ChatMessages = ({
                         onlineUsers={onlineUsers}
                     />
                 ))}
+
+                {Object.keys(typingUsers).map((typingUserId) => {
+                    const typingUserIdInt = parseInt(typingUserId);
+                    const selectedUserId = selectedUser?.id;
+
+                    if (selectedUser && typingUserIdInt === selectedUserId) {
+                        return (
+                            <TypingIndicator
+                                key={typingUserId}
+                                user={selectedUser}
+                            />
+                        );
+                    }
+                    return null;
+                })}
             </>
         )}
         <span ref={targetScrollRef}></span>

@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import ChatHeader from "@/Components/inbox/Chat/Header/ChatHeader";
 import ChatMessages from "@/Components/inbox/Chat/Messages/ChatMessages";
 import AttachmentPreview from "@/Components/inbox/Chat/Input/AttachmentPreview";
@@ -30,6 +31,7 @@ const ChatArea = ({
     onlineUsers,
     handleConversationDeleted,
     isBlocked,
+    typingUsers,
 }) => (
     <div
         className={`flex flex-col ${
@@ -63,6 +65,7 @@ const ChatArea = ({
                     targetScrollRef={targetScrollRef}
                     selectedUser={selectedUser}
                     onlineUsers={onlineUsers}
+                    typingUsers={typingUsers}
                 />
                 <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                     {error && error.includes("send") && (
@@ -90,9 +93,11 @@ const ChatArea = ({
                         selectedUser={selectedUser}
                     />
                     {!isBlocked && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">
-                            Press Enter to send, Shift+Enter for new line
-                        </p>
+                        <>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">
+                                Press Enter to send, Shift+Enter for new line
+                            </p>
+                        </>
                     )}
                 </div>
             </>

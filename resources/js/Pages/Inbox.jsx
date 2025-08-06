@@ -31,6 +31,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
     const [isUserSelectionLoading, setIsUserSelectionLoading] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [typingUsers, setTypingUsers] = useState({});
 
     const targetScrollRef = useRef(null);
     const selectedUserRef = useRef(null);
@@ -66,7 +67,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
         return () => {
             delete window.scrollToBottom;
         };
-    }, []);
+    }, [selectedUser]);
 
     useEffect(() => {
         selectedUserRef.current = selectedUser;
@@ -205,6 +206,10 @@ export default function Inbox({ auth, users, selectedUserId }) {
         try {
             const channel = window.Echo.private(webSocketChannel);
 
+            channel.error((error) => {
+                console.error("WebSocket channel error:", error);
+            });
+
             channel.listen("MessageSent", (e) => {
                 const isMessageForCurrentChat =
                     selectedUserRef.current &&
@@ -298,6 +303,26 @@ export default function Inbox({ auth, users, selectedUserId }) {
                 }
             });
 
+            channel.subscription.bind("UserTyping", (data) => {
+                const senderId = data.senderId || data.sender_id;
+                const currentUserId = auth.user.id;
+
+                if (currentUserId && senderId !== currentUserId) {
+                    setTypingUsers((prev) => {
+                        const newState = { ...prev, [senderId]: true };
+                        return newState;
+                    });
+
+                    setTimeout(() => {
+                        setTypingUsers((prev) => {
+                            const updated = { ...prev };
+                            delete updated[senderId];
+                            return updated;
+                        });
+                    }, 3000);
+                }
+            });
+
             return () => {
                 channel.stopListening("MessageSent");
                 channel.stopListening("MessageDeleted");
@@ -310,6 +335,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
     const handleUserSelect = (user) => {
         if (selectedUser && selectedUser.id !== user.id) {
             setShowInfoSidebar(false);
+            setTypingUsers({});
         }
         setIsUserSelectionLoading(true);
         setCurrentMessages([]);
@@ -569,6 +595,7 @@ export default function Inbox({ auth, users, selectedUserId }) {
                         onlineUsers={onlineUsers}
                         handleConversationDeleted={handleConversationDeleted}
                         isBlocked={isBlocked}
+                        typingUsers={typingUsers}
                     />
                     {selectedUser && (
                         <ConversationSidebar

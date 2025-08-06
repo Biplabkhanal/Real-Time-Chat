@@ -12,7 +12,6 @@ const MessageInput = ({
     inputRef,
     messageInput,
     setMessageInput,
-    handleKeyDown,
     isLoading,
     attachments,
     setAttachments,
@@ -27,6 +26,67 @@ const MessageInput = ({
         isBlockedByUser: false,
     });
     const emojiContainerRef = useRef(null);
+    const typingTimeoutRef = useRef(null);
+    const isTypingRef = useRef(false);
+    const handleTyping = async () => {
+        if (!selectedUser?.id) {
+            return;
+        }
+
+        if (!isTypingRef.current) {
+            try {
+                await axios.post("/typing", {
+                    recipient_id: selectedUser.id,
+                });
+                isTypingRef.current = true;
+            } catch (error) {
+                console.error("Error sending typing indicator:", error);
+            }
+        }
+
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
+        typingTimeoutRef.current = setTimeout(() => {
+            isTypingRef.current = false;
+        }, 2000);
+    };
+
+    const handleInputChange = (value) => {
+        setMessageInput(value);
+
+        if (value.length > 0 && selectedUser?.id) {
+            const prevLength = messageInput.length;
+            if (prevLength === 0 || value.length % 5 === 0) {
+                handleTyping();
+            }
+        }
+    };
+
+    const handleSendMessage = () => {
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+        isTypingRef.current = false;
+
+        sendMessage();
+    };
+
+    const handleKeyDownWithTyping = (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -99,8 +159,8 @@ const MessageInput = ({
                 <TextArea
                     inputRef={inputRef}
                     value={messageInput}
-                    onChange={setMessageInput}
-                    onKeyDown={handleKeyDown}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDownWithTyping}
                 />
                 <div className="absolute right-3 flex space-x-1 items-center h-full">
                     <div className="relative" ref={emojiContainerRef}>
@@ -134,7 +194,7 @@ const MessageInput = ({
                 </div>
             </div>
             <SendButton
-                onClick={sendMessage}
+                onClick={handleSendMessage}
                 disabled={
                     isLoading ||
                     (messageInput.trim() === "" && attachments.length === 0)

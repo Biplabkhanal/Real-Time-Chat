@@ -16,6 +16,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Broadcast;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -96,5 +97,7 @@ Route::middleware('auth')->group(function () {
         return response()->json(['csrf_token' => csrf_token()]);
     })->name('csrf-token');
 });
+
+Broadcast::routes(['middleware' => ['web', 'auth']]);
 
 require __DIR__ . '/auth.php';
