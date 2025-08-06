@@ -51,7 +51,11 @@ const MessageOptions = ({ onDelete, onForward, isCurrentUser }) => {
                     </svg>
                 </button>
                 {showOptions && (
-                    <div className="dropdown-menu absolute right-0 bg-white dark:bg-gray-800 rounded shadow-lg z-10 border border-gray-200 dark:border-gray-700">
+                    <div
+                        className={`dropdown-menu absolute bg-white dark:bg-gray-800 rounded shadow-lg z-10 border border-gray-200 dark:border-gray-700 ${
+                            isCurrentUser ? " right-0" : "-right-18"
+                        }`}
+                    >
                         <button
                             onClick={onForward}
                             className="flex items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
