@@ -20,7 +20,9 @@ const MessageContent = ({ message }) => (
                 Forwarded
             </div>
         )}
-        <p className="break-words mr-2">{message.message}</p>
+        <p className="break-words break-all overflow-wrap-anywhere whitespace-pre-wrap max-w-full mr-2">
+            {message.message}
+        </p>
     </div>
 );
 
