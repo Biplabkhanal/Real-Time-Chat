@@ -125,7 +125,7 @@ const ForwardMessageModal = ({ message, onClose, onForward, onlineUsers }) => {
 
                 {/* Original Message Preview */}
                 <div className="mb-4 p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded text-xs sm:text-sm text-gray-500 dark:text-gray-300">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded text-xs sm:text-sm text-gray-500 dark:text-gray-300 whitespace-pre-wrap break-words">
                         {message.message}
                         {message.attachment && (
                             <div className="mt-1 text-xs text-gray-500 dark:text-gray-300">

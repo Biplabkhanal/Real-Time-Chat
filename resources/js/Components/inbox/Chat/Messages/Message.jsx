@@ -94,7 +94,10 @@ const Message = ({
                     isCurrentUser={isCurrentUser}
                 />
 
-                <MessageContent message={message} />
+                <MessageContent
+                    message={message}
+                    isCurrentUser={isCurrentUser}
+                />
 
                 {message.attachment && (
                     <MessageAttachment attachment={message.attachment} />

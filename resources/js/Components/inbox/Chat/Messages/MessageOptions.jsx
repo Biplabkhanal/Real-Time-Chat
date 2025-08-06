@@ -33,7 +33,11 @@ const MessageOptions = ({ onDelete, onForward, isCurrentUser }) => {
         <div className="absolute top-1 right-1" ref={dropdownRef}>
             <div className="dropdown inline-block relative">
                 <button
-                    className="p-1 text-blue-200 hover:text-white transition-colors"
+                    className={`p-1  transition-colors duration-200 ${
+                        isCurrentUser
+                            ? " text-gray-200 hover:text-gray-300 dark:text-gray-200 dark:hover:text-gray-300"
+                            : "text-gray-600 hover:text-gray-400 dark:text-gray-200 dark:hover:text-gray-300"
+                    }`}
                     onClick={toggleDropdown}
                 >
                     <svg

@@ -1,9 +1,15 @@
 import React from "react";
 
-const MessageContent = ({ message }) => (
+const MessageContent = ({ message, isCurrentUser }) => (
     <div>
         {message.forwarded_from && (
-            <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center mr-2">
+            <div
+                className={`text-xs  flex items-center mr-2  ${
+                    isCurrentUser
+                        ? " text-gray-200 dark:text-gray-300"
+                        : "text-gray-500 dark:text-gray-400"
+                }`}
+            >
                 <svg
                     className="w-3 h-3 mr-1"
                     fill="none"
