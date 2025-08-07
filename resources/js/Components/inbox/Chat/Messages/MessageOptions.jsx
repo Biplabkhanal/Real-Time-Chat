@@ -57,7 +57,7 @@ const MessageOptions = ({ onDelete, onForward, isCurrentUser }) => {
                 {showOptions && (
                     <div
                         className={`dropdown-menu absolute bg-white dark:bg-gray-800 rounded shadow-lg z-10 border border-gray-200 dark:border-gray-700 ${
-                            isCurrentUser ? " right-0" : "-right-18"
+                            isCurrentUser ? "right-0" : "sm:-right-18 right-2"
                         }`}
                     >
                         <button

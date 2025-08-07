@@ -5,8 +5,65 @@ import ReviewForm from "./ReviewForm";
 import ReviewDeleteModal from "./ReviewDeleteModal";
 import TrashIcon from "../Icons/TrashIcon";
 
+const StarRating = ({ rating }) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+    return (
+        <div className="flex items-center justify-center space-x-1">
+            {[...Array(fullStars)].map((_, i) => (
+                <svg
+                    key={`full-${i}`}
+                    className="w-5 h-5 text-yellow-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+            ))}
+            {hasHalfStar && (
+                <div className="relative w-5 h-5">
+                    <svg
+                        className="absolute w-5 h-5 text-gray-300"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <div className="absolute w-[50%] h-full overflow-hidden">
+                        <svg
+                            className="w-5 h-5 text-yellow-400"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                    </div>
+                </div>
+            )}
+            {[...Array(emptyStars)].map((_, i) => (
+                <svg
+                    key={`empty-${i}`}
+                    className="w-5 h-5 text-gray-300"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+            ))}
+            <span className="ml-2 text-gray-600 dark:text-gray-300 text-sm">
+                {rating.toFixed(1)}
+            </span>
+        </div>
+    );
+};
+
 export default function ReviewSection({ reviews, auth }) {
     const hasReviews = reviews?.data && reviews.data.length > 0;
+    const averageRating = hasReviews ? reviews.data[0].average_rating : 0;
+    const totalReviews = hasReviews ? reviews.data[0].total_reviews : 0;
+
     return (
         <div className="mt-24 bg-gray-50 dark:bg-gray-900 py-14 px-4 sm:px-6 lg:px-8 rounded-2xl">
             <div className="max-w-4xl mx-auto">
@@ -15,8 +72,11 @@ export default function ReviewSection({ reviews, auth }) {
                         <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
                             What Our Users Say
                         </h2>
+                        <div className="mt-4">
+                            <StarRating rating={averageRating} />
+                        </div>
                         <p className="mt-3 text-base text-gray-500 dark:text-gray-400">
-                            Read reviews from real ChatSync users
+                            Based on {totalReviews} reviews
                         </p>
                     </div>
                 ) : (

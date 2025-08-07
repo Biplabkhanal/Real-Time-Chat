@@ -12,6 +12,14 @@ const ForwardMessageModal = ({ message, onClose, onForward, onlineUsers }) => {
     const [isFetching, setIsFetching] = useState(true);
 
     useEffect(() => {
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, []);
+
+    useEffect(() => {
         const fetchFriendsAndBlocked = async () => {
             try {
                 setIsFetching(true);

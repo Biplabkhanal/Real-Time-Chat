@@ -24,6 +24,7 @@ class ReviewController extends Controller
     public function index()
     {
         $reviews = Review::with('user')
+            ->where('published', true)
             ->orderBy('created_at', 'desc')
             ->paginate(6);
 
