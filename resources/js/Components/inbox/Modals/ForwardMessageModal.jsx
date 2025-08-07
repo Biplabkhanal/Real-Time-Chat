@@ -11,6 +11,14 @@ const ForwardMessageModal = ({ message, onClose, onForward, onlineUsers }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
 
+    const parseMessage = (text) => {
+        const bracketRegex = /^(.*?)\s*\[([^\]]+)\]$/;
+        const match = text.match(bracketRegex);
+        return match ? match[1].trim() : text;
+    };
+
+    const originalMessage = parseMessage(message.message);
+
     useEffect(() => {
         document.body.style.overflow = "hidden";
 
@@ -76,11 +84,17 @@ const ForwardMessageModal = ({ message, onClose, onForward, onlineUsers }) => {
 
         setIsLoading(true);
         try {
+            let forwardMessage = originalMessage;
+
+            if (additionalMessage.trim()) {
+                forwardMessage = `${originalMessage} [${additionalMessage.trim()}]`;
+            }
+
             const response = await axios.post(
                 `/message/${message.id}/forward`,
                 {
                     recipient_ids: selectedFriends.map((friend) => friend.id),
-                    message: additionalMessage || message.message,
+                    message: forwardMessage,
                 }
             );
             onForward(response.data);
@@ -134,7 +148,7 @@ const ForwardMessageModal = ({ message, onClose, onForward, onlineUsers }) => {
                 {/* Original Message Preview */}
                 <div className="mb-4 p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded text-xs sm:text-sm text-gray-500 dark:text-gray-300 whitespace-pre-wrap break-words">
-                        {message.message}
+                        {originalMessage}
                         {message.attachment && (
                             <div className="mt-1 text-xs text-gray-500 dark:text-gray-300">
                                 📎 {message.attachment.name || "Attachment"}
