@@ -44,6 +44,16 @@ export default function ReviewForm({ auth }) {
             return;
         }
 
+        const letterCount = data.content.replace(/[^a-zA-Z]/g, "").length;
+        if (letterCount < 10) {
+            setValidationError({
+                show: true,
+                title: "Review Too Short",
+                message: "Your review must be at least 10 letters.",
+            });
+            return;
+        }
+
         post(route("reviews.store"), {
             onSuccess: () => {
                 reset();
