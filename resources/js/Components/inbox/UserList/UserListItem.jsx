@@ -56,17 +56,15 @@ const UserListItem = ({ user, selectedUser, setSelectedUser, isOnline }) => {
             <div className="ml-4 flex-1 flex justify-between items-center">
                 <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-900 dark:text-white truncate">
-                        {user.display_name || user.name}
+                        {user.display_name}{" "}
+                        {user.display_name !== user.name && (
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                                [{user.name}]
+                            </span>
+                        )}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
-                        {user.display_name &&
-                        user.display_name !== user.name ? (
-                            <span>
-                                {user.name} • {user.email}
-                            </span>
-                        ) : (
-                            <span>{user.email}</span>
-                        )}
+                        <span>{user.email}</span>
                     </div>
                 </div>
                 {user.latest_message_at && (
