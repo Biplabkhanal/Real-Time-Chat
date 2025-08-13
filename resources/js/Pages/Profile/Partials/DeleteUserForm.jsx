@@ -113,7 +113,7 @@ export default function DeleteUserForm({ className = "" }) {
                     <div className="mt-6 flex justify-end space-x-3">
                         <SecondaryButton
                             onClick={closeModal}
-                            className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 text-white"
+                            className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
                         >
                             Cancel
                         </SecondaryButton>
