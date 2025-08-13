@@ -169,22 +169,44 @@ const MessageInput = ({
                             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                         />
                         {showEmojiPicker && (
-                            <div className="absolute bottom-12 right-0 z-[999]">
-                                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl transition-colors duration-200">
-                                    <div className="emoji-picker-container [&>*]:!bg-white [&>*]:dark:!bg-gray-800">
-                                        <EmojiPicker
-                                            onEmojiClick={onEmojiClick}
-                                            disableSearchBar={true}
-                                            native
-                                            theme="auto"
-                                            width={320}
-                                            height={400}
-                                            className="!border-none"
-                                            lazyLoadEmojis={true}
-                                        />
+                            <>
+                                <style>
+                                    {`
+                                        .emoji-picker-container .epr-search-container {
+                                            background-color: #fff !important;
+                                        }
+                                        .emoji-picker-container .epr-search-container input {
+                                            background-color: #fff !important;
+                                            color: #222 !important;
+                                        }
+                                        .dark .emoji-picker-container .epr-search-container {
+                                            background-color: #1f2937 !important;
+                                        }
+                                        .dark .emoji-picker-container .epr-search-container input {
+                                            background-color: #1f2937 !important;
+                                            color: #fff !important;
+                                        }
+                                        .dark .emoji-picker-container .epr_-99lr9q {
+                                            background-color: #1f2937 !important;
+                                        }
+                                    `}
+                                </style>
+                                <div className="absolute bottom-12 right-0 z-[999]">
+                                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl transition-colors duration-200">
+                                        <div className="emoji-picker-container [&>*]:!bg-white [&>*]:dark:!bg-gray-800">
+                                            <EmojiPicker
+                                                onEmojiClick={onEmojiClick}
+                                                disableSearchBar={false}
+                                                native
+                                                width={320}
+                                                height={400}
+                                                className="!border-none"
+                                                lazyLoadEmojis={true}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </>
                         )}
                     </div>
                     <FileUploadButton
