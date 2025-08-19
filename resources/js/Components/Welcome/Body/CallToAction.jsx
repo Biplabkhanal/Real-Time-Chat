@@ -42,13 +42,22 @@ export default function CallToAction({ auth }) {
                             </Link>
                         </>
                     ) : (
-                        <Link
-                            href={route("inbox")}
-                            className="inline-flex items-center justify-center px-6 py-4 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-blue-50 shadow-md transition duration-150 ease-in-out"
-                        >
-                            <span>Go to Inbox</span>
-                            <ArrowRightIcon className="h-5 w-5 ml-2" />
-                        </Link>
+                        <>
+                            <Link
+                                href={route("inbox")}
+                                className="inline-flex items-center justify-center px-6 py-4 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-blue-50 shadow-md transition duration-150 ease-in-out"
+                            >
+                                <span>Go to Inbox</span>
+                                <ArrowRightIcon className="h-5 w-5 ml-2" />
+                            </Link>
+                            <Link
+                                href={route("inbox")}
+                                className="inline-flex items-center justify-center px-6 py-4 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-blue-50 shadow-md transition duration-150 ease-in-out"
+                            >
+                                <span>Go to Friend Lists</span>
+                                <ArrowRightIcon className="h-5 w-5 ml-2" />
+                            </Link>
+                        </>
                     )}
                 </div>
 

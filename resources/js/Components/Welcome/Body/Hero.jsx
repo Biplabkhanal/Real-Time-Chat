@@ -39,12 +39,18 @@ export default function Hero({ auth }) {
                     </>
                 )}
                 {auth.user && (
-                    <div className="inline-flex rounded-md shadow">
+                    <div className="inline-flex gap-4 rounded-md shadow">
                         <Link
                             href={route("inbox")}
                             className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                         >
                             Go to Inbox
+                        </Link>
+                        <Link
+                            href={route("friend-requests.index")}
+                            className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                        >
+                            Go to Friend Lists
                         </Link>
                     </div>
                 )}
