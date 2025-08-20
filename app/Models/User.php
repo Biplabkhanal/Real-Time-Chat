@@ -189,4 +189,15 @@ class User extends Authenticatable
 
         return $friend->pivot->nickname ?: $friend->name;
     }
+
+    /**
+     * Get mutual friends between current user and another user
+     */
+    public function getMutualFriends($otherUserId)
+    {
+        $myFriendIds = $this->friends()->pluck('users.id')->toArray();
+        $otherFriendIds = User::find($otherUserId)?->friends()->pluck('users.id')->toArray();
+        $mutualIds = array_intersect($myFriendIds, $otherFriendIds);
+        return User::whereIn('id', $mutualIds)->get(['id', 'name', 'avatar']);
+    }
 }

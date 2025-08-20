@@ -258,7 +258,6 @@ class FriendRequestController extends Controller
             });
             $query->limit(10);
         } else {
-
             $query->limit(20);
         }
 
@@ -284,6 +283,7 @@ class FriendRequestController extends Controller
                     ->first();
                 $user->received_request_id = $receivedRequest ? $receivedRequest->id : null;
             }
+            $user->mutualFriends = $currentUser->getMutualFriends($user->id);
 
             return $user;
         });

@@ -79,6 +79,28 @@ const UserCard = memo(
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                             {user.email}
                         </p>
+                        {user.mutualFriends &&
+                            user.mutualFriends.length > 0 && (
+                                <div className="mt-1 flex items-center gap-0">
+                                    {user.mutualFriends
+                                        .sort(() => Math.random() - 0.5)
+                                        .slice(0, 2)
+                                        .map((friend) => (
+                                            <UserAvatar
+                                                key={friend.id}
+                                                user={friend}
+                                                size="xs"
+                                            />
+                                        ))}
+                                    <span className="text-xs text-gray-600 dark:text-gray-300 ml-1">
+                                        {user.mutualFriends.length} mutual
+                                        friend
+                                        {user.mutualFriends.length > 1
+                                            ? "s"
+                                            : ""}
+                                    </span>
+                                </div>
+                            )}
                     </div>
                 </div>
                 <div className="flex justify-end mt-2">
