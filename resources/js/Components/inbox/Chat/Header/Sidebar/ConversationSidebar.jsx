@@ -111,7 +111,7 @@ const ConversationSidebar = ({
         if (["images", "documents", "links"].includes(activeTab)) {
             return (
                 <SharedMediaRenderer
-                    key={selectedUser?.id} // Force re-render when user changes
+                    key={selectedUser?.id}
                     activeTab={activeTab}
                     mediaLoading={mediaLoading}
                     mediaError={mediaError}
@@ -150,19 +150,41 @@ const ConversationSidebar = ({
         >
             <ConversationHeader onClose={onClose} />
 
-            <div className="border-b border-gray-200 dark:border-gray-700">
-                <TabNavigation
-                    activeTab={activeTab}
-                    setActiveTab={handleTabChange}
-                    tabs={[
-                        { id: "info", label: "Info" },
-                        { id: "images", label: "Images" },
-                        { id: "documents", label: "Documents" },
-                        { id: "links", label: "Links" },
-                        { id: "analytics", label: "Analytics" },
-                        { id: "theme", label: "Theme" },
-                    ]}
-                />
+            <div>
+                <div className="sm:hidden px-2 py-2">
+                    <select
+                        value={activeTab}
+                        onChange={(e) => handleTabChange(e.target.value)}
+                        className="block w-full rounded-md border-gray-300 dark:bg-gray-800 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
+                    >
+                        {[
+                            { id: "info", label: "Info" },
+                            { id: "images", label: "Images" },
+                            { id: "documents", label: "Documents" },
+                            { id: "links", label: "Links" },
+                            { id: "analytics", label: "Analytics" },
+                            { id: "theme", label: "Theme" },
+                        ].map((tab) => (
+                            <option key={tab.id} value={tab.id}>
+                                {tab.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="hidden sm:flex overflow-x-auto scrollbar-hide no-border">
+                    <TabNavigation
+                        activeTab={activeTab}
+                        setActiveTab={handleTabChange}
+                        tabs={[
+                            { id: "info", label: "Info" },
+                            { id: "images", label: "Images" },
+                            { id: "documents", label: "Documents" },
+                            { id: "links", label: "Links" },
+                            { id: "analytics", label: "Analytics" },
+                            { id: "theme", label: "Theme" },
+                        ]}
+                    />
+                </div>
             </div>
 
             <div className="overflow-y-auto flex-1 p-4">
