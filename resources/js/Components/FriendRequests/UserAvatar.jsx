@@ -5,6 +5,7 @@ const UserAvatar = memo(
         const sizeClasses = {
             xs: "w-3 h-3",
             sm: "w-8 h-8",
+            ssm: "w-[3.5rem] h-12",
             md: "w-12 h-12",
             lg: "w-16 h-16",
         };
