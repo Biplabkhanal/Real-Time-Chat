@@ -7,6 +7,7 @@ import {
     ChatIcon,
     ShareIcon,
 } from "../../Components/FriendRequests/icons";
+import SharePostModal from "./SharePostModal";
 
 function VerticalDotsIcon({ className }) {
     return (
@@ -26,6 +27,7 @@ function VerticalDotsIcon({ className }) {
 
 export default function FeedPost({ post, onEdit, onDelete, user }) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
     const { deletePost, loading } = useFeedPostActions();
     const menuRef = useRef(null);
 
@@ -95,11 +97,21 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
                                     </button>
                                 </>
                             )}
-                            <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                            <button
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                onClick={() => setShowShareModal(true)}
+                            >
                                 <ShareIcon className="w-5 h-5 text-gray-500" />{" "}
                                 Share
                             </button>
                         </div>
+                    )}
+                    {showShareModal && (
+                        <SharePostModal
+                            post={post}
+                            onClose={() => setShowShareModal(false)}
+                            onShare={() => setShowShareModal(false)}
+                        />
                     )}
                 </div>
             </div>

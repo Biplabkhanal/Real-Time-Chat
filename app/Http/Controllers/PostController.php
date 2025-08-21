@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -79,5 +80,20 @@ class PostController extends Controller
         }
         $post->delete();
         return response()->json(['message' => 'Post deleted']);
+    }
+
+    public function share(Request $request, $postId, $friendId)
+    {
+        $user = Auth::user();
+        $post = Post::findOrFail($postId);
+        $messageContent = "Shared a post: " . $post->content;
+        $friend = User::findOrFail($friendId);
+        $friend->messages()->create([
+            'sender_id' => $user->id,
+            'recipient_id' => $friend->id,
+            'message' => $messageContent,
+            'attachment' => $post->image_path ?? null,
+        ]);
+        return response()->json(['success' => true]);
     }
 }

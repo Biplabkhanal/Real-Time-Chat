@@ -102,6 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/feed', [PostController::class, 'store'])->name('feed.store');
     Route::put('/feed/{id}', [PostController::class, 'update'])->name('feed.update');
     Route::delete('/feed/{id}', [PostController::class, 'destroy'])->name('feed.destroy');
+    Route::post('/share-post/{postId}/to/{friendId}', [PostController::class, 'share']);
 });
 
 Broadcast::routes(['middleware' => ['web', 'auth']]);
