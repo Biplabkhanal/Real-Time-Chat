@@ -23,7 +23,7 @@ const FriendsTab = memo(
 
         return (
             <div className="space-y-6">
-                <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6">
+                <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-0 sm:p-6">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
                         Your Friends ({friends.length})
                     </h2>

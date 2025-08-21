@@ -19,7 +19,7 @@ const SearchBar = memo(({ searchQuery, onSearchChange, isSearching }) => {
     };
 
     return (
-        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-6">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-0 sm:p-6">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Search Users
             </h2>

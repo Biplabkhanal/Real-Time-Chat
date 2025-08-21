@@ -53,7 +53,7 @@ export default function UpdatePasswordForm({ className = "" }) {
 
     return (
         <section
-            className={`${className} p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg`}
+            className={`${className} p-4 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg`}
         >
             <header>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">

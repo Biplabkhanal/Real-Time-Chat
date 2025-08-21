@@ -46,7 +46,7 @@ export default function UpdateProfileInformation({
 
     return (
         <section
-            className={`${className} p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg`}
+            className={`${className} p-4 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg`}
         >
             <header className="space-y-2">
                 <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
