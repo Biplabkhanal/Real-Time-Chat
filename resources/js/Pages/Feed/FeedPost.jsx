@@ -29,6 +29,8 @@ function VerticalDotsIcon({ className }) {
 export default function FeedPost({ post, onEdit, onDelete, user }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
+    const [hasLiked, setHasLiked] = useState(false);
     const { deletePost, loading } = useFeedPostActions();
     const menuRef = useRef(null);
 
@@ -45,12 +47,41 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
         };
     }, [menuOpen]);
 
+    useEffect(() => {
+        fetch(`/post/${post.id}/like-status`)
+            .then((res) => res.json())
+            .then((data) => {
+                setLikeCount(data.count);
+                setHasLiked(data.liked);
+            });
+    }, [post.id]);
+
     const handleDelete = () => {
         if (onDelete) onDelete(post.id);
     };
     const handleEdit = () => {
         if (onEdit) onEdit({ ...post, image_path: post.image_path });
         setMenuOpen(false);
+    };
+    const handleLikeToggle = () => {
+        const url = hasLiked
+            ? `/post/${post.id}/unlike`
+            : `/post/${post.id}/like`;
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setLikeCount(data.count);
+                setHasLiked(data.liked);
+            });
     };
     return (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 mb-4 relative">
@@ -126,10 +157,23 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
                     className="rounded-lg max-h-96 w-full object-cover mb-2"
                 />
             )}
-            <div className="flex justify-between items-center mt-3 px-2">
-                <button className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-blue-500 transition-colors py-2 px-4 rounded-lg shadow-md">
+            <div className="flex justify-start items-center px-3 mb-1">
+                <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">
+                    {likeCount} {likeCount === 1 ? "Like" : "Likes"}
+                </span>
+            </div>
+            <div className="flex justify-between items-center mt-2 px-2">
+                <button
+                    className={`flex items-center gap-1 py-2 px-4 rounded-lg shadow-md transition-colors
+        ${
+            hasLiked
+                ? "text-blue-500"
+                : "text-gray-600 dark:text-gray-300 hover:text-blue-500"
+        }`}
+                    onClick={handleLikeToggle}
+                >
                     <LikeIcon className="w-5 h-5" />
-                    Like
+                    {hasLiked ? "Unlike" : "Like"}
                 </button>
                 <button className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-green-500 transition-colors py-2 px-4 rounded-lg shadow-md">
                     <ChatIcon className="w-5 h-5" />

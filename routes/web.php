@@ -7,6 +7,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NicknameController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserStatusController;
@@ -103,6 +104,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/feed/{id}', [PostController::class, 'update'])->name('feed.update');
     Route::delete('/feed/{id}', [PostController::class, 'destroy'])->name('feed.destroy');
     Route::post('/share-post/{postId}/to/{friendId}', [PostController::class, 'share']);
+
+    Route::post('/post/{postId}/like', [PostLikeController::class, 'like']);
+    Route::post('/post/{postId}/unlike', [PostLikeController::class, 'unlike']);
+    Route::get('/post/{postId}/like-status', [PostLikeController::class, 'status']);
 });
 
 Broadcast::routes(['middleware' => ['web', 'auth']]);
