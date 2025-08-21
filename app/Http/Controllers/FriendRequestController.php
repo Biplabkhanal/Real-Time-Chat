@@ -283,6 +283,7 @@ class FriendRequestController extends Controller
                     ->first();
                 $user->received_request_id = $receivedRequest ? $receivedRequest->id : null;
             }
+
             $user->mutualFriends = $currentUser->getMutualFriends($user->id);
 
             return $user;

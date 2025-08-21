@@ -6,6 +6,7 @@ use App\Http\Controllers\FriendRequestController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NicknameController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserStatusController;
@@ -96,6 +97,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/csrf-token', function () {
         return response()->json(['csrf_token' => csrf_token()]);
     })->name('csrf-token');
+
+    Route::get('/feed', [PostController::class, 'index'])->name('feed.index');
+    Route::post('/feed', [PostController::class, 'store'])->name('feed.store');
 });
 
 Broadcast::routes(['middleware' => ['web', 'auth']]);

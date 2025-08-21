@@ -71,6 +71,13 @@ export default function AuthenticatedLayout({ children }) {
                                 >
                                     Friends
                                 </NavLink>
+                                <NavLink
+                                    href={route("feed.index")}
+                                    active={route().current("feed.index")}
+                                    className="font-medium leading-5 text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white focus:outline-none focus:text-gray-900 dark:focus:text-white"
+                                >
+                                    Feed
+                                </NavLink>
                             </div>
                         </div>
 

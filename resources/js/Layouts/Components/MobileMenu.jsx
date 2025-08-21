@@ -5,6 +5,7 @@ import {
     FriendsIcon,
     ProfileIcon,
     LogoutIcon,
+    FeedIcon,
 } from "./NavIcons/MobileMenuIcons";
 
 export default function MobileMenu({
@@ -57,6 +58,15 @@ export default function MobileMenu({
                         >
                             <FriendsIcon />
                             Friends
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("feed.index")}
+                            active={route().current("feed.index")}
+                            className="flex items-center"
+                            onClick={onClose}
+                        >
+                            {FeedIcon ? <FeedIcon /> : null}
+                            Feed
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route("profile.edit")}
