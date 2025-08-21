@@ -14,4 +14,9 @@ class Post extends Model
         'content',
         'image_path',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

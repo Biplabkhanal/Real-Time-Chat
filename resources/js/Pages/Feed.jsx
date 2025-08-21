@@ -15,7 +15,7 @@ export default function Feed({ auth, csrf_token }) {
             <Head title="Feed" />
             <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
                 <div className="max-w-2xl mx-auto p-6">
-                    <FeedTab csrf_token={csrf_token} />
+                    <FeedTab csrf_token={csrf_token} user={auth.user} />
                 </div>
             </div>
         </AuthenticatedLayout>
