@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import FeedInput from "./FeedInput";
 import FeedPost from "./FeedPost";
+import { useFeedPostActions } from "./useFeedPostActions";
 
 export default function FeedTab({ csrf_token, user }) {
     const [content, setContent] = useState("");
@@ -9,6 +10,14 @@ export default function FeedTab({ csrf_token, user }) {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [posts, setPosts] = useState([]);
+    const [editMode, setEditMode] = useState(false);
+    const [editPostId, setEditPostId] = useState(null);
+
+    const {
+        editPost,
+        deletePost,
+        loading: postActionLoading,
+    } = useFeedPostActions();
 
     const fetchPosts = async () => {
         const res = await axios.get("/feed");
@@ -19,19 +28,38 @@ export default function FeedTab({ csrf_token, user }) {
         fetchPosts();
     }, []);
 
+    const handleEditPost = (post) => {
+        setContent(post.content);
+        setImage(null);
+        setEditMode(true);
+        setEditPostId(post.id);
+        setShowModal(true);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         const formData = new FormData();
         formData.append("content", content);
-        if (image) formData.append("image", image);
+        if (image instanceof File) formData.append("image", image);
         formData.append("_token", csrf_token);
-        await axios.post("/feed", formData);
+        if (editMode && editPostId) {
+            await editPost(editPostId, formData);
+            await fetchPosts();
+        } else {
+            await axios.post("/feed", formData);
+            await fetchPosts();
+        }
         setContent("");
         setImage(null);
         setLoading(false);
         setShowModal(false);
-        fetchPosts();
+        setEditMode(false);
+        setEditPostId(null);
+    };
+    const handleDeletePost = async (postId) => {
+        await deletePost(postId);
+        setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
     };
 
     useEffect(() => {
@@ -59,11 +87,17 @@ export default function FeedTab({ csrf_token, user }) {
                     handleSubmit={handleSubmit}
                     user={user}
                     csrf_token={csrf_token}
+                    editMode={editMode}
                 />
             </div>
             <div className="mt-6 space-y-6">
                 {posts.map((post) => (
-                    <FeedPost key={post.id} post={post} />
+                    <FeedPost
+                        key={post.id}
+                        post={post}
+                        onDelete={handleDeletePost}
+                        onEdit={handleEditPost}
+                    />
                 ))}
             </div>
         </>

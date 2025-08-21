@@ -1,17 +1,15 @@
 import { UserAvatar } from "../../Components/FriendRequests";
-import { useState } from "react";
 
 export default function FeedInput({
     content,
     setContent,
-    image,
     setImage,
     loading,
     showModal,
     setShowModal,
     handleSubmit,
     user,
-    csrf_token,
+    editMode = false,
 }) {
     return (
         <div className="flex items-center justify-center">
@@ -30,7 +28,7 @@ export default function FeedInput({
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 w-full max-w-md relative">
                         <div className="relative flex items-center justify-center mb-2 h-12">
                             <span className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white w-full text-center">
-                                Create a Post
+                                {editMode ? "Edit Post" : "Create a Post"}
                             </span>
                             <button
                                 className="absolute right-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-full focus:outline-none"
@@ -98,7 +96,13 @@ export default function FeedInput({
                                 className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold shadow transition duration-200 text-base sm:text-lg"
                                 disabled={loading}
                             >
-                                {loading ? "Posting..." : "Post"}
+                                {loading
+                                    ? editMode
+                                        ? "Saving..."
+                                        : "Posting..."
+                                    : editMode
+                                    ? "Save"
+                                    : "Post"}
                             </button>
                         </form>
                     </div>
