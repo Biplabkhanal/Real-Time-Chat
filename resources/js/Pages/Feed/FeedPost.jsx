@@ -6,6 +6,7 @@ import {
     CheckIcon,
     ChatIcon,
     ShareIcon,
+    LikeIcon,
 } from "../../Components/FriendRequests/icons";
 import SharePostModal from "./SharePostModal";
 
@@ -125,6 +126,23 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
                     className="rounded-lg max-h-96 w-full object-cover mb-2"
                 />
             )}
+            <div className="flex justify-between items-center mt-3 px-2">
+                <button className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-blue-500 transition-colors py-2 px-4 rounded-lg shadow-md">
+                    <LikeIcon className="w-5 h-5" />
+                    Like
+                </button>
+                <button className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-green-500 transition-colors py-2 px-4 rounded-lg shadow-md">
+                    <ChatIcon className="w-5 h-5" />
+                    Comment
+                </button>
+                <button
+                    className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors py-2 px-4 rounded-lg shadow-md"
+                    onClick={() => setShowShareModal(true)}
+                >
+                    <ShareIcon className="w-5 h-5" />
+                    Share
+                </button>
+            </div>
         </div>
     );
 }

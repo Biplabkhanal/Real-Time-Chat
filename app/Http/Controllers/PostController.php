@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Events\MessageSent;
 
 class PostController extends Controller
 {
@@ -88,12 +89,13 @@ class PostController extends Controller
         $post = Post::findOrFail($postId);
         $messageContent = "Shared a post: " . $post->content;
         $friend = User::findOrFail($friendId);
-        $friend->messages()->create([
+        $message = $friend->messages()->create([
             'sender_id' => $user->id,
             'recipient_id' => $friend->id,
             'message' => $messageContent,
             'attachment' => $post->image_path ?? null,
         ]);
+        broadcast(new MessageSent($message, $user))->toOthers();
         return response()->json(['success' => true]);
     }
 }
