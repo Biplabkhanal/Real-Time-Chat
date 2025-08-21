@@ -1,5 +1,5 @@
 import { UserAvatar } from "../../Components/FriendRequests";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFeedPostActions } from "./useFeedPostActions";
 
 function VerticalDotsIcon({ className }) {
@@ -18,9 +18,23 @@ function VerticalDotsIcon({ className }) {
     );
 }
 
-export default function FeedPost({ post, onEdit, onDelete }) {
+export default function FeedPost({ post, onEdit, onDelete, user }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const { deletePost, loading } = useFeedPostActions();
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+        if (!menuOpen) return;
+        function handleClickOutside(event) {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setMenuOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [menuOpen]);
 
     const handleDelete = () => {
         if (onDelete) onDelete(post.id);
@@ -52,19 +66,29 @@ export default function FeedPost({ post, onEdit, onDelete }) {
                         <VerticalDotsIcon className="h-6 w-6 text-gray-500" />
                     </button>
                     {menuOpen && (
-                        <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
-                            <button
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                onClick={handleEdit}
-                            >
-                                Edit
-                            </button>
-                            <button
-                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                onClick={handleDelete}
-                                disabled={loading}
-                            >
-                                {loading ? "Deleting..." : "Delete"}
+                        <div
+                            ref={menuRef}
+                            className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10"
+                        >
+                            {user && post.user?.id === user.id && (
+                                <>
+                                    <button
+                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        onClick={handleEdit}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        onClick={handleDelete}
+                                        disabled={loading}
+                                    >
+                                        {loading ? "Deleting..." : "Delete"}
+                                    </button>
+                                </>
+                            )}
+                            <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                Share
                             </button>
                         </div>
                     )}

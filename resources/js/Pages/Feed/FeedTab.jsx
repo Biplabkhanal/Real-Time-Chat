@@ -97,6 +97,7 @@ export default function FeedTab({ csrf_token, user }) {
                         post={post}
                         onDelete={handleDeletePost}
                         onEdit={handleEditPost}
+                        user={user}
                     />
                 ))}
             </div>
