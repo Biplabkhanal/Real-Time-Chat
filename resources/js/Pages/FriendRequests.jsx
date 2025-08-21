@@ -6,7 +6,6 @@ import AddFriendTab from "@/Components/FriendRequests/AddFriendTab";
 import FriendRequestsTab from "@/Components/FriendRequests/FriendRequestsTab";
 import FriendsTab from "@/Components/FriendRequests/FriendsTab";
 import { useFriendRequestsLogic } from "@/Components/FriendRequests/useFriendRequestsLogic";
-import FeedTab from "@/Components/FeedTab";
 
 export default function FriendRequests({
     auth,

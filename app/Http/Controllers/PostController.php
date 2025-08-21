@@ -9,10 +9,13 @@ use Inertia\Inertia;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $posts = Post::with('user')->latest()->get();
-        return Inertia::render('Feed', [
+        if ($request->expectsJson()) {
+            return response()->json(['posts' => $posts]);
+        }
+        return Inertia::render('Feed/Feed', [
             'posts' => $posts,
             'csrf_token' => csrf_token(),
             'auth' => [
@@ -40,5 +43,36 @@ class PostController extends Controller
         ]);
 
         return response()->json($post, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $post = Post::findOrFail($id);
+        if ($post->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        $request->validate([
+            'content' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
+        ]);
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('posts', 'public');
+            $post->image_path = $imagePath;
+        }
+        if ($request->filled('content')) {
+            $post->content = $request->content;
+        }
+        $post->save();
+        return response()->json($post);
+    }
+
+    public function destroy($id)
+    {
+        $post = Post::findOrFail($id);
+        if ($post->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        $post->delete();
+        return response()->json(['message' => 'Post deleted']);
     }
 }

@@ -1,54 +1,30 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { UserAvatar } from "./FriendRequests";
+import { UserAvatar } from "../../Components/FriendRequests";
+import { useState } from "react";
 
-export default function FeedTab({ csrf_token, user }) {
-    const [content, setContent] = useState("");
-    const [image, setImage] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const formData = new FormData();
-        formData.append("content", content);
-        if (image) formData.append("image", image);
-        formData.append("_token", csrf_token);
-        await axios.post("/feed", formData);
-        setContent("");
-        setImage(null);
-        setLoading(false);
-        setShowModal(false);
-    };
-
-    useEffect(() => {
-        if (showModal) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
-        }
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [showModal]);
-
+export default function FeedInput({
+    content,
+    setContent,
+    image,
+    setImage,
+    loading,
+    showModal,
+    setShowModal,
+    handleSubmit,
+    user,
+    csrf_token,
+}) {
     return (
-        <div className="max-w-xl w-full mx-auto bg-white dark:bg-gray-800 shadow-md rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center">
-                <UserAvatar user={user || { name: "User" }} size="ssm" />
-                <input
-                    type="text"
-                    value={content}
-                    onClick={() => setShowModal(true)}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder={`What's on your mind, ${
-                        user?.name || "User"
-                    }?`}
-                    className="w-full p-2 sm:p-3 border border-gray-300 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-base sm:text-lg bg-gray-50 dark:bg-gray-800 cursor-pointer ml-2 sm:ml-4 text-gray-900 dark:text-white"
-                    readOnly={showModal ? false : true}
-                />
-            </div>
+        <div className="flex items-center justify-center">
+            <UserAvatar user={user || { name: "User" }} size="ssm" />
+            <input
+                type="text"
+                value={content}
+                onClick={() => setShowModal(true)}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={`What's on your mind, ${user?.name || "User"}?`}
+                className="w-full p-2 sm:p-3 border border-gray-300 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-base sm:text-lg bg-gray-50 dark:bg-gray-800 cursor-pointer ml-2 sm:ml-4 text-gray-900 dark:text-white"
+                readOnly={showModal ? false : true}
+            />
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 dark:bg-gray-900 dark:bg-opacity-80 px-2 sm:px-0">
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 w-full max-w-md relative">

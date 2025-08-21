@@ -1,6 +1,6 @@
 import { Head } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import FeedTab from "@/Components/FeedTab";
+import FeedTab from "./FeedTab";
 
 export default function Feed({ auth, csrf_token }) {
     return (

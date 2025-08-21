@@ -100,6 +100,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/feed', [PostController::class, 'index'])->name('feed.index');
     Route::post('/feed', [PostController::class, 'store'])->name('feed.store');
+    Route::put('/feed/{id}', [PostController::class, 'update'])->name('feed.update');
+    Route::delete('/feed/{id}', [PostController::class, 'destroy'])->name('feed.destroy');
 });
 
 Broadcast::routes(['middleware' => ['web', 'auth']]);
