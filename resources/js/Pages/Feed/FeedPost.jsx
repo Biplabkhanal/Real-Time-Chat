@@ -26,7 +26,7 @@ export default function FeedPost({ post, onEdit, onDelete }) {
         if (onDelete) onDelete(post.id);
     };
     const handleEdit = () => {
-        if (onEdit) onEdit(post);
+        if (onEdit) onEdit({ ...post, image_path: post.image_path });
         setMenuOpen(false);
     };
     return (

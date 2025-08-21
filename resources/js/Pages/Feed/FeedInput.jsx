@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import { UserAvatar } from "../../Components/FriendRequests";
 
 export default function FeedInput({
     content,
     setContent,
+    image,
     setImage,
     loading,
     showModal,
@@ -11,6 +13,33 @@ export default function FeedInput({
     user,
     editMode = false,
 }) {
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setImage(file);
+        if (file) {
+            setPreviewUrl(URL.createObjectURL(file));
+        } else {
+            setPreviewUrl(null);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setContent("");
+        setImage(null);
+        setPreviewUrl(null);
+    };
+
+    useEffect(() => {
+        if (editMode && typeof image === "string" && image) {
+            setPreviewUrl(image);
+        } else if (!image) {
+            setPreviewUrl(null);
+        }
+    }, [editMode, image]);
+
     return (
         <div className="flex items-center justify-center">
             <UserAvatar user={user || { name: "User" }} size="ssm" />
@@ -32,7 +61,7 @@ export default function FeedInput({
                             </span>
                             <button
                                 className="absolute right-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-full focus:outline-none"
-                                onClick={() => setShowModal(false)}
+                                onClick={handleCloseModal}
                                 aria-label="Close"
                                 type="button"
                             >
@@ -85,12 +114,19 @@ export default function FeedInput({
                                 <input
                                     type="file"
                                     accept="image/*"
-                                    onChange={(e) =>
-                                        setImage(e.target.files[0])
-                                    }
+                                    onChange={handleImageChange}
                                     className="hidden"
                                 />
                             </label>
+                            {previewUrl && (
+                                <div className="flex justify-center mb-2">
+                                    <img
+                                        src={previewUrl}
+                                        alt="Preview"
+                                        className="h-[5rem] w-[5rem] object-cover border-2 border-blue-100 shadow-lg"
+                                    />
+                                </div>
+                            )}
                             <button
                                 type="submit"
                                 className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold shadow transition duration-200 text-base sm:text-lg"

@@ -30,7 +30,7 @@ export default function FeedTab({ csrf_token, user }) {
 
     const handleEditPost = (post) => {
         setContent(post.content);
-        setImage(null);
+        setImage(post.image_path ? `/storage/${post.image_path}` : null);
         setEditMode(true);
         setEditPostId(post.id);
         setShowModal(true);
