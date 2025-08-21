@@ -1,6 +1,12 @@
 import { UserAvatar } from "../../Components/FriendRequests";
 import { useEffect, useRef, useState } from "react";
 import { useFeedPostActions } from "./useFeedPostActions";
+import {
+    CancelIcon,
+    CheckIcon,
+    ChatIcon,
+    ShareIcon,
+} from "../../Components/FriendRequests/icons";
 
 function VerticalDotsIcon({ className }) {
     return (
@@ -73,21 +79,24 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
                             {user && post.user?.id === user.id && (
                                 <>
                                     <button
-                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="block w-full text-left px-4 py-2 text-sm text-green-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                                         onClick={handleEdit}
                                     >
+                                        <CheckIcon className="w-4 h-4 text-green-500" />{" "}
                                         Edit
                                     </button>
                                     <button
-                                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                                         onClick={handleDelete}
                                         disabled={loading}
                                     >
+                                        <CancelIcon className="w-4 h-4 text-red-500" />{" "}
                                         {loading ? "Deleting..." : "Delete"}
                                     </button>
                                 </>
                             )}
-                            <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                                <ShareIcon className="w-5 h-5 text-gray-500" />{" "}
                                 Share
                             </button>
                         </div>

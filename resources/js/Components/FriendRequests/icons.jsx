@@ -83,6 +83,24 @@ export const CheckIcon = memo(({ className = "" }) => (
     </svg>
 ));
 
+// share icon
+export const ShareIcon = memo(({ className = "" }) => (
+    <svg
+        className={className}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path
+            d="M15 8l5-5m0 0l-5-5m5 5H9a6 6 0 00-6 6v7"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+    </svg>
+));
+
 // Add Friend Icon
 export const AddFriendIcon = memo(({ className = "" }) => (
     <svg

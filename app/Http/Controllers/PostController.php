@@ -11,7 +11,12 @@ class PostController extends Controller
 {
     public function index(Request $request)
     {
-        $posts = Post::with('user')->latest()->get();
+        $user = Auth::user();
+        $friendIds = $user->friends()->pluck('users.id')->toArray();
+        $posts = Post::with('user')
+            ->whereIn('user_id', array_merge($friendIds, [$user->id]))
+            ->latest()
+            ->get();
         if ($request->expectsJson()) {
             return response()->json(['posts' => $posts]);
         }
@@ -19,7 +24,7 @@ class PostController extends Controller
             'posts' => $posts,
             'csrf_token' => csrf_token(),
             'auth' => [
-                'user' => Auth::user(),
+                'user' => $user,
             ],
         ]);
     }
