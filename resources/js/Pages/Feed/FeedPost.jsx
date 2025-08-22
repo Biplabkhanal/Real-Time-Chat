@@ -26,7 +26,7 @@ function VerticalDotsIcon({ className }) {
     );
 }
 
-export default function FeedPost({ post, onEdit, onDelete, user }) {
+export default function FeedPost({ post, onEdit, onDelete, user, csrf_token }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
@@ -72,10 +72,21 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
             headers: {
                 "Content-Type": "application/json",
                 "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                "X-CSRF-TOKEN":
+                    csrf_token ||
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute("content") ||
+                    "",
             },
+            body: JSON.stringify({
+                _token:
+                    csrf_token ||
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute("content") ||
+                    "",
+            }),
         })
             .then((res) => res.json())
             .then((data) => {
