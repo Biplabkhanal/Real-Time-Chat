@@ -87,8 +87,8 @@ export default function FeedTab({ csrf_token, user }) {
     }, [showModal]);
 
     return (
-        <>
-            <div className=" w-full mx-auto bg-white dark:bg-gray-800 shadow-md rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+        <div className="h-screen overflow-y-auto bg-gray-50 dark:bg-gray-900 scrollbar-hide">
+            <div className="w-full mx-auto bg-white dark:bg-gray-800 shadow-md rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
                 <FeedInput
                     content={content}
                     setContent={setContent}
@@ -115,6 +115,6 @@ export default function FeedTab({ csrf_token, user }) {
                     />
                 ))}
             </div>
-        </>
+        </div>
     );
 }
