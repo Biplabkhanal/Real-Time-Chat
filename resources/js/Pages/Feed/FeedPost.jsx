@@ -1,6 +1,7 @@
 import { UserAvatar } from "../../Components/FriendRequests";
 import { useEffect, useRef, useState } from "react";
-import { useFeedPostActions } from "./useFeedPostActions";
+import { useFeedPostActions } from "./Hooks/useFeedPostActions";
+import { useLikePost } from "./Hooks/useLikePost";
 import {
     VerticalDotsIcon,
     CancelIcon,
@@ -16,10 +17,14 @@ export default function FeedPost({ post, onEdit, onDelete, user, csrf_token }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [showCommentModal, setShowCommentModal] = useState(false);
-    const [likeCount, setLikeCount] = useState(0);
-    const [hasLiked, setHasLiked] = useState(false);
     const { deletePost, loading } = useFeedPostActions();
     const menuRef = useRef(null);
+
+    const { likeCount, hasLiked, fetchLikeStatus, toggleLike } = useLikePost();
+
+    useEffect(() => {
+        fetchLikeStatus(post.id);
+    }, [post.id, fetchLikeStatus]);
 
     useEffect(() => {
         if (!menuOpen) return;
@@ -34,15 +39,6 @@ export default function FeedPost({ post, onEdit, onDelete, user, csrf_token }) {
         };
     }, [menuOpen]);
 
-    useEffect(() => {
-        fetch(`/post/${post.id}/like-status`)
-            .then((res) => res.json())
-            .then((data) => {
-                setLikeCount(data.count);
-                setHasLiked(data.liked);
-            });
-    }, [post.id]);
-
     const handleDelete = () => {
         if (onDelete) onDelete(post.id);
     };
@@ -51,35 +47,7 @@ export default function FeedPost({ post, onEdit, onDelete, user, csrf_token }) {
         setMenuOpen(false);
     };
     const handleLikeToggle = () => {
-        const url = hasLiked
-            ? `/post/${post.id}/unlike`
-            : `/post/${post.id}/like`;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-TOKEN":
-                    csrf_token ||
-                    document
-                        .querySelector('meta[name="csrf-token"]')
-                        ?.getAttribute("content") ||
-                    "",
-            },
-            body: JSON.stringify({
-                _token:
-                    csrf_token ||
-                    document
-                        .querySelector('meta[name="csrf-token"]')
-                        ?.getAttribute("content") ||
-                    "",
-            }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setLikeCount(data.count);
-                setHasLiked(data.liked);
-            });
+        toggleLike(post.id, hasLiked);
     };
     return (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 mb-4 relative">

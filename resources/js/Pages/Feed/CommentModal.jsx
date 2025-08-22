@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { UserAvatar } from "../../Components/FriendRequests";
 import {
     VerticalDotsIcon,
@@ -8,19 +8,16 @@ import {
     LikeIcon,
     ChatIcon,
 } from "./FeedIcon";
-import { useSharePost } from "./useSharePost";
 import SharePostModal from "./SharePostModal";
+import { useLikePost } from "./Hooks/useLikePost";
 
-export default function CommentModal({ open, onClose, post }) {
-    const [menuOpen, setMenuOpen] = React.useState(false);
-    const [showShareModal, setShowShareModal] = React.useState(false);
-    const [likeCount, setLikeCount] = React.useState(
-        post.likeCount || post.likes || 0
-    );
-    const [hasLiked, setHasLiked] = React.useState(false);
-    const menuRef = React.useRef(null);
+export default function CommentModal({ open, onClose, post, user }) {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
+    const menuRef = useRef(null);
+    const { likeCount, hasLiked, fetchLikeStatus, toggleLike } = useLikePost();
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!menuOpen) return;
         function handleClickOutside(event) {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -33,41 +30,12 @@ export default function CommentModal({ open, onClose, post }) {
         };
     }, [menuOpen]);
 
-    React.useEffect(() => {
-        fetch(`/post/${post.id}/like-status`)
-            .then((res) => res.json())
-            .then((data) => {
-                setLikeCount(data.count);
-                setHasLiked(data.liked);
-            });
-    }, [post.id]);
+    useEffect(() => {
+        fetchLikeStatus(post.id);
+    }, [post.id, fetchLikeStatus]);
 
     const handleLikeToggle = () => {
-        const url = hasLiked
-            ? `/post/${post.id}/unlike`
-            : `/post/${post.id}/like`;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-TOKEN":
-                    document
-                        .querySelector('meta[name="csrf-token"]')
-                        ?.getAttribute("content") || "",
-            },
-            body: JSON.stringify({
-                _token:
-                    document
-                        .querySelector('meta[name="csrf-token"]')
-                        ?.getAttribute("content") || "",
-            }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setLikeCount(data.count);
-                setHasLiked(data.liked);
-            });
+        toggleLike(post.id, hasLiked);
     };
 
     if (!open) return null;
@@ -115,22 +83,26 @@ export default function CommentModal({ open, onClose, post }) {
                                 ref={menuRef}
                                 className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10"
                             >
-                                <button
-                                    className="block w-full text-left px-4 py-2 text-sm text-green-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-                                    onClick={() => {}}
-                                    disabled
-                                >
-                                    <CheckIcon className="w-4 h-4 text-green-500" />{" "}
-                                    Edit
-                                </button>
-                                <button
-                                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-                                    onClick={() => {}}
-                                    disabled
-                                >
-                                    <CancelIcon className="w-4 h-4 text-red-500" />{" "}
-                                    Delete
-                                </button>
+                                {user && post.user?.id === user.id && (
+                                    <>
+                                        <button
+                                            className="block w-full text-left px-4 py-2 text-sm text-green-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                            onClick={() => {}}
+                                            disabled
+                                        >
+                                            <CheckIcon className="w-4 h-4 text-green-500" />{" "}
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                            onClick={() => {}}
+                                            disabled
+                                        >
+                                            <CancelIcon className="w-4 h-4 text-red-500" />{" "}
+                                            Delete
+                                        </button>
+                                    </>
+                                )}
                                 <button
                                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                                     onClick={() => setShowShareModal(true)}
@@ -165,14 +137,7 @@ export default function CommentModal({ open, onClose, post }) {
                 <hr className="my-2 border-gray-300 dark:border-gray-700 block w-full h-[2px]" />
                 <div className="flex justify-start items-center px-3 mb-1">
                     <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">
-                        {post.likeCount !== undefined
-                            ? post.likeCount
-                            : post.likes || 0}{" "}
-                        {(post.likeCount !== undefined
-                            ? post.likeCount
-                            : post.likes || 0) === 1
-                            ? "Like"
-                            : "Likes"}
+                        {likeCount} {likeCount === 1 ? "Like" : "Likes"}
                     </span>
                 </div>
                 <hr className="my-2 border-gray-300 dark:border-gray-700 block w-full h-[2px]" />

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import FeedInput from "./FeedInput";
 import FeedPost from "./FeedPost";
-import { useFeedPostActions } from "./useFeedPostActions";
+import { useFeedPostActions } from "./Hooks/useFeedPostActions";
 
 export default function FeedTab({ csrf_token, user }) {
     const [content, setContent] = useState("");
