@@ -113,6 +113,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/comment', [CommentController::class, 'store']);
     Route::put('/comment/{id}', [CommentController::class, 'update']);
     Route::delete('/comment/{id}', [CommentController::class, 'destroy']);
+    Route::get('/post/{postId}/comments', [CommentController::class, 'getComments']);
 });
 
 Broadcast::routes(['middleware' => ['web', 'auth']]);

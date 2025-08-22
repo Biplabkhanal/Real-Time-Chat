@@ -8,7 +8,6 @@ export default function PostContentActions({
     handleLikeToggle,
     onComment,
     onShare,
-    disableComment = false,
 }) {
     return (
         <>
@@ -47,7 +46,6 @@ export default function PostContentActions({
                 <button
                     className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-green-500 transition-colors py-2 px-4 rounded-lg shadow-md w-32 justify-center "
                     onClick={onComment}
-                    disabled={disableComment}
                 >
                     <ChatIcon className="w-5 h-5" />
                     Comment

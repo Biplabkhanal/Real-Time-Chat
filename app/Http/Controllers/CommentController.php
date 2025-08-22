@@ -45,4 +45,13 @@ class CommentController extends Controller
         $comment->delete();
         return response()->json(['success' => true]);
     }
+
+    public function getComments($postId)
+    {
+        $comments = Comment::where('post_id', $postId)
+            ->with('user')
+            ->latest()
+            ->get();
+        return response()->json($comments);
+    }
 }

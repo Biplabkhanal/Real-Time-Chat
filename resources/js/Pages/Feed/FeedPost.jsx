@@ -38,7 +38,6 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
                 handleLikeToggle={handleLikeToggle}
                 onComment={() => setShowCommentModal(true)}
                 onShare={() => setShowShareModal(true)}
-                disableComment={false}
             />
             <CommentModal
                 open={showCommentModal}
