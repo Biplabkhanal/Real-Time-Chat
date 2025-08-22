@@ -3,6 +3,7 @@ import axios from "axios";
 import FeedInput from "./FeedInput";
 import FeedPost from "./FeedPost";
 import { useFeedPostActions } from "./Hooks/useFeedPostActions";
+import { toast } from "react-toastify";
 
 export default function FeedTab({ csrf_token, user }) {
     const [content, setContent] = useState("");
@@ -43,23 +44,35 @@ export default function FeedTab({ csrf_token, user }) {
         formData.append("content", content);
         if (image instanceof File) formData.append("image", image);
         formData.append("_token", csrf_token);
-        if (editMode && editPostId) {
-            await editPost(editPostId, formData);
-            await fetchPosts();
-        } else {
-            await axios.post("/feed", formData);
-            await fetchPosts();
+        try {
+            if (editMode && editPostId) {
+                await editPost(editPostId, formData);
+                await fetchPosts();
+                toast.success("Post updated successfully!");
+            } else {
+                await axios.post("/feed", formData);
+                await fetchPosts();
+                toast.success("Post uploaded successfully!");
+            }
+            setContent("");
+            setImage(null);
+            setShowModal(false);
+            setEditMode(false);
+            setEditPostId(null);
+        } catch (err) {
+            toast.error("Action failed. Please try again.");
+        } finally {
+            setLoading(false);
         }
-        setContent("");
-        setImage(null);
-        setLoading(false);
-        setShowModal(false);
-        setEditMode(false);
-        setEditPostId(null);
     };
     const handleDeletePost = async (postId) => {
-        await deletePost(postId);
-        setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
+        try {
+            await deletePost(postId);
+            setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
+            toast.success("Post deleted successfully!");
+        } catch (err) {
+            toast.error("Failed to delete post.");
+        }
     };
 
     useEffect(() => {

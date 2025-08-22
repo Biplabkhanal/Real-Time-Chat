@@ -2,10 +2,12 @@ import React, { useRef, useEffect, useState } from "react";
 import { UserAvatar } from "../../Components/FriendRequests";
 import { VerticalDotsIcon, CancelIcon, CheckIcon, ShareIcon } from "./FeedIcon";
 import SharePostModal from "./SharePostModal";
+import PostDeleteModal from "./PostDeleteModal";
 
 export default function PostHeaderMenu({ post, user, onEdit, onDelete }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const menuRef = useRef(null);
 
     useEffect(() => {
@@ -61,7 +63,7 @@ export default function PostHeaderMenu({ post, user, onEdit, onDelete }) {
                                 {onDelete && (
                                     <button
                                         className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-                                        onClick={onDelete}
+                                        onClick={() => setShowDeleteModal(true)}
                                     >
                                         <CancelIcon className="w-4 h-4 text-red-500" />{" "}
                                         Delete
@@ -83,6 +85,17 @@ export default function PostHeaderMenu({ post, user, onEdit, onDelete }) {
                         post={post}
                         onClose={() => setShowShareModal(false)}
                         onShare={() => setShowShareModal(false)}
+                    />
+                )}
+                {showDeleteModal && (
+                    <PostDeleteModal
+                        open={showDeleteModal}
+                        postId={post.id}
+                        onConfirm={(id) => {
+                            setShowDeleteModal(false);
+                            if (onDelete) onDelete(id);
+                        }}
+                        onCancel={() => setShowDeleteModal(false)}
                     />
                 )}
             </div>

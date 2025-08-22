@@ -11,6 +11,8 @@ import { useLikePost } from "./Hooks/useLikePost";
 import SharePostModal from "./SharePostModal";
 import { UserAvatar } from "@/Components/FriendRequests";
 import { useCommentApi } from "./Hooks/useCommentApi";
+import { toast } from "react-toastify";
+import CommentDeleteModal from "./CommentDeleteModal";
 
 export default function CommentModal({
     open,
@@ -29,6 +31,8 @@ export default function CommentModal({
     const [showMenuId, setShowMenuId] = useState(null);
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editingContent, setEditingContent] = useState("");
+    const [showCommentDeleteModal, setShowCommentDeleteModal] = useState(false);
+    const [commentToDelete, setCommentToDelete] = useState(null);
     const {
         addComment,
         editComment,
@@ -93,9 +97,11 @@ export default function CommentModal({
                 await editComment(editingCommentId, editingContent);
                 setEditingCommentId(null);
                 setEditingContent("");
+                toast.success("Comment edited successfully!");
             } else {
                 await addComment(post.id, comment);
                 setComment("");
+                toast.success("Comment added successfully!");
             }
             fetchComments();
         } catch (err) {
@@ -103,6 +109,11 @@ export default function CommentModal({
                 editingCommentId
                     ? "Failed to edit comment."
                     : "Failed to post comment."
+            );
+            toast.error(
+                editingCommentId
+                    ? "Failed to edit comment."
+                    : "Failed to add comment."
             );
         } finally {
             setLoading(false);
@@ -113,10 +124,14 @@ export default function CommentModal({
         try {
             await deleteComment(commentId);
             fetchComments();
+            toast.success("Comment deleted successfully!");
         } catch (err) {
             setCommentError("Failed to delete comment.");
+            toast.error("Failed to delete comment.");
         }
         setShowMenuId(null);
+        setShowCommentDeleteModal(false);
+        setCommentToDelete(null);
     };
 
     if (!open) return null;
@@ -221,11 +236,14 @@ export default function CommentModal({
                                                 </button>
                                                 <button
                                                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-                                                    onClick={() =>
-                                                        handleDeleteComment(
+                                                    onClick={() => {
+                                                        setCommentToDelete(
                                                             c.id
-                                                        )
-                                                    }
+                                                        );
+                                                        setShowCommentDeleteModal(
+                                                            true
+                                                        );
+                                                    }}
                                                 >
                                                     <CancelIcon className="w-4 h-4 text-red-500" />{" "}
                                                     Delete
@@ -282,6 +300,17 @@ export default function CommentModal({
                         )}
                     </form>
                 </div>
+                {showCommentDeleteModal && (
+                    <CommentDeleteModal
+                        open={showCommentDeleteModal}
+                        commentId={commentToDelete}
+                        onConfirm={handleDeleteComment}
+                        onCancel={() => {
+                            setShowCommentDeleteModal(false);
+                            setCommentToDelete(null);
+                        }}
+                    />
+                )}
             </div>
         </div>
     );
