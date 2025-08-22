@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
 import PostHeaderMenu from "./PostHeaderMenu";
 import PostContentActions from "./PostContentActions";
-import { CancelIcon, CommentIcon } from "./FeedIcon";
+import {
+    CancelIcon,
+    CheckIcon,
+    CommentIcon,
+    VerticalDotsIcon,
+} from "./FeedIcon";
 import { useLikePost } from "./Hooks/useLikePost";
 import SharePostModal from "./SharePostModal";
 import { UserAvatar } from "@/Components/FriendRequests";
-import axios from "axios";
+import { useCommentApi } from "./Hooks/useCommentApi";
 
 export default function CommentModal({
     open,
@@ -21,6 +26,17 @@ export default function CommentModal({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [comments, setComments] = useState([]);
+    const [showMenuId, setShowMenuId] = useState(null);
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editingContent, setEditingContent] = useState("");
+    const {
+        addComment,
+        editComment,
+        deleteComment,
+        commentLoading,
+        commentError,
+        setError: setCommentError,
+    } = useCommentApi();
 
     useEffect(() => {
         fetchLikeStatus(post.id);
@@ -62,22 +78,45 @@ export default function CommentModal({
         if (onClose) onClose();
     };
 
-    const handleCommentSubmit = async (e) => {
+    const handleEditClick = (comment) => {
+        setEditingCommentId(comment.id);
+        setEditingContent(comment.content);
+        setShowMenuId(null);
+    };
+
+    const handleCommentFormSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError("");
         try {
-            await axios.post("/comment", {
-                post_id: post.id,
-                content: comment,
-            });
-            setComment("");
+            if (editingCommentId) {
+                await editComment(editingCommentId, editingContent);
+                setEditingCommentId(null);
+                setEditingContent("");
+            } else {
+                await addComment(post.id, comment);
+                setComment("");
+            }
             fetchComments();
         } catch (err) {
-            setError("Failed to post comment.");
+            setError(
+                editingCommentId
+                    ? "Failed to edit comment."
+                    : "Failed to post comment."
+            );
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            await deleteComment(commentId);
+            fetchComments();
+        } catch (err) {
+            setCommentError("Failed to delete comment.");
+        }
+        setShowMenuId(null);
     };
 
     if (!open) return null;
@@ -145,13 +184,54 @@ export default function CommentModal({
                         comments.map((c) => (
                             <div key={c.id} className="flex items-center gap-2">
                                 <UserAvatar user={c.user} size="sm" />
-                                <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl px-3 py-2 flex flex-col">
-                                    <span className="font-semibold text-gray-800 dark:text-white text-sm">
-                                        {c.user?.name}
-                                    </span>
+                                <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl px-3 py-2 flex flex-col relative">
+                                    <div className="flex items-center">
+                                        <span className="font-semibold text-gray-800 dark:text-white text-sm">
+                                            {c.user?.name}
+                                        </span>
+                                        {user?.id === c.user?.id && (
+                                            <button
+                                                className="ml-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                                                onClick={() =>
+                                                    setShowMenuId(
+                                                        showMenuId === c.id
+                                                            ? null
+                                                            : c.id
+                                                    )
+                                                }
+                                            >
+                                                <VerticalDotsIcon className="h-4 w-4 text-gray-500" />
+                                            </button>
+                                        )}
+                                    </div>
                                     <span className="text-gray-700 dark:text-gray-300 text-sm">
                                         {c.content}
                                     </span>
+                                    {user?.id === c.user?.id &&
+                                        showMenuId === c.id && (
+                                            <div className="absolute top-7 -right-[5rem] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-md z-10 flex flex-col min-w-[100px]">
+                                                <button
+                                                    className="block w-full text-left px-4 py-2 text-sm text-green-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                    onClick={() =>
+                                                        handleEditClick(c)
+                                                    }
+                                                >
+                                                    <CheckIcon className="w-4 h-4 text-green-500" />{" "}
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                    onClick={() =>
+                                                        handleDeleteComment(
+                                                            c.id
+                                                        )
+                                                    }
+                                                >
+                                                    <CancelIcon className="w-4 h-4 text-red-500" />{" "}
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        )}
                                 </div>
                             </div>
                         ))
@@ -160,23 +240,40 @@ export default function CommentModal({
                 <div className="mt-auto">
                     <form
                         className="border-gray-200 dark:border-gray-700 p-0 flex items-center gap-2"
-                        onSubmit={handleCommentSubmit}
+                        onSubmit={handleCommentFormSubmit}
                     >
                         <UserAvatar user={user} size="sm" />
                         <textarea
                             className="flex-1 border rounded-lg p-2 dark:bg-gray-700 dark:text-white resize-none"
                             rows={1}
                             placeholder="Write a comment..."
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
+                            value={editingCommentId ? editingContent : comment}
+                            onChange={(e) => {
+                                if (editingCommentId) {
+                                    setEditingContent(e.target.value);
+                                } else {
+                                    setComment(e.target.value);
+                                }
+                            }}
                             disabled={loading}
                         />
                         <button
                             type="submit"
                             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                            disabled={loading || !comment.trim()}
+                            disabled={
+                                loading ||
+                                !(editingCommentId
+                                    ? editingContent.trim()
+                                    : comment.trim())
+                            }
                         >
-                            {loading ? "Posting..." : "Post"}
+                            {loading
+                                ? editingCommentId
+                                    ? "Saving..."
+                                    : "Posting..."
+                                : editingCommentId
+                                ? "Edit"
+                                : "Post"}
                         </button>
                         {error && (
                             <span className="text-red-500 text-sm ml-2">
