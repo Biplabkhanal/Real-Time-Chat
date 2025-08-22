@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import UserAvatar from "../../Components/FriendRequests/UserAvatar";
 import { filterBlockedUsers } from "@/utils/filterBlockedUsers";
 import { LoadingIcon } from "../../Components/FriendRequests/icons";
+import { useSharePost } from "./useSharePost";
 
 const SharePostModal = ({ post, onClose, onShare }) => {
     const [friends, setFriends] = useState([]);

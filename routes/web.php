@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BlockUserController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\FriendRequestController;
 use App\Http\Controllers\MessageController;
@@ -108,6 +109,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/post/{postId}/like', [PostLikeController::class, 'like']);
     Route::post('/post/{postId}/unlike', [PostLikeController::class, 'unlike']);
     Route::get('/post/{postId}/like-status', [PostLikeController::class, 'status']);
+
+    Route::post('/comment', [CommentController::class, 'store']);
+    Route::put('/comment/{id}', [CommentController::class, 'update']);
+    Route::delete('/comment/{id}', [CommentController::class, 'destroy']);
 });
 
 Broadcast::routes(['middleware' => ['web', 'auth']]);

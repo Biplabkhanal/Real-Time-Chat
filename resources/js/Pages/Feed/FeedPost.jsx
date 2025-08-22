@@ -2,33 +2,20 @@ import { UserAvatar } from "../../Components/FriendRequests";
 import { useEffect, useRef, useState } from "react";
 import { useFeedPostActions } from "./useFeedPostActions";
 import {
+    VerticalDotsIcon,
     CancelIcon,
     CheckIcon,
-    ChatIcon,
     ShareIcon,
     LikeIcon,
-} from "../../Components/FriendRequests/icons";
+    ChatIcon,
+} from "./FeedIcon";
 import SharePostModal from "./SharePostModal";
-
-function VerticalDotsIcon({ className }) {
-    return (
-        <svg
-            className={className || "h-6 w-6"}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <circle cx="12" cy="5" r="1.5" fill="currentColor" />
-            <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-            <circle cx="12" cy="19" r="1.5" fill="currentColor" />
-        </svg>
-    );
-}
+import CommentModal from "./CommentModal";
 
 export default function FeedPost({ post, onEdit, onDelete, user, csrf_token }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [showCommentModal, setShowCommentModal] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const { deletePost, loading } = useFeedPostActions();
@@ -191,7 +178,10 @@ export default function FeedPost({ post, onEdit, onDelete, user, csrf_token }) {
                     <LikeIcon className="w-5 h-5" />
                     {hasLiked ? "Unlike" : "Like"}
                 </button>
-                <button className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-green-500 transition-colors py-2 px-4 rounded-lg shadow-md w-32 justify-center ">
+                <button
+                    className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-green-500 transition-colors py-2 px-4 rounded-lg shadow-md w-32 justify-center "
+                    onClick={() => setShowCommentModal(true)}
+                >
                     <ChatIcon className="w-5 h-5" />
                     Comment
                 </button>
@@ -203,6 +193,11 @@ export default function FeedPost({ post, onEdit, onDelete, user, csrf_token }) {
                     Share
                 </button>
             </div>
+            <CommentModal
+                open={showCommentModal}
+                onClose={() => setShowCommentModal(false)}
+                post={post}
+            />
         </div>
     );
 }
