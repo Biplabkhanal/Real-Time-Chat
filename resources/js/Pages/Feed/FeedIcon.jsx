@@ -89,3 +89,15 @@ export const ChatIcon = memo(({ className = "" }) => (
         />
     </svg>
 ));
+
+export const CommentIcon = memo(({ className = "" }) => (
+    <svg
+        className="w-12 h-12 text-gray-400 mb-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <rect x="4" y="4" width="16" height="16" rx="2" fill="#e5e7eb" />
+        <rect x="8" y="8" width="8" height="4" rx="1" fill="#9ca3af" />
+    </svg>
+));
