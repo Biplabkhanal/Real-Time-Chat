@@ -144,17 +144,17 @@ export default function CommentModal({
 
     if (!open) return null;
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
             <div
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 mb-4 relative flex flex-col w-full max-w-2xl mx-2 sm:mx-auto h-[90vh]"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-2 sm:p-4 mb-2 sm:mb-4 relative flex flex-col w-full sm:max-w-md md:max-w-2xl mx-2 h-[95vh] sm:h-[90vh]"
                 style={{
-                    height: "90vh",
-                    maxHeight: "90vh",
+                    height: "95vh",
+                    maxHeight: "95vh",
                     overflow: "hidden",
                 }}
             >
                 <div className="flex items-center justify-between w-full mb-2 relative">
-                    <span className="font-bold text-gray-900 dark:text-white text-xl mx-auto text-center w-full">
+                    <span className="font-bold text-gray-900 dark:text-white text-lg sm:text-xl mx-auto text-center w-full">
                         {post.user?.name || "User"}'s Post
                     </span>
                     <button
@@ -271,14 +271,14 @@ export default function CommentModal({
                         ))
                     )}
                 </div>
-                <div className="mt-auto">
+                <div className="mt-auto w-full">
                     <form
-                        className="border-gray-200 dark:border-gray-700 p-0 flex items-center gap-2"
+                        className="border-gray-200 dark:border-gray-700 p-0 flex items-center gap-2 w-full"
                         onSubmit={handleCommentFormSubmit}
                     >
                         <UserAvatar user={user} size="sm" />
                         <textarea
-                            className="flex-1 border rounded-lg p-2 dark:bg-gray-700 dark:text-white resize-none"
+                            className="flex-1 border rounded-lg p-2 dark:bg-gray-700 dark:text-white resize-none text-sm sm:text-base"
                             rows={1}
                             placeholder="Write a comment..."
                             value={editingCommentId ? editingContent : comment}
@@ -293,7 +293,7 @@ export default function CommentModal({
                         />
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                            className="bg-blue-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
                             disabled={
                                 loading ||
                                 !(editingCommentId
@@ -310,7 +310,7 @@ export default function CommentModal({
                                 : "Post"}
                         </button>
                         {error && (
-                            <span className="text-red-500 text-sm ml-2">
+                            <span className="text-red-500 text-xs sm:text-sm ml-2">
                                 {error}
                             </span>
                         )}
