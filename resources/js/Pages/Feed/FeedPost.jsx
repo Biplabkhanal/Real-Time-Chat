@@ -9,6 +9,7 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
     const [showCommentModal, setShowCommentModal] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const { likeCount, hasLiked, fetchLikeStatus, toggleLike } = useLikePost();
+    const [commentCount, setCommentCount] = useState(post.comment_count ?? 0);
 
     useEffect(() => {
         fetchLikeStatus(post.id);
@@ -38,6 +39,8 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
                 handleLikeToggle={handleLikeToggle}
                 onComment={() => setShowCommentModal(true)}
                 onShare={() => setShowShareModal(true)}
+                commentCount={commentCount}
+                setCommentCount={setCommentCount}
             />
             <CommentModal
                 open={showCommentModal}
@@ -46,6 +49,8 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
                 user={user}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                commentCount={commentCount}
+                setCommentCount={setCommentCount}
             />
             {showShareModal && (
                 <SharePostModal

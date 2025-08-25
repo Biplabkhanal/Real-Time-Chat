@@ -13,6 +13,7 @@ import { UserAvatar } from "@/Components/FriendRequests";
 import { useCommentApi } from "./Hooks/useCommentApi";
 import { toast } from "react-toastify";
 import CommentDeleteModal from "./CommentDeleteModal";
+import LoadingSpinner from "@/Components/LoadingSpinner";
 
 export default function CommentModal({
     open,
@@ -21,6 +22,8 @@ export default function CommentModal({
     onDelete,
     post,
     user,
+    commentCount,
+    setCommentCount,
 }) {
     const [showShareModal, setShowShareModal] = useState(false);
     const { likeCount, hasLiked, fetchLikeStatus, toggleLike } = useLikePost();
@@ -33,6 +36,7 @@ export default function CommentModal({
     const [editingContent, setEditingContent] = useState("");
     const [showCommentDeleteModal, setShowCommentDeleteModal] = useState(false);
     const [commentToDelete, setCommentToDelete] = useState(null);
+    const [commentsLoading, setCommentsLoading] = useState(false);
     const {
         addComment,
         editComment,
@@ -47,14 +51,18 @@ export default function CommentModal({
     }, [post.id, fetchLikeStatus]);
 
     const fetchComments = () => {
+        setCommentsLoading(true);
         axios
             .get(`/post/${post.id}/comments`)
             .then((res) => {
                 setComments(res.data);
+                setCommentCount(res.data.length);
             })
             .catch(() => {
                 setComments([]);
-            });
+                setCommentCount(0);
+            })
+            .finally(() => setCommentsLoading(false));
     };
 
     useEffect(() => {
@@ -171,6 +179,7 @@ export default function CommentModal({
                     handleLikeToggle={handleLikeToggle}
                     onComment={() => {}}
                     onShare={() => setShowShareModal(true)}
+                    commentCount={commentCount}
                     disableComment={true}
                 />
                 {showShareModal && (
@@ -185,7 +194,14 @@ export default function CommentModal({
                     className="flex-1 flex flex-col gap-4 overflow-y-auto"
                     style={{ marginTop: "inherit", marginBottom: "inherit" }}
                 >
-                    {comments.length === 0 ? (
+                    {commentsLoading ? (
+                        <div className="flex items-center justify-center py-8">
+                            <LoadingSpinner
+                                size="md"
+                                text="Loading comments..."
+                            />
+                        </div>
+                    ) : comments.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8">
                             <CommentIcon />
                             <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
