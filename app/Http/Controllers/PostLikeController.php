@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\PostLike;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -16,6 +17,18 @@ class PostLikeController extends Controller
             'post_id' => $postId,
             'user_id' => $userId,
         ]);
+
+        $post = Post::findOrFail($postId);
+        if ($post->user_id !== $userId) {
+            Notification::create([
+                'user_id' => $post->user_id,
+                'sender_id' => $userId,
+                'type' => 'post_liked',
+                'content' => 'liked your post',
+                'reference_id' => $postId,
+            ]);
+        }
+
         return response()->json(['liked' => true, 'count' => PostLike::where('post_id', $postId)->count()]);
     }
 
