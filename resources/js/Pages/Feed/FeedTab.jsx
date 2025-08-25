@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import FeedInput from "./FeedInput";
 import FeedPost from "./FeedPost";
@@ -86,8 +86,19 @@ export default function FeedTab({ csrf_token, user }) {
         };
     }, [showModal]);
 
+    const lastPostRef = useRef(null);
+
+    useEffect(() => {
+        if (posts.length > 0 && lastPostRef.current) {
+            lastPostRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "end",
+            });
+        }
+    }, [posts]);
+
     return (
-        <div className="h-screen overflow-y-auto bg-gray-50 dark:bg-gray-900 scrollbar-hide">
+        <div className="h-screen overflow-y-auto bg-gray-50 dark:bg-gray-900 scrollbar-hide pb-32">
             <div className="w-full mx-auto bg-white dark:bg-gray-800 shadow-md rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
                 <FeedInput
                     content={content}
@@ -104,7 +115,7 @@ export default function FeedTab({ csrf_token, user }) {
                 />
             </div>
             <div className="mt-6 space-y-6">
-                {posts.map((post) => (
+                {posts.map((post, idx) => (
                     <FeedPost
                         key={post.id}
                         post={post}
@@ -112,6 +123,7 @@ export default function FeedTab({ csrf_token, user }) {
                         onEdit={handleEditPost}
                         user={user}
                         csrf_token={csrf_token}
+                        ref={idx === posts.length - 1 ? lastPostRef : null}
                     />
                 ))}
             </div>
