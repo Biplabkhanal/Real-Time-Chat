@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import PostHeaderMenu from "./PostHeaderMenu";
 import PostContentActions from "./PostContentActions";
 import { useLikePost } from "./Hooks/useLikePost";
@@ -14,6 +15,18 @@ export default function FeedPost({ post, onEdit, onDelete, user }) {
     useEffect(() => {
         fetchLikeStatus(post.id);
     }, [post.id, fetchLikeStatus]);
+
+    useEffect(() => {
+        const fetchCommentCount = async () => {
+            try {
+                const res = await axios.get(`/post/${post.id}/comments`);
+                setCommentCount(res.data.length);
+            } catch {
+                setCommentCount(0);
+            }
+        };
+        fetchCommentCount();
+    }, [post.id]);
 
     const handleDelete = () => {
         if (onDelete) onDelete(post.id);
