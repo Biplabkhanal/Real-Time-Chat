@@ -49,7 +49,9 @@ const SharePostModal = ({ post, onClose, onShare }) => {
                 {isFetching ? (
                     <div className="text-center py-6 flex flex-col items-center justify-center">
                         <LoadingIcon size="lg" className="mb-2 text-gray-400" />
-                        <span>Loading friends...</span>
+                        <span className="text-gray-700 dark:text-gray-300">
+                            Loading friends...
+                        </span>
                     </div>
                 ) : friends.length === 0 ? (
                     <div className="text-center py-6 text-gray-500">
